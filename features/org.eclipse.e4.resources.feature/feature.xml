@@ -17,6 +17,7 @@
    </license>
 
    <requires>
+      <import feature="org.eclipse.platform" version="3.5.0.v20081007-9K9PFB8EmejKTyIuqEtaD9W0A_HKt--eWz-EeS" match="compatible"/>
       <import feature="org.eclipse.rcp" version="3.5.0.v20080911-9B9sEvNElF3-JMUxCcQIdwr" match="compatible"/>
       <import plugin="org.eclipse.equinox.preferences" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.equinox.registry" version="3.2.0" match="compatible"/>
@@ -47,14 +48,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.core.resources.compatibility"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
 </feature>
