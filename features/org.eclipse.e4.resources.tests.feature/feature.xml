@@ -17,6 +17,10 @@
       %license
    </license>
 
+   <requires>
+      <import feature="org.eclipse.e4.resources.feature" version="0.9.0" match="compatible"/>
+   </requires>
+
    <plugin
          id="org.eclipse.core.tests.resources"
          download-size="0"
