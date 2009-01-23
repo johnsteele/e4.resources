@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.resources.feature"
       label="%featureName"
-      version="3.105.0.qualifier"
+      version="0.9.0.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg">
 
@@ -25,16 +25,5 @@
    <includes
          id="org.eclipse.e4.resources.platform.patch"
          version="0.0.0"/>
-
-   <!--
-   this didn't work out so well
-   <includes
-         id="org.eclipse.e4.resources.rcp.patch.source"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.e4.resources.platform.patch.source"
-         version="0.0.0"/> -->
-
 
 </feature>
