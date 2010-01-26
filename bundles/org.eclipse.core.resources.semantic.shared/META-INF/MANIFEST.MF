@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.core.resources.semantic.shared;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: org.eclipse.core.internal.resources.semantic.SemanticResourcesSharedPlugin
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"
+Eclipse-ExtensibleAPI: true
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.core.internal.resources.semantic;x-internal:=true,
+ org.eclipse.core.internal.resources.semantic.util;x-friends:="org.eclipse.core.resources.semantic,org.eclipse.core.resources.semantic.spi,org.eclipse.core.resources.semantic.test,org.eclipse.core.resources.semantic.ui",
+ org.eclipse.core.resources.semantic
+Bundle-Localization: plugin
