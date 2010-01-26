@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.core.resources.semantic.shared</name>
+	<name>org.eclipse.core.resources.semantic.api</name>
 	<comment></comment>
 	<projects>
 	</projects>

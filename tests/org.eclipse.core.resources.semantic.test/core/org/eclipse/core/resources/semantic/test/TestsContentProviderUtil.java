@@ -1,0 +1,254 @@
+/*******************************************************************************
+ * Copyright (c) 2009 SAP AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Eduard Bartsch (SAP AG) - initial API and implementation
+ *    Mathias Kinzler (SAP AG) - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.core.resources.semantic.test;
+
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.Assert;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.semantic.ISemanticFileSystem;
+import org.eclipse.core.resources.semantic.ISemanticProject;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
+import org.eclipse.core.resources.semantic.spi.Util;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.team.core.RepositoryProvider;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+
+/**
+ * Some basic functionality for (almost) all SFS tests
+ * <p>
+ * Initializes the trace
+ * 
+ */
+public abstract class TestsContentProviderUtil {
+
+	static final QualifiedName TEMPLATE_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Hello");
+	static final QualifiedName DUMMY_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy1");
+	static final QualifiedName DUMMY_PROP2 = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy2");
+
+	final String projectName;
+	final String providerName;
+	protected IProject testProject;
+	final int options;
+	final boolean autoRefresh;
+
+	/**
+	 * The constructor
+	 * 
+	 * @param withAutoRefresh
+	 *            if auto refresh should be used
+	 * @param projectName
+	 *            the project name
+	 * @param providerName
+	 *            the id of the content provider
+	 */
+	public TestsContentProviderUtil(boolean withAutoRefresh, String projectName, String providerName) {
+		this.projectName = projectName;
+		this.providerName = providerName;
+		if (withAutoRefresh) {
+			this.options = ISemanticFileSystem.NONE;
+			this.autoRefresh = true;
+		} else {
+			this.options = ISemanticFileSystem.SUPPRESS_REFRESH;
+			this.autoRefresh = false;
+		}
+	}
+
+	/**
+	 * Initializes the trace locations
+	 * 
+	 * @throws Exception
+	 */
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		initTrace();
+	}
+
+	/**
+	 * Initializes all traces except the verbose ones to be active
+	 */
+	public static void initTrace() {
+		// activate all non-verbose traces to see if tracing itself causes problems
+		for (TraceLocation location : TraceLocation.values()) {
+			if (location != TraceLocation.CORE_VERBOSE) {
+				location.setActive(true);
+			}
+		}
+	}
+	/**
+	 * Resets the trace locations
+	 * 
+	 * @throws Exception
+	 */
+	public static void afterClass() throws Exception {
+		// reset traces
+		TraceLocation.init();
+	}
+
+	/**
+	 * Creates a test project and initializes the remote repository
+	 * 
+	 * @throws Exception
+	 */
+	@Before
+	public void beforeMethod() throws Exception {
+
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IProject project = workspace.getRoot().getProject(this.projectName);
+
+		if (project.exists()) {
+			throw new IllegalStateException("Project exists");
+		}
+
+		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				IProjectDescription description = workspace.newProjectDescription(TestsContentProviderUtil.this.projectName);
+
+				try {
+					description.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestsContentProviderUtil.this.projectName));
+				} catch (URISyntaxException e) {
+					// really not likely, though
+					throw new RuntimeException(e);
+				}
+				project.create(description, monitor);
+				project.open(monitor);
+
+				RemoteStoreTransient store = (RemoteStoreTransient) project.getAdapter(RemoteStoreTransient.class);
+				RemoteFolder f1 = store.getRootFolder().addFolder("Folder1");
+				f1.addFolder("Folder11");
+				try {
+					f1.addFile("File1", "Hello World".getBytes("UTF-8"), System.currentTimeMillis());
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+
+				// for SFS, we map this to the team provider
+				RepositoryProvider.map(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+
+				ISemanticProject spr = (ISemanticProject) project.getAdapter(ISemanticProject.class);
+
+				Map<QualifiedName, String> properties = new HashMap<QualifiedName, String>();
+				properties.put(TEMPLATE_PROP, "World");
+
+				spr.addFolder("root", TestsContentProviderUtil.this.providerName, properties,
+						TestsContentProviderUtil.this.options, monitor);
+
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+			}
+
+		};
+
+		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+
+		this.testProject = project;
+
+		String projectName = this.testProject.getName();
+		String[] roots = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
+		for (String root : roots) {
+			if (root.equals(projectName)) {
+				return;
+			}
+		}
+		Assert.fail("Project should be in the list of root names");
+
+	}
+
+	/**
+	 * Deletes the test project and resets the remote repository
+	 * 
+	 * @throws Exception
+	 */
+	@After
+	public void afterMethod() throws Exception {
+
+		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject.getAdapter(RemoteStoreTransient.class);
+		store.reset();
+
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IProject project = workspace.getRoot().getProject(this.projectName);
+
+		this.testProject = null;
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				project.delete(true, monitor);
+
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+	}
+
+
+	protected void assertContentsEqual(IFile file, String test) {
+		InputStream is = null;
+		try {
+			is = file.getContents();
+			int size = is.available();
+			byte[] buffer = new byte[size];
+			is.read(buffer);
+			Assert.assertEquals("Wrong content", test, new String(buffer, "UTF-8"));
+
+		} catch (Exception e) {
+			// $JL-EXC$
+			Assert.fail("Exception getting file content: " + e.getMessage());
+		} finally {
+			Util.safeClose(is);
+		}
+	}
+
+	protected void assertContentsNotEqual(IFile file, String test) {
+		InputStream is = null;
+		try {
+			is = file.getContents();
+			int size = is.available();
+			byte[] buffer = new byte[size];
+			is.read(buffer);
+			if (new String(buffer, "UTF-8").equals(test)) {
+				Assert.fail("Contents should differ");
+			}
+
+		} catch (Exception e) {
+			// $JL-EXC$
+			Assert.fail("Exception getting file content: " + e.getMessage());
+		} finally {
+			Util.safeClose(is);
+		}
+	}
+
+
+}

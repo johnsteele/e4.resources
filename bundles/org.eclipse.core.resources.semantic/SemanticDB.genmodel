@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText=""
+    modelDirectory="/til.sfs__org.eclipse.core.resources.semantic_aie_dev/api" modelPluginID="org.eclipse.core.resources.semantic"
+    modelName="SemanticDB" nonNLSMarkers="true" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false" language="" classNamePattern="">
+  <foreignModel>SemanticDB.ecore</foreignModel>
+  <genPackages prefix="SemanticResourceDB" basePackage="org.eclipse.core.internal.resources.semantic.model"
+      disposableProviderFactory="true" fileExtensions="" ecorePackage="SemanticDB.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="SemanticDB.ecore#//TreeNodeType">
+      <genEnumLiterals ecoreEnumLiteral="SemanticDB.ecore#//TreeNodeType/FOLDER"/>
+      <genEnumLiterals ecoreEnumLiteral="SemanticDB.ecore#//TreeNodeType/FILE"/>
+      <genEnumLiterals ecoreEnumLiteral="SemanticDB.ecore#//TreeNodeType/PROJECT"/>
+      <genEnumLiterals ecoreEnumLiteral="SemanticDB.ecore#//TreeNodeType/UNKNOWN"/>
+    </genEnums>
+    <genDataTypes ecoreDataType="SemanticDB.ecore#//PersistentProperties"/>
+    <genDataTypes ecoreDataType="SemanticDB.ecore#//SessionProperties"/>
+    <genClasses ecoreClass="SemanticDB.ecore#//ResourceTreeNode">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SemanticDB.ecore#//ResourceTreeNode/children"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SemanticDB.ecore#//ResourceTreeNode/parent"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/exists"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/templateID"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/persistentProperties"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/localOnly"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/sessionProperties"/>
+    </genClasses>
+    <genClasses ecoreClass="SemanticDB.ecore#//SemanticDB">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SemanticDB.ecore#//SemanticDB/roots"/>
+    </genClasses>
+    <genClasses ecoreClass="SemanticDB.ecore#//TreeRoot">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SemanticDB.ecore#//TreeRoot/parentDB"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//TreeRoot/rootURI"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
