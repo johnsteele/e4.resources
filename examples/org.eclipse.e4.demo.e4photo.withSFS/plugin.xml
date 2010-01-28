@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.e4.ui.workbench.swt.E4Application"
+            name="e4 photo demo with SFS support">
+         <property
+               name="appName"
+               value="e4 photo demo with SFS">
+         </property>
+         <property
+               name="applicationXMI"
+               value="org.eclipse.e4.demo.e4photo/Application.e4xmi">
+         </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/org.eclipse.e4.demo.e4photo/css/e4photo.css">
+         </property>
+         <property
+               name="applicationCSSResources"
+               value="platform:/plugin/org.eclipse.e4.demo.e4photo/images/">
+         </property>
+      </product>
+   </extension>
+
+   <extension
+         id="PhotoDemoWithSFS"
+         name="Photo Demo with SFS"
+         point="org.eclipse.e4.workbench.model">
+      <snippet
+            uri="xmi/components.e4xmi">
+      </snippet>
+   </extension>
+</plugin>

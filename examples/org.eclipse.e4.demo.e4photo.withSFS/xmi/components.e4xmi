@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ASCII"?>
+<application:ModelComponents xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2008/UIModel" xsi:schemaLocation="http://www.eclipse.org/ui/2008/UIModel ../../org.eclipse.e4.ui.model.workbench/model/UIElements.ecore" xmi:id="1">
+  <components xmi:id="2" id="2" parentID="_AXU5YO8IEd6FC9cDb6iV7g">
+    <children xsi:type="application:HandledMenuItem" xmi:id="3" id="3" label="Create Album on Semantic File System" command="org.eclipse.e4.demo.e4photo.command.withsfs.createAlbum"/>
+  </components>
+  <components xmi:id="3" id="3" parentID="_AXeqVO8IEd6FC9cDb6iV7g">
+    <children xsi:type="application:HandledMenuItem" xmi:id="4" id="4" label="Add Image from File" command="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromFile"/>
+    <children xsi:type="application:HandledMenuItem" xmi:id="5" id="5" label="Add Image from Internet" command="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromInternet"/>
+    <children xsi:type="application:HandledMenuItem" xmi:id="5_" id="5_" label="Set Proxies" command="org.eclipse.e4.demo.e4photo.command.withsfs.setProxies"/>
+  </components>
+  <components xmi:id="10" id="10" parentID="_AXU5X-8IEd6FC9cDb6iV7g">
+    <children xsi:type="application:MenuItem" xmi:id="11" id="11" label="Refresh" >
+      <children xsi:type="application:HandledMenuItem" xmi:id="12" id="12" label="Refresh Album" command="org.eclipse.e4.demo.e4photo.command.withsfs.refreshAlbum"/>
+    </children>
+  </components>
+  <components xmi:id="6" id="6" parentID="_AXU5UO8IEd6FC9cDb6iV7g">
+    <commands xmi:id="org.eclipse.e4.demo.e4photo.command.withsfs.createAlbum" id="org.eclipse.e4.demo.e4photo.command.withsfs.createAlbum" commandName="Create Album Snippet"/>
+    <commands xmi:id="org.eclipse.e4.demo.e4photo.command.withsfs.refreshAlbum" id="org.eclipse.e4.demo.e4photo.command.withsfs.refreshAlbum" commandName="Refresh Album Snippet"/>
+    <commands xmi:id="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromFile" id="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromFile" commandName="Add Image from File Snippet"/>
+    <commands xmi:id="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromInternet" id="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromInternet" commandName="Add Image from Internet Snippet"/>
+    <commands xmi:id="org.eclipse.e4.demo.e4photo.command.withsfs.setProxies" id="org.eclipse.e4.demo.e4photo.command.withsfs.setProxies" commandName="Set Proxies Snippet"/>
+    <handlers xmi:id="7" id="7" URI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.NewProjectHandler" command="org.eclipse.e4.demo.e4photo.command.withsfs.createAlbum"/>
+    <handlers xmi:id="8" id="8" URI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.AddImageFromFileDialogHandler" command="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromFile"/>
+    <handlers xmi:id="9" id="9" URI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.AddImageFromInternetDialogHandler" command="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromInternet"/>
+    <handlers xmi:id="9_" id="9_" URI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.RefreshAlbumHandler" command="org.eclipse.e4.demo.e4photo.command.withsfs.refreshAlbum"/>
+    <handlers xmi:id="9_1" id="9_1" URI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.SetProxiesDialogHandler" command="org.eclipse.e4.demo.e4photo.command.withsfs.setProxies"/>
+  </components>
+</application:ModelComponents>
