@@ -11,11 +11,16 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.cacheservice;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.core.internal.resources.semantic.spi.SfsSpiTraceLocation;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +38,7 @@ public class CacheService implements ICacheService {
 	private final Lock readLock = this.rwl.readLock();
 	private final Lock writeLock = this.rwl.writeLock();
 	private IContentHandleFactory handleFactory;
+	private static final DateFormat DFFORTRACE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss::SSS"); //$NON-NLS-1$
 
 	/**
 	 * @param handleFactory
@@ -61,6 +67,11 @@ public class CacheService implements ICacheService {
 
 		boolean append = (options & ISemanticFileSystem.CONTENT_APPEND) > 0;
 
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+					new Object[] { path.toString(), new Boolean(append) });
+		}
+
 		ITemporaryContentHandle tempHandle;
 
 		try {
@@ -85,6 +96,11 @@ public class CacheService implements ICacheService {
 
 		boolean append = (options & ISemanticFileSystem.CONTENT_APPEND) > 0;
 
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+					new Object[] { path.toString(), DFFORTRACE.format(new Date(timestamp)), new Boolean(append) });
+		}
+
 		ITemporaryContentHandle tempHandle;
 
 		try {
@@ -105,24 +121,58 @@ public class CacheService implements ICacheService {
 	}
 
 	public InputStream getContent(IPath path) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
+		InputStream result;
+
 		try {
 			lockForRead();
 
 			ICachedContentHandle cacheFile = createCacheContentHandle(path);
 			if (cacheFile.exists()) {
-				return cacheFile.openInputStream();
+				result = cacheFile.openInputStream();
+			} else {
+				return null;
 			}
-			return null;
+			if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+				if (result == null) {
+					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(), null);
+				} else {
+					int available;
+					try {
+						available = result.available();
+					} catch (IOException e) {
+						// $JL-EXC$
+						available = -1;
+					}
+					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+							"InputStream[" + available + "]");
+				}
+
+			}
+			return result;
 		} finally {
 			unlockForRead();
 		}
 	}
 
 	public boolean hasContent(IPath path) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
 		try {
 			lockForRead();
 
 			ICachedContentHandle cacheFile = createCacheContentHandle(path);
+
+			if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+				SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(), new Boolean(cacheFile.exists()));
+			}
 
 			return cacheFile.exists();
 		} finally {
@@ -131,22 +181,45 @@ public class CacheService implements ICacheService {
 	}
 
 	public long getContentTimestamp(IPath path) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
 		try {
 			lockForRead();
 
 			ICachedContentHandle cacheFile = createCacheContentHandle(path);
 
+			long result;
 			if (cacheFile.exists()) {
-				return cacheFile.lastModified();
+				result = cacheFile.lastModified();
+			} else {
+				result = -1;
 			}
 
-			return -1;
+			if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+				if (result >= 0) {
+					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+							DFFORTRACE.format(new Date(result)));
+				} else {
+					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(), new Long(result));
+				}
+			}
+
+			return result;
 		} finally {
 			unlockForRead();
 		}
 	}
 
 	public void setContentTimestamp(IPath path, long timestamp) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+					new Object[] { path.toString(), DFFORTRACE.format(new Date(timestamp)) });
+		}
+
 		try {
 			lockForWrite();
 
@@ -162,6 +235,11 @@ public class CacheService implements ICacheService {
 	}
 
 	public void removeContent(IPath path, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
 		try {
 			lockForWrite();
 

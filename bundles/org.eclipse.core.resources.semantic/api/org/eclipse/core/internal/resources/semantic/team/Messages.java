@@ -16,19 +16,11 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.team.messages"; //$NON-NLS-1$
 	public static String DelegatingResourceRuleFactory_NoExistingParentFound_XMSG;
+	public static String DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG;
 	public static String MoveDeleteHook_MoveRenameNotSupported_XMSG;
-	public static String RepositoryConfigurationWizard_SFSError_XGRP;
-	public static String RepositoryConfigurationWizard_SFSNotInitialized_XMSG;
 	public static String SemanticFileModificationValidator_CanNotAdaptFile_XMSG;
 	public static String SemanticFileModificationValidator_ValidateEdit_XGRP;
-	public static String SemanticHistoryPage_Comment_XCOL;
-	public static String SemanticHistoryPage_Compare_XMIT;
-	public static String SemanticHistoryPage_Revision_XCOL;
-	public static String SemanticHistoryPage_SelectCommonAncestor_XGRP;
-	public static String SemanticHistoryPage_SemHistPage_XGRP;
-	public static String SemanticHistoryPage_ThreeWayCompare_XMIT;
-	public static String SemanticHistoryPage_Timestamp_XCOL;
-	public static String SemanticHistoryPage_User_XCOL;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

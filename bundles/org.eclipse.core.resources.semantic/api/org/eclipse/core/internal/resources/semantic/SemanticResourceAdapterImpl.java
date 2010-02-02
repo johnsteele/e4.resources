@@ -16,8 +16,6 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
@@ -44,8 +42,6 @@ import org.eclipse.team.core.RepositoryProvider;
  */
 public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
-	protected final ISemanticFileSystemTrace myTrace;
-
 	/**
 	 * Used for rule checking
 	 * 
@@ -56,9 +52,8 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 	private final IResource resource;
 
-	SemanticResourceAdapterImpl(IResource resource, ISemanticFileSystem fileSystem) {
+	SemanticResourceAdapterImpl(IResource resource, @SuppressWarnings("unused") ISemanticFileSystem fileSystem) {
 		this.resource = resource;
-		this.myTrace = fileSystem.getTrace();
 	}
 
 	public IResource getAdaptedResource() {
@@ -72,6 +67,7 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	 *             if store can not be determined
 	 */
 	protected ISemanticFileStoreInternal getOwnStore() throws CoreException {
+		// TODO trace
 		URI uri = this.resource.getLocationURI();
 
 		try {
@@ -110,9 +106,10 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 			} else {
 				// TODO 0.1: we need to investigate again what to do when rule
 				// is null
-				this.myTrace.trace(TraceLocation.CORE, new SemanticResourceException(
-						SemanticResourceStatusCode.CALLED_OUTSIDE_OF_SCHEDULING_RULE, this.resource.getFullPath(),
-						Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG));
+				if (SfsTraceLocation.CORE.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG);
+					SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE.getLocation());
+				}
 
 			}
 			return checkRule;
@@ -171,6 +168,9 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 		if ((options & ISemanticFileSystem.SUPPRESS_REFRESH) == 0) {
 
 			if (rule instanceof IResource) {
+				if (SfsTraceLocation.CORE.isActive()) {
+					SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE.getLocation());
+				}
 				((IResource) rule).refreshLocal(IResource.DEPTH_INFINITE, monitor);
 				return;
 			}
@@ -210,7 +210,9 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 			return store.validateRemoteDelete(shell);
 		} catch (CoreException e) {
-			this.myTrace.trace(TraceLocation.CORE, e);
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
+			}
 			return e.getStatus();
 		}
 	}
@@ -221,7 +223,9 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 			return store.validateRemove(options, monitor);
 		} catch (CoreException e) {
-			this.myTrace.trace(TraceLocation.CORE, e);
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
+			}
 			return e.getStatus();
 		}
 	}

@@ -9,12 +9,12 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.sync;
+package org.eclipse.core.internal.resources.semantic.ui.sync;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.sync.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.ui.sync.messages"; //$NON-NLS-1$
 	public static String ConfigurationPage_NotInitialized_XMSG;
 	public static String ConfigurationPage_PageTitle_XGRP;
 	public static String ConfigurationPage_ThreeWay_XRBL;

@@ -21,12 +21,13 @@ import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.provider.FileHistory;
 import org.eclipse.team.core.history.provider.FileHistoryProvider;
-import org.eclipse.team.ui.history.IHistoryPageSource;
 
 /**
  * History Provider for Semantic Files
@@ -127,8 +128,21 @@ public class SemanticFileHistoryProvider extends FileHistoryProvider implements 
 
 	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
-		if (adapter.equals(IHistoryPageSource.class)) {
-			return new SemanticHistoryPageSource();
+		if (adapter.getName().equals("org.eclipse.team.ui.history.IHistoryPageSource")) { //$NON-NLS-1$
+
+			IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
+					"org.eclipse.core.resources.semantic.shared.historyPageSource"); //$NON-NLS-1$
+			if (elements != null && elements.length > 0) {
+				IConfigurationElement element = elements[0];
+				try {
+					Object extension = element.createExecutableExtension("class"); //$NON-NLS-1$
+					return extension;
+				} catch (CoreException e) {
+					// TODO ignore here?
+				}
+
+			}
+			//return new SemanticHistoryPageSource();
 		}
 		return null;
 	}

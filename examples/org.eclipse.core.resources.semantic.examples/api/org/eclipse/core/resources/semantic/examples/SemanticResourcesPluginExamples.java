@@ -11,16 +11,15 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.examples;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.IMenuService;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class SemanticResourcesPluginExamples extends AbstractUIPlugin {
+public class SemanticResourcesPluginExamples extends Plugin {
 
 	/** Plug-in ID */
 	public static final String PLUGIN_ID = "org.eclipse.core.resources.semantic.examples"; //$NON-NLS-1$
@@ -54,15 +53,4 @@ public class SemanticResourcesPluginExamples extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
 }

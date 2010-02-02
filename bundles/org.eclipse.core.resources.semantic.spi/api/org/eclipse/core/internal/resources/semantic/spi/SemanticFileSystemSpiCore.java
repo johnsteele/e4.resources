@@ -52,6 +52,10 @@ public class SemanticFileSystemSpiCore implements IRegistryChangeListener {
 
 	public void registryChanged(IRegistryChangeEvent event) {
 
+		if (SfsSpiTraceLocation.CORE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CORE.getLocation());
+		}
+
 		IExtensionDelta[] mappingChanges = event.getExtensionDeltas(SemanticResourcesSpiPlugin.PLUGIN_ID,
 				SemanticFileSystemSpiCore.PI_FOLDER_MAPPING);
 		if (mappingChanges.length == 0) {
@@ -73,7 +77,18 @@ public class SemanticFileSystemSpiCore implements IRegistryChangeListener {
 	 * @return the mapped content provider ID, or <code>null</code>
 	 */
 	public String getFolderTemplateMapping(IPath path) {
-		return getFolderMappingRegistry().get(path);
+
+		if (SfsSpiTraceLocation.CORE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CORE.getLocation(), path.toString());
+		}
+
+		String result = getFolderMappingRegistry().get(path);
+
+		if (SfsSpiTraceLocation.CORE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CORE.getLocation(), result);
+		}
+
+		return result;
 	}
 
 	private synchronized Map<IPath, String> getFolderMappingRegistry() {

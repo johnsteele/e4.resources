@@ -9,10 +9,10 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.team;
+package org.eclipse.core.internal.resources.semantic.ui.team;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.SemanticResourcesPlugin;
+import org.eclipse.core.internal.resources.semantic.ui.SemanticResourcesUIPlugin;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +36,7 @@ public class RepositoryConfigurationWizard extends Wizard implements IConfigurat
 
 	public boolean performFinish() {
 		if (this.mySfs == null) {
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID,
+			IStatus error = new Status(IStatus.ERROR, SemanticResourcesUIPlugin.PLUGIN_ID,
 					Messages.RepositoryConfigurationWizard_SFSNotInitialized_XMSG);
 			ErrorDialog.openError(getShell(), Messages.RepositoryConfigurationWizard_SFSError_XGRP, null, error);
 			return false;

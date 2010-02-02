@@ -1,6 +1,6 @@
-package org.eclipse.core.internal.resources.semantic.team;
+package org.eclipse.core.internal.resources.semantic.ui.team;
 
-import org.eclipse.core.internal.resources.semantic.team.SemanticHistoryPage.SemanticFileRevisionLabelProvider;
+import org.eclipse.core.internal.resources.semantic.ui.team.SemanticHistoryPage.SemanticFileRevisionLabelProvider;
 import org.eclipse.core.resources.semantic.spi.SemanticFileRevision;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;

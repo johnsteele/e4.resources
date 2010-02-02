@@ -17,8 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
+import org.eclipse.core.internal.resources.semantic.SfsTraceLocation;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -40,40 +39,71 @@ import org.eclipse.core.runtime.jobs.MultiRule;
  */
 public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
-	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	private ISemanticFileSystemTrace trace;
+	final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 	/**
 	 * @param actSfs
 	 *            the SFS
 	 */
 	public DelegatingResourceRuleFactory(ISemanticFileSystem actSfs) {
-		this.trace = actSfs.getTrace();
+		// nothing
 	}
 
 	public ISchedulingRule buildRule() {
 		// since this has no resource parameter, we can't obtain the provider
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), this.root.getFullPath().toString());
+		}
+
 		return this.root;
 	}
 
 	public ISchedulingRule charsetRule(IResource resource) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 			if (sres != null) {
 				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
 
-				return toRule(sfs.getEffectiveContentProvider().getRuleFactory().charsetRule(sfs));
+				result = toRule(sfs.getEffectiveContentProvider().getRuleFactory().charsetRule(sfs));
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+		return result;
 	}
 
 	public ISchedulingRule copyRule(IResource source, IResource destination) {
 
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), destination.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sourceres = (ISemanticResource) source.getAdapter(ISemanticResource.class);
 			ISemanticResource desinationres = (ISemanticResource) destination.getAdapter(ISemanticResource.class);
@@ -85,22 +115,46 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				if (sourceStore.getEffectiveContentProvider().getClass().getName().equals(
 				// source and target provider are the same
 						destinationStore.getEffectiveContentProvider().getClass().getName())) {
-					return toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore));
+					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore));
 				}
 				// if source and target come from different providers, return
 				// MultiRule
-				return toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore),
+				result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore),
 						destinationStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore));
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
 	}
 
 	public ISchedulingRule createRule(IResource resource) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
+
 		try {
 			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 			if (sres != null) {
@@ -112,20 +166,42 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				if (effectiveProvider.getRootStore().getPath().equals(sfs.getPath())) {
 					ISemanticFileStore parentStore = (ISemanticFileStore) sfs.getParent();
 					if (parentStore != null) {
-						return toRule(parentStore.getEffectiveContentProvider().getRuleFactory().createRule(sfs));
+						result = toRule(parentStore.getEffectiveContentProvider().getRuleFactory().createRule(sfs));
 					}
 				}
-				return toRule(effectiveProvider.getRuleFactory().createRule(sfs));
+				result = toRule(effectiveProvider.getRuleFactory().createRule(sfs));
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+		return result;
 	}
 
 	public ISchedulingRule deleteRule(IResource resource) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 			if (sres != null) {
@@ -137,22 +213,50 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				if (effectiveProvider.getRootStore().getPath().equals(sfs.getPath())) {
 					ISemanticFileStore parentStore = (ISemanticFileStore) sfs.getParent();
 					if (parentStore != null) {
-						return toRule(parentStore.getEffectiveContentProvider().getRuleFactory().deleteRule(sfs));
+						result = toRule(parentStore.getEffectiveContentProvider().getRuleFactory().deleteRule(sfs));
+					} else {
+						result = toRule(effectiveProvider.getRuleFactory().deleteRule(sfs));
 					}
+				} else {
+					result = toRule(effectiveProvider.getRuleFactory().deleteRule(sfs));
 				}
-				return toRule(effectiveProvider.getRuleFactory().deleteRule(sfs));
 
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
+
 	}
 
 	public ISchedulingRule markerRule(IResource resource) {
 
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), null);
+		}
 		// TODO 0.2: the current org.eclipse.core.internal.resources.Rules
 		// implementation does not delegate to this method
 
@@ -177,23 +281,52 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 	}
 
 	public ISchedulingRule modifyRule(IResource resource) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 			if (sres != null) {
 				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
 
-				return toRule(sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(sfs));
+				result = toRule(sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(sfs));
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
 	}
 
 	public ISchedulingRule moveRule(IResource source, IResource destination) {
 
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(),
+					new Object[] { source.getFullPath().toString(), destination.getFullPath().toString() });
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sourceres = (ISemanticResource) source.getAdapter(ISemanticResource.class);
 			ISemanticResource desinationres = (ISemanticResource) destination.getAdapter(ISemanticResource.class);
@@ -205,20 +338,44 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				// root
 				if (sourceStore.getEffectiveContentProvider().getClass().getName().equals(
 						destinationStore.getEffectiveContentProvider().getClass().getName())) {
-					return toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
+					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
+				} else {
+					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore),
+							destinationStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
 				}
-				return toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore),
-						destinationStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
 	}
 
 	public ISchedulingRule refreshRule(IResource resource) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		ISchedulingRule result;
 		try {
 			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 			if (sres != null) {
@@ -237,18 +394,45 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				// toRule(parentStore.getEffectiveContentProvider().getRuleFactory().refreshRule(sfs));
 				// }
 				// }
-				return toRule(effectiveProvider.getRuleFactory().refreshRule(sfs));
+				result = toRule(effectiveProvider.getRuleFactory().refreshRule(sfs));
 
+			} else {
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+				}
+				result = this.root;
 			}
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.RULEFACTORY, e);
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+			}
 			// $JL-EXC$ ignore here
-			return this.root;
+			result = this.root;
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
 	}
 
 	public ISchedulingRule validateEditRule(IResource[] resources) {
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			Object[] input = new Object[resources.length];
+			for (int i = 0; i < resources.length; i++) {
+				input[i] = resources[i].getFullPath().toString();
+			}
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), input);
+		}
+
+		ISchedulingRule result;
 
 		ISemanticFileStore[] stores = allStoresFromSameProvider(resources);
 		if (stores != null) {
@@ -257,15 +441,22 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				ISemanticResource sres = (ISemanticResource) resources[0].getAdapter(ISemanticResource.class);
 				if (sres != null) {
 
-					return toRule(stores[0].getEffectiveContentProvider().getRuleFactory().validateEditRule(stores));
+					result = toRule(stores[0].getEffectiveContentProvider().getRuleFactory().validateEditRule(stores));
+				} else {
+					if (SfsTraceLocation.RULEFACTORY.isActive()) {
+						SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+								Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+					}
+					result = this.root;
 				}
 			} catch (CoreException e) {
-				this.trace.trace(TraceLocation.RULEFACTORY, e);
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+				}
 				// $JL-EXC$ ignore here
-				return this.root;
+				result = this.root;
 			}
 		} else {
-			Set<ISemanticFileStore> ruleStores = new HashSet<ISemanticFileStore>();
 			// we could collect the resources per effective content provider and
 			// call each provider once for optimization, but then it's not clear
 			// whether
@@ -273,6 +464,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			// responsible for,
 			// so let's do it resource by resource for the time being
 			try {
+				Set<ISemanticFileStore> ruleStores = new HashSet<ISemanticFileStore>();
 				for (IResource res : resources) {
 					ISemanticResource sres = (ISemanticResource) res.getAdapter(ISemanticResource.class);
 					if (sres != null) {
@@ -285,19 +477,43 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 							if (ruleStore != null) {
 								ruleStores.add(ruleStore);
 							} else {
-								return this.root;
+								ruleStores.clear();
+								break;
 							}
 						}
 
+					} else {
+						ruleStores.clear();
+						break;
 					}
 				}
-				return toRule(ruleStores.toArray(new ISemanticFileStore[0]));
+				if (ruleStores.isEmpty()) {
+					if (SfsTraceLocation.RULEFACTORY.isActive()) {
+						SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+								Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+					}
+					result = this.root;
+				} else {
+					result = toRule(ruleStores.toArray(new ISemanticFileStore[0]));
+				}
 			} catch (CoreException e) {
-				this.trace.trace(TraceLocation.RULEFACTORY, e);
+				if (SfsTraceLocation.RULEFACTORY.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
+				}
 				// $JL-EXC$ ignore here
+				result = this.root;
 			}
 		}
-		return this.root;
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			if (result instanceof IResource) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+			} else {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
+			}
+		}
+
+		return result;
 	}
 
 	/*
@@ -305,6 +521,14 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 	 */
 	public ISchedulingRule derivedRule(@SuppressWarnings("unused") IResource resource) {
 		// TODO 0.1 add implementation
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
+		}
+
+		if (SfsTraceLocation.RULEFACTORY.isActive()) {
+			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), null);
+		}
+
 		return null;
 	}
 

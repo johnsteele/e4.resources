@@ -18,7 +18,6 @@ import java.net.URISyntaxException;
 import junit.framework.Assert;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -118,7 +117,7 @@ public class TestsFederatingProvider {
 
 		project.delete(true, new NullProgressMonitor());
 
-		TraceLocation.init();
+		TestsContentProviderUtil.resetTrace();
 
 		testProject = null;
 	}

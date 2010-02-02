@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -81,7 +80,7 @@ public class TestsRestContentProvider {
 	 */
 	public static void afterClass() throws Exception {
 		// reset traces
-		TraceLocation.init();
+		TestsContentProviderUtil.resetTrace();
 	}
 
 	/**

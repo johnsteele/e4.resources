@@ -41,7 +41,7 @@ import org.eclipse.core.runtime.Path;
  */
 public class FileHandleFactory implements IContentHandleFactory {
 
-	private static final String FAILED_DELETIONS_$$$ = ".failedDeletions.$$$"; //$NON-NLS-1$
+	private static final String FAILED_DELETIONS_DOLLAR = ".failedDeletions.$$$"; //$NON-NLS-1$
 	private static final String DOT_SEPARATOR = "."; //$NON-NLS-1$
 	private static final String TEMP_FILE_EXTENSION = ".$$$"; //$NON-NLS-1$
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -58,7 +58,7 @@ public class FileHandleFactory implements IContentHandleFactory {
 	 */
 	public FileHandleFactory(File cacheRoot) {
 		this.cacheRoot = cacheRoot;
-		this.deletionsFile = new File(this.cacheRoot, FAILED_DELETIONS_$$$);
+		this.deletionsFile = new File(this.cacheRoot, FAILED_DELETIONS_DOLLAR);
 
 		try {
 			lockForWrite();

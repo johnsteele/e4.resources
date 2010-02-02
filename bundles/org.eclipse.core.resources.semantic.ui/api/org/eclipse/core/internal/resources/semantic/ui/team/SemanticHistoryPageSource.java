@@ -9,7 +9,7 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.team;
+package org.eclipse.core.internal.resources.semantic.ui.team;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.semantic.ISemanticResource;

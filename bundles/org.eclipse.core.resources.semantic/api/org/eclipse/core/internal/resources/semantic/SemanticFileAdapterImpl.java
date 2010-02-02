@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic;
 
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
@@ -44,7 +43,9 @@ public class SemanticFileAdapterImpl extends SemanticResourceAdapterImpl impleme
 
 			return store.validateEdit(shell);
 		} catch (CoreException e) {
-			this.myTrace.trace(TraceLocation.TEAM, e);
+			if (SfsTraceLocation.TEAM.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.TEAM.getLocation(), e.getMessage(), e);
+			}
 			return e.getStatus();
 		}
 
@@ -57,7 +58,9 @@ public class SemanticFileAdapterImpl extends SemanticResourceAdapterImpl impleme
 
 			return store.validateSave();
 		} catch (CoreException e) {
-			this.myTrace.trace(TraceLocation.TEAM, e);
+			if (SfsTraceLocation.TEAM.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.TEAM.getLocation(), e.getMessage(), e);
+			}
 			return e.getStatus();
 		}
 

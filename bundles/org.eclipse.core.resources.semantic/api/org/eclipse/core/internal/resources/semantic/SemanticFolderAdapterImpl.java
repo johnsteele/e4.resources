@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.semantic.ISemanticFile;
@@ -207,7 +206,9 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 			return store.validateRemoteCreate(name, shell);
 		} catch (CoreException e) {
-			this.myTrace.trace(TraceLocation.CORE, e);
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
+			}
 			return e.getStatus();
 		}
 

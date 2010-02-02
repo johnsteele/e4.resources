@@ -28,8 +28,6 @@ import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.Res
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBFactory;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType;
 import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemLog;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
@@ -62,22 +60,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	// we can't use the class name, since we don't have it in the class loader
 	private final static String DEFAULT_CONTENT_PROVIDER_ID = "org.eclipse.core.resources.semantic.provider.DefaultContentProvider"; //$NON-NLS-1$
-	private final ISemanticFileSystemTrace trace;
+
 	private final ISemanticFileSystemLog log;
 	private ISemanticContentProvider provider;
 
-	private final static class TraceException extends Exception {
-
-		private static final long serialVersionUID = 1L;
-
-		public TraceException() {
-			super(Messages.SemanticFileStore_TraceException_XMSG);
-		}
-	}
-
 	SemanticFileStore(SemanticFileSystem fs, ResourceTreeNode node) {
 		super(fs, node);
-		this.trace = fs.getTrace();
 		this.log = fs.getLog();
 	}
 
@@ -104,6 +92,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
 		FileInfo info;
+
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 		boolean askContentProviderForReadonly = false;
 		boolean askContentProviderForTimestamp = false;
@@ -144,7 +133,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			try {
 				readOnly = effectiveProvider.fetchResourceInfo(this, ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, monitor).isReadOnly();
 			} catch (CoreException e) {
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, e);
+				if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(), e.getMessage(), e);
+				}
+
 			}
 			info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, readOnly);
 		}
@@ -156,7 +148,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				// we don't want to crash everything if the resource is not
 				// accessible
 				info.setLastModified(EFS.NONE);
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, e);
+				if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(), e.getMessage(), e);
+				}
 			}
 		}
 
@@ -165,10 +159,13 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
 
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_UpdateFileInfo_XMSG, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CORE.isActive()) {
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_UpdateFileInfo_XMSG, getPath().toString()));
 		}
 
 		if ((options & EFS.SET_ATTRIBUTES) != 0) {
@@ -235,6 +232,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 			}
 			initProvider(contentProviderID, this);
+
+			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
+			}
+
 			return this.provider;
 
 		} finally {
@@ -264,12 +266,6 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IFileStore getChild(String name) {
-
-		if (TraceLocation.CORE_VERBOSE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(Messages.SemanticFileStore_GetChild_XMSG,
-					name, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE_VERBOSE, stat);
-		}
 
 		IFileStore store = findChild(name);
 
@@ -313,7 +309,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			this.fs.requestFlush(false);
 
 		} catch (CoreException e) {
-			this.trace.trace(TraceLocation.CORE, e);
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
+			}
 			return EFS.getNullFileSystem().getStore(getPath().append(name));
 		} finally {
 			this.fs.unlockForWrite();
@@ -329,7 +327,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					result.getEffectiveContentProvider().onImplicitStoreCreate(result);
 				} catch (CoreException e) {
 					// $JL-EXC$ ignore and just trace
-					this.trace.trace(TraceLocation.CONTENTPROVIDER, e);
+					if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+						SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(), e.getMessage(), e);
+					}
 				}
 			}
 		}
@@ -361,6 +361,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		try {
 			this.fs.lockForRead();
 			TreeNodeType type = this.node.getType();
@@ -374,11 +379,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_OpeningInputInfo_XMSG, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS
+							.bind(Messages.SemanticFileStore_OpeningInputInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
+									.toString()));
+
 		}
 
 		return effectiveProvider.openInputStream(this, monitor);
@@ -386,6 +394,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
 		// TODO 0.1: concurrency/race condition with IFile.getContent()
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		try {
 			this.fs.lockForRead();
 			TreeNodeType type = this.node.getType();
@@ -400,7 +413,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 		boolean append = (options & EFS.APPEND) != 0;
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 			String message;
 			if (append) {
 				message = NLS.bind(Messages.SemanticFileStore_AppendingInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
@@ -409,8 +422,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				message = NLS.bind(Messages.SemanticFileStore_OpeningInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
 						.toString());
 			}
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, message, new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(), message);
 		}
 
 		ISemanticSpiResourceInfo info = effectiveProvider.fetchResourceInfo(this, ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, monitor);
@@ -468,10 +480,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
 
-		if (TraceLocation.CORE_VERBOSE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(Messages.SemanticFileStore_MkDir_XMSG,
-					getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE_VERBOSE, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE_VERBOSE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_MkDir_XMSG, getPath().toString()));
 		}
 
 		try {
@@ -534,14 +545,19 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	// ISemantiFileStoreInternal
 	//
 	public void createFileRemotely(String name, InputStream source, Object context, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_CreateFileRemote_XMSG, name, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_CreateFileRemote_XMSG, name, effectiveProvider.getClass().getName(),
+							getPath().toString()));
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderRemote) {
@@ -555,14 +571,21 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticFileStoreInternal createResourceRemotely(String name, Object context, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_CreateResourceRemtoe_XMSG, name, effectiveProvider.getClass().getName(), getPath()
-							.toString()), new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_CreateResourceRemtoe_XMSG, name,
+							effectiveProvider.getClass().getName(), getPath().toString()));
+
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderRemote) {
@@ -577,13 +600,19 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void addFileFromRemote(String name, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_AddFileRemote_XMSG, name, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_AddFileRemote_XMSG, name, effectiveProvider.getClass().getName(),
+							getPath().toString()));
 		}
 
 		// delegate to content provider
@@ -592,17 +621,23 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void addFileFromRemoteByURI(String name, URI uri, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
 		this.mkdir(EFS.NONE, monitor);
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		// delegate to content provider
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
 
-			if (TraceLocation.CONTENTPROVIDER.isActive()) {
-				IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.SemanticFileStore_AddFileRemoteURI_XMSG, name, uri.toString(), effectiveProvider.getClass().getName(),
-						getPath().toString()), new TraceException());
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+				SfsTraceLocation.getTrace().trace(
+						SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+						MessageFormat.format(Messages.SemanticFileStore_AddFileRemoteURI_XMSG, name, uri.toString(), effectiveProvider
+								.getClass().getName(), getPath().toString()));
+
 			}
 
 			((ISemanticContentProviderREST) effectiveProvider).addFileFromRemoteByURI(this, name, uri, monitor);
@@ -616,17 +651,23 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void addFolderFromRemoteByURI(String name, URI uri, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		// delegate to content provider
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
 
-			if (TraceLocation.CONTENTPROVIDER.isActive()) {
-				IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.SemanticFileStore_AddFileRemoteURI_XMSG, name, uri.toString(), effectiveProvider.getClass().getName(),
-						getPath().toString()), new TraceException());
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+				SfsTraceLocation.getTrace().trace(
+						SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+						MessageFormat.format(Messages.SemanticFileStore_AddFileRemoteURI_XMSG, name, uri.toString(), effectiveProvider
+								.getClass().getName(), getPath().toString()));
 			}
 
 			((ISemanticContentProviderREST) effectiveProvider).addFolderFromRemoteByURI(this, name, uri, monitor);
@@ -640,14 +681,20 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void addFolderFromRemote(String name, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_AddFolderRemote_XMSG, name, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_AddFolderRemote_XMSG, name, effectiveProvider.getClass().getName(),
+							getPath().toString()));
 		}
 
 		// delegate to content provider
@@ -656,14 +703,20 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticFileStoreInternal addResourceFromRemote(String name, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_AddResourceRemote_XMSG, name, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_AddResourceRemote_XMSG, name, effectiveProvider.getClass().getName(),
+							getPath().toString()));
 		}
 
 		// delegate to content provider
@@ -674,6 +727,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void addResource(String name, boolean asFolder, String contentProviderID, Map<QualifiedName, String> properties,
 			IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		this.mkdir(EFS.NONE, monitor);
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
@@ -694,20 +752,27 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		// or if resource is marked as derived
 		// TODO 0.1: review this behavior e.g. with respect to linked resources
 
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		removeFromWorkspace(monitor);
 
 	}
 
 	public void deleteRemotely(IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_DeleteResourceRemote_XMSG, getPath().toString(), effectiveProvider.getClass().getName()),
-					new TraceException());
-
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_DeleteResourceRemote_XMSG, getPath().toString(), effectiveProvider.getClass()
+							.getName()));
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderRemote) {
@@ -722,11 +787,16 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void removeFromWorkspace(IProgressMonitor monitor) throws CoreException {
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_RemoveResourceRemote_XMSG, getPath().toString(), effectiveProvider.getClass().getName()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_RemoveResourceRemote_XMSG, getPath().toString(), effectiveProvider.getClass()
+							.getName()));
 		}
 
 		effectiveProvider.removeResource(this, monitor);
@@ -735,12 +805,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void synchronizeContentWithRemote(SyncDirection direction, IProgressMonitor monitor) throws CoreException {
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
 
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_SynchContent_XMSG, effectiveProvider.getClass().getName(), getPath().toString()),
-					new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_SynchContent_XMSG, effectiveProvider.getClass().getName(), getPath().toString()));
+
 		}
 		MultiStatus status = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
 				Messages.SemanticFileStore_SyncContent_XGRP, getPath().toString()), null);
@@ -753,14 +825,19 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void setRemoteURI(URI uri, IProgressMonitor monitor) throws CoreException {
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		// delegate to content provider
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
 
-			if (TraceLocation.CONTENTPROVIDER.isActive()) {
-				IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.SemanticFileStore_SettingURI_XMSG, uri.toString(), effectiveProvider.getClass().getName(), getPath()
-								.toString()), new TraceException());
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+				SfsTraceLocation.getTrace().trace(
+						SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+						MessageFormat.format(Messages.SemanticFileStore_SettingURI_XMSG, uri.toString(), effectiveProvider.getClass()
+								.getName(), getPath().toString()));
 			}
 
 			((ISemanticContentProviderREST) effectiveProvider).setURIString(this, uri, monitor);
@@ -775,24 +852,31 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void revertChanges(IProgressMonitor monitor) throws CoreException {
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
 
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(Messages.SemanticFileStore_Revert_XMSG,
-					getPath().toString(), effectiveProvider.getClass().getName()), new TraceException());
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_Revert_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
 
 		effectiveProvider.revertChanges(this, monitor);
 	}
 
 	public IStatus lockResource(IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(Messages.SemanticFileStore_Locking_XMSG,
-					getPath().toString(), effectiveProvider.getClass().getName()), new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_Locking_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderLocking) {
@@ -805,12 +889,17 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus unlockResource(IProgressMonitor monitor) throws CoreException {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(Messages.SemanticFileStore_Unlocking_XMSG,
-					getPath().toString(), effectiveProvider.getClass().getName()), new TraceException());
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_Unlocking_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderLocking) {
@@ -823,6 +912,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus validateRemoteCreate(String name, Object shell) {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		ISemanticContentProvider effectiveProvider;
 		try {
 			effectiveProvider = getEffectiveContentProvider();
@@ -831,13 +925,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			return ce.getStatus();
 		}
 
-		if (TraceLocation.CONTENTPROVIDER.isActive()) {
+		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.SemanticFileStore_ValidateRemoteCreate_XMSG, name, effectiveProvider.getClass().getName(), getPath()
-							.toString()), new TraceException());
-
-			this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			SfsTraceLocation.getTrace().trace(
+					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					MessageFormat.format(Messages.SemanticFileStore_ValidateRemoteCreate_XMSG, name,
+							effectiveProvider.getClass().getName(), getPath().toString()));
 		}
 
 		if (effectiveProvider instanceof ISemanticContentProviderRemote) {
@@ -850,6 +943,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus validateRemoteDelete(Object shell) {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		boolean canBeDeleted;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -869,11 +967,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 
 		if (canBeDeleted) {
-			if (TraceLocation.CONTENTPROVIDER.isActive()) {
-				IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID,
+			if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+				SfsTraceLocation.getTrace().trace(
+						SfsTraceLocation.CONTENTPROVIDER.getLocation(),
 						MessageFormat.format(Messages.SemanticFileStore_ValidateRemoteDelete_XMSG, getPath().toString(), effectiveProvider
-								.getClass().getName()), new TraceException());
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+								.getClass().getName()));
 			}
 
 			if (effectiveProvider instanceof ISemanticContentProviderRemote) {
@@ -888,6 +987,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus validateRemove(int options, IProgressMonitor monitor) {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		boolean canBeDeleted;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -907,11 +1011,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 
 		if (canBeDeleted) {
-			if (TraceLocation.CONTENTPROVIDER.isActive()) {
-				IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID,
-						MessageFormat.format(Messages.SemanticFileStore_ValidateRemoteDelete_XMSG, getPath().toString(), effectiveProvider
-								.getClass().getName()), new TraceException());
-				this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+			if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+				SfsTraceLocation.getTrace().trace(
+						SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+						NLS.bind(Messages.SemanticFileStore_ValidateRemove_XMSG, getPath().toString(), effectiveProvider.getClass()
+								.getName()));
 			}
 			try {
 				return effectiveProvider.validateRemove(this, options, monitor);
@@ -926,10 +1030,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void addChildFolder(String name) throws CoreException {
 
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_AddChildFolder_XMSG, name, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CORE.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_AddChildFolder_XMSG, name, getPath().toString()));
 		}
 
 		try {
@@ -947,17 +1055,20 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void addChildResource(String name, boolean asFolder, String contentProviderID, Map<QualifiedName, String> properties)
 			throws CoreException {
 
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat;
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CORE.isActive()) {
+			String message;
 			if (asFolder) {
-				stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-						Messages.SemanticFileStore_AddContentProviderRootFolder_XMSG, name, getPath().toString()), new TraceException());
+				message = NLS.bind(Messages.SemanticFileStore_AddContentProviderRootFolder_XMSG, name, getPath().toString());
 			} else {
-				stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-						Messages.SemanticFileStore_AddContentProviderRootFile_XMSG, name, getPath().toString()), new TraceException());
+				message = NLS.bind(Messages.SemanticFileStore_AddContentProviderRootFile_XMSG, name, getPath().toString());
 			}
 
-			this.trace.trace(TraceLocation.CORE, stat);
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), message);
+
 		}
 
 		try {
@@ -984,10 +1095,13 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void addChildFile(String name) throws CoreException {
 
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_AddChildFile_XMSG, name, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+		if (SfsTraceLocation.CORE.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_AddChildFile_XMSG, name, getPath().toString()));
 		}
 
 		try {
@@ -1004,10 +1118,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void addLocalChildResource(String name, String contentProviderID) throws CoreException {
 
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_AddLocalChild_XMSG, name, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE, stat);
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CORE.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_AddLocalChild_XMSG, name, getPath().toString()));
 		}
 
 		try {
@@ -1205,6 +1323,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus validateEdit(Object shell) {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		boolean canBeEdited;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -1237,11 +1360,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 			if (readOnly) {
 
-				if (TraceLocation.CONTENTPROVIDER.isActive()) {
-					IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-							Messages.SemanticFileStore_ValidateEdit_XMSG, effectiveProvider.getClass().getName(), getPath().toString()),
-							new TraceException());
-					this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+				if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+					SfsTraceLocation.getTrace().trace(
+							SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+							NLS.bind(Messages.SemanticFileStore_ValidateEdit_XMSG, effectiveProvider.getClass().getName(), getPath()
+									.toString()));
+
 				}
 
 				return effectiveProvider.validateEdit(new ISemanticFileStore[] { this }, shell);
@@ -1255,6 +1379,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public IStatus validateSave() {
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
 		boolean canBeSaved;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -1281,11 +1410,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				return e.getStatus();
 			}
 			if (!readOnly) {
-				if (TraceLocation.CONTENTPROVIDER.isActive()) {
-					IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-							Messages.SemanticFileStore_ValidateSave_XMSG, effectiveProvider.getClass().getName(), getPath().toString()),
-							new TraceException());
-					this.trace.trace(TraceLocation.CONTENTPROVIDER, stat);
+				if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
+
+					SfsTraceLocation.getTrace().trace(
+							SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+							NLS.bind(Messages.SemanticFileStore_ValidateSave_XMSG, effectiveProvider.getClass().getName(), getPath()
+									.toString()));
 				}
 				return effectiveProvider.validateSave(this);
 			}
@@ -1322,10 +1452,15 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public void remove(IProgressMonitor monitor) throws CoreException {
 
 		// TODO how do we deal with "removed" stores wrt getPath and other methods?
-		if (TraceLocation.CORE.isActive()) {
-			IStatus stat = new Status(IStatus.INFO, SemanticResourcesPlugin.PLUGIN_ID, NLS.bind(
-					Messages.SemanticFileStore_RemovingResource_XMSG, getPath().toString()), new TraceException());
-			this.trace.trace(TraceLocation.CORE, stat);
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		if (SfsTraceLocation.CORE.isActive()) {
+
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+					NLS.bind(Messages.SemanticFileStore_RemovingResource_XMSG, getPath().toString()));
 		}
 
 		IFileStore parent = getParent();
@@ -1388,9 +1523,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	protected void notifyPersistentPropertySet(String keyString, String oldValue, String newValue) throws CoreException {
+		// TODO tracing
 		// if uri locator has not been requested yet, it will be rebuild later
 		if (this.fs.getURILocator() != null) {
-			if (oldValue != newValue) {
+
+			if ((oldValue == null && newValue != null) || (oldValue != null && !oldValue.equals(newValue))) {
 				IPath path = getPath();
 				if (oldValue != null) {
 					this.fs.getURILocator().removeURI(path, oldValue);

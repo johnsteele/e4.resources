@@ -25,8 +25,6 @@ import junit.framework.Assert;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.provider.FileInfo;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -91,8 +89,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 	}
 
 	public static void afterClass() throws Exception {
-		// reset traces
-		TraceLocation.init();
+		TestsContentProviderUtil.resetTrace();
 	}
 
 	@Before
@@ -266,9 +263,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 					Assert.fail("Exception should have been thrown for adding nonexisting resource");
 				} catch (CoreException e) {
 					// $JL-EXC$ expected
-					// let's test the trace here
-					ISemanticFileSystemTrace trace = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getTrace();
-					trace.trace(TraceLocation.CORE, e);
 					// TODO fix test
 //					String test = e.getStatus().toString();
 //					Assert.assertTrue("Status as String should contain path", test.contains(sfr.getAdaptedContainer()

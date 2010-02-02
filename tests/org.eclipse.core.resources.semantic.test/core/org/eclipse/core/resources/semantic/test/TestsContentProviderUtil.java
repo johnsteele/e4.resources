@@ -21,7 +21,6 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -94,15 +93,17 @@ public abstract class TestsContentProviderUtil {
 	}
 
 	/**
-	 * Initializes all traces except the verbose ones to be active
+	 * Initializes tracing
 	 */
 	public static void initTrace() {
-		// activate all non-verbose traces to see if tracing itself causes problems
-		for (TraceLocation location : TraceLocation.values()) {
-			if (location != TraceLocation.CORE_VERBOSE) {
-				location.setActive(true);
-			}
-		}
+		// currently not used
+	}
+
+	/**
+	 * Resets tracing
+	 */
+	public static void resetTrace() {
+		// currently not used
 	}
 	/**
 	 * Resets the trace locations
@@ -111,7 +112,7 @@ public abstract class TestsContentProviderUtil {
 	 */
 	public static void afterClass() throws Exception {
 		// reset traces
-		TraceLocation.init();
+		resetTrace();
 	}
 
 	/**

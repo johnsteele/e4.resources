@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic;
 
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.runtime.Plugin;
 
 /**
@@ -24,12 +23,5 @@ public class SemanticResourcesSharedPlugin extends Plugin {
 	 * This plugin's ID
 	 */
 	public static final String PLUGIN_ID = "org.eclipse.core.resources.semantic.shared"; //$NON-NLS-1$
-
-	/**
-	 * No-argument constructor
-	 */
-	public SemanticResourcesSharedPlugin() {
-		TraceLocation.init();
-	}
 
 }

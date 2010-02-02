@@ -16,7 +16,7 @@ import java.io.PrintStream;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.SemanticResourcesPlugin;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
+import org.eclipse.core.internal.resources.semantic.SfsTraceLocation;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
@@ -254,9 +254,9 @@ public class TestsSemanticResourceException {
 	void trace(CoreException x) {
 
 		try {
-			ISemanticFileSystem sfs = (ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME);
-			sfs.getTrace().trace(TraceLocation.CORE, x);
-
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), x.getMessage(), x);
+			}
 		} catch (Exception e) {
 			// $JL-EXC$ //$JL-SYS_OUT_ERR$
 			x.printStackTrace(System.out);
@@ -266,8 +266,9 @@ public class TestsSemanticResourceException {
 	void trace(IStatus stat) {
 
 		try {
-			ISemanticFileSystem sfs = (ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME);
-			sfs.getTrace().trace(TraceLocation.CORE, stat);
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), stat.getMessage());
+			}
 		} catch (Exception e) {
 			// $JL-EXC$ //$JL-SYS_OUT_ERR$
 			printChildren(stat, System.out);

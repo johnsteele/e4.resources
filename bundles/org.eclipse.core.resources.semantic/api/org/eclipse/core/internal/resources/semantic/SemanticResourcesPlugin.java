@@ -12,18 +12,15 @@
 package org.eclipse.core.internal.resources.semantic;
 
 import java.io.File;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
-import org.eclipse.core.resources.semantic.ISemanticFileSystem;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -31,7 +28,7 @@ import org.osgi.framework.ServiceReference;
 /**
  * The Semantic Resources implementation plug-in
  */
-public class SemanticResourcesPlugin extends Plugin {
+public class SemanticResourcesPlugin extends Plugin implements DebugOptionsListener {
 
 	/**
 	 * The plug-in ID
@@ -43,6 +40,10 @@ public class SemanticResourcesPlugin extends Plugin {
 	public void start(BundleContext actContext) throws Exception {
 		super.start(actContext);
 		context = actContext;
+		Dictionary<String, String> props = new Hashtable<String, String>(4);
+		props.put(DebugOptions.LISTENER_SYMBOLICNAME, context.getBundle().getSymbolicName());
+		context.registerService(DebugOptionsListener.class.getName(), this, props);
+
 	}
 
 	public void stop(BundleContext actContext) throws Exception {
@@ -75,15 +76,17 @@ public class SemanticResourcesPlugin extends Plugin {
 			// $JL-EXC$ ignore and use user.home below
 		}
 		// just put the cache in the user home directory
-		IStatus stat = new Status(IStatus.WARNING, PLUGIN_ID, Messages.SemanticResourcesPlugin_UserHomeAsCache_XMSG);
-		try {
-			ISemanticFileSystemTrace trace = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getTrace();
-			trace.trace(TraceLocation.CACHESTORE, stat);
-		} catch (CoreException e) {
-			// $JL-EXC$ $JL-SYS_OUT_ERR$
-			e.printStackTrace(System.out);
+
+		if (SfsTraceLocation.CORE.isActive()) {
+			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), Messages.SemanticResourcesPlugin_UserHomeAsCache_XMSG);
 		}
 		return Path.fromOSString(System.getProperty("user.home")); //$NON-NLS-1$
+	}
+
+	public void optionsChanged(DebugOptions options) {
+
+		SfsTraceLocation.initializeFromOptions(options, isDebugging());
+
 	}
 
 }

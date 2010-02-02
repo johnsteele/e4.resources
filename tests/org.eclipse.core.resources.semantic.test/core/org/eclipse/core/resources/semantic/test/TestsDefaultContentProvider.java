@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 
 import junit.framework.Assert;
 
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -101,7 +100,7 @@ public class TestsDefaultContentProvider {
 	@AfterClass
 	public static void afterClass() throws Exception {
 
-		TraceLocation.init();
+		TestsContentProviderUtil.resetTrace();
 	}
 
 	/**

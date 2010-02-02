@@ -9,7 +9,7 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.sync;
+package org.eclipse.core.internal.resources.semantic.ui.sync;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IProject;

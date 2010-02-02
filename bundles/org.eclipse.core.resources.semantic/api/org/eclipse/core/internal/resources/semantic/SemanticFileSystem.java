@@ -31,7 +31,6 @@ import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.Tre
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot;
 import org.eclipse.core.internal.resources.semantic.spi.SemanticResourcesSpiPlugin;
 import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemLog;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticURILocatorService;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
@@ -67,7 +66,6 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	private final Lock readLock = this.rwl.readLock();
 	private final Lock writeLock = this.rwl.writeLock();
-	private final ISemanticFileSystemTrace trace;
 	private final ISemanticFileSystemLog log;
 
 	private SemanticDB db;
@@ -82,7 +80,6 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 	public SemanticFileSystem() {
 
 		this.log = new SemanticFileSystemLog();
-		this.trace = new SemanticFileSystemTrace();
 
 		init();
 	}
@@ -317,6 +314,9 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 	private void saveSemanticDB() throws CoreException {
 		try {
 			if (this.needsFlush) {
+				if (SfsTraceLocation.CORE_DB.isActive()) {
+					SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_DB.getLocation());
+				}
 				try {
 					this.lockForWrite();
 					this.metadataResource.save(null);
@@ -359,10 +359,6 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		String metadataLocation = metadataFile.getAbsolutePath();
 
 		return metadataLocation;
-	}
-
-	public ISemanticFileSystemTrace getTrace() {
-		return this.trace;
 	}
 
 	public ISemanticFileSystemLog getLog() {

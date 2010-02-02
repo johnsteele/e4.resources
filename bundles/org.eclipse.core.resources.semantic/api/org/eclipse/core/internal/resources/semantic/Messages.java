@@ -28,7 +28,6 @@ public class Messages extends NLS {
 	public static String SemanticFileStore_CreateFileRemote_XMSG;
 	public static String SemanticFileStore_CreateResourceRemtoe_XMSG;
 	public static String SemanticFileStore_DeleteResourceRemote_XMSG;
-	public static String SemanticFileStore_GetChild_XMSG;
 	public static String SemanticFileStore_IntefaceNotImplemented_XMSG;
 	public static String SemanticFileStore_Locking_XMSG;
 	public static String SemanticFileStore_MkDir_XMSG;
@@ -46,12 +45,12 @@ public class Messages extends NLS {
 	public static String SemanticFileStore_ShallowMkDirFailed_XMSG;
 	public static String SemanticFileStore_SyncContent_XGRP;
 	public static String SemanticFileStore_SynchContent_XMSG;
-	public static String SemanticFileStore_TraceException_XMSG;
 	public static String SemanticFileStore_Unlocking_XMSG;
 	public static String SemanticFileStore_UpdateFileInfo_XMSG;
 	public static String SemanticFileStore_ValidateEdit_XMSG;
 	public static String SemanticFileStore_ValidateRemoteCreate_XMSG;
 	public static String SemanticFileStore_ValidateRemoteDelete_XMSG;
+	public static String SemanticFileStore_ValidateRemove_XMSG;
 	public static String SemanticFileStore_ValidateSave_XMSG;
 	public static String SemanticFileSystem_NotInitialized_XMSG;
 	public static String SemanticFileSystem_SFSInitError_XMSG;

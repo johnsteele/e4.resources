@@ -9,7 +9,7 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.team;
+package org.eclipse.core.internal.resources.semantic.ui.team;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.eclipse.compare.CompareUI;
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.sync.SemanticSubscriber;
+import org.eclipse.core.internal.resources.semantic.ui.sync.SemanticSubscriber;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;

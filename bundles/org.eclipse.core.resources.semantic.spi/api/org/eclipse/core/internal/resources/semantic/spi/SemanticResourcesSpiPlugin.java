@@ -12,18 +12,15 @@
 package org.eclipse.core.internal.resources.semantic.spi;
 
 import java.io.File;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
-import org.eclipse.core.internal.resources.semantic.util.TraceLocation;
-import org.eclipse.core.resources.semantic.ISemanticFileSystem;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -32,7 +29,7 @@ import org.osgi.framework.ServiceReference;
  * The SPI plug-in
  * 
  */
-public class SemanticResourcesSpiPlugin extends Plugin {
+public class SemanticResourcesSpiPlugin extends Plugin implements DebugOptionsListener {
 	/** The Plug-in ID */
 	public static final String PLUGIN_ID = "org.eclipse.core.resources.semantic.spi"; //$NON-NLS-1$
 
@@ -44,13 +41,25 @@ public class SemanticResourcesSpiPlugin extends Plugin {
 	}
 
 	public void start(BundleContext actContext) throws Exception {
+
 		super.start(actContext);
 		context = actContext;
+
+		Dictionary<String, String> props = new Hashtable<String, String>(4);
+		props.put(DebugOptions.LISTENER_SYMBOLICNAME, context.getBundle().getSymbolicName());
+		context.registerService(DebugOptionsListener.class.getName(), this, props);
+
 	}
 
 	public void stop(BundleContext actContext) throws Exception {
 		super.stop(actContext);
 		context = null;
+	}
+
+	public void optionsChanged(DebugOptions options) {
+
+		SfsSpiTraceLocation.initializeFromOptions(options, isDebugging());
+
 	}
 
 	/**
@@ -77,14 +86,15 @@ public class SemanticResourcesSpiPlugin extends Plugin {
 			// $JL-EXC$ ignore and use user.home below
 		}
 		// just put the cache in the user home directory
-		IStatus stat = new Status(IStatus.WARNING, PLUGIN_ID, Messages.SemanticResourcesSpiPlugin_UserHomeForCache_XMSG);
+		//IStatus stat = new Status(IStatus.WARNING, PLUGIN_ID, Messages.SemanticResourcesSpiPlugin_UserHomeForCache_XMSG);
+
 		try {
-			ISemanticFileSystemTrace trace = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getTrace();
-			trace.trace(TraceLocation.CACHESTORE, stat);
-		} catch (CoreException e) {
+			// TODO log?
+		} catch (Exception e) {
 			// $JL-EXC$
 			// TODO 0.1: error log and fallback
 		}
+
 		return Path.fromOSString(System.getProperty("user.home")); //$NON-NLS-1$
 	}
 }

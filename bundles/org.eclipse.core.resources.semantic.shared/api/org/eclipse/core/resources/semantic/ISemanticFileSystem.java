@@ -12,7 +12,6 @@
 package org.eclipse.core.resources.semantic;
 
 import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemLog;
-import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemTrace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -128,11 +127,6 @@ public interface ISemanticFileSystem {
 	 * @return the path
 	 */
 	public String getPathToDb();
-
-	/**
-	 * @return the trace
-	 */
-	public ISemanticFileSystemTrace getTrace();
 
 	/**
 	 * @return the log
