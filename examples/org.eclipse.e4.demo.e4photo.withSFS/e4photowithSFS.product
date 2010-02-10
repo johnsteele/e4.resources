@@ -50,9 +50,6 @@
       <plugin id="org.eclipse.core.net"/>
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.resources.semantic"/>
-      <plugin id="org.eclipse.core.resources.semantic.api"/>
-      <plugin id="org.eclipse.core.resources.semantic.shared"/>
-      <plugin id="org.eclipse.core.resources.semantic.spi"/>
       <plugin id="org.eclipse.core.resources.win32.ia64" fragment="true"/>
       <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
