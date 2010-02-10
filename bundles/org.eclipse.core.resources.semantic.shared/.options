@@ -1,8 +1,0 @@
-org.eclipse.core.resources.semantic.shared/debug = false
-org.eclipse.core.resources.semantic.shared/debug/core = false
-org.eclipse.core.resources.semantic.shared/debug/core/verbose = false
-org.eclipse.core.resources.semantic.shared/debug/cacheFileStore = false
-org.eclipse.core.resources.semantic.shared/debug/rulefactory = false
-org.eclipse.core.resources.semantic.shared/debug/synchronization = false
-org.eclipse.core.resources.semantic.shared/debug/teamprovider = false
-org.eclipse.core.resources.semantic.shared/debug/contentprovider = false
