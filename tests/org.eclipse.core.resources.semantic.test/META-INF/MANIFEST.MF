@@ -5,7 +5,6 @@ Bundle-SymbolicName: org.eclipse.core.resources.semantic.test;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: SAP AG
-Fragment-Host: org.eclipse.core.resources.semantic
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit4;bundle-version="4.3.1",
  org.eclipse.ui.ide;bundle-version="3.4.2",
@@ -14,14 +13,15 @@ Require-Bundle: org.junit4;bundle-version="4.3.1",
  org.eclipse.team.core;bundle-version="3.4.2",
  org.eclipse.core.resources;bundle-version="3.4.2",
  org.eclipse.core.runtime;bundle-version="3.4.0",
- org.eclipse.core.resources.semantic.spi;bundle-version="0.1.0",
- org.eclipse.core.resources.semantic.api;bundle-version="0.1.0",
+ org.eclipse.core.resources.semantic;bundle-version="0.1.0",
  org.eclipse.swt;bundle-version="3.4.2",
  org.eclipse.team.ui;bundle-version="3.4.1",
  org.eclipse.ui.workbench;bundle-version="3.4.2",
  org.eclipse.jface;bundle-version="3.4.2",
  org.eclipse.core.expressions;bundle-version="3.4.1",
  org.eclipse.core.resources.semantic.examples;bundle-version="0.1.0"
-Export-Package: org.eclipse.core.resources.semantic.test.suite
+Export-Package: org.eclipse.core.resources.semantic.test,
+ org.eclipse.core.resources.semantic.test.provider,
+ org.eclipse.core.resources.semantic.test.suite
 
 

@@ -84,7 +84,7 @@
       </command>
    </extension>
    <extension
-         point="org.eclipse.core.resources.semantic.spi.contentProvider">
+         point="org.eclipse.core.resources.semantic.contentProvider">
       <contentProvider
             class="org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider"
             id="org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider">
@@ -99,7 +99,7 @@
       </contentProvider>
    </extension>
    <extension
-         point="org.eclipse.core.resources.semantic.spi.pathContentProviderMapping">
+         point="org.eclipse.core.resources.semantic.pathContentProviderMapping">
       <mapping
             contentProviderId="org.eclipse.core.resources.semantic.examples.providers.SampleCompositeResourceContentProvider"
             path="SampleCompositeResourceContentProvider">

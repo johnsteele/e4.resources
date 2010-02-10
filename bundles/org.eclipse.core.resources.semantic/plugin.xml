@@ -73,4 +73,14 @@
             metaFilePaths=".repository/info.xmi">
       </repository>
    </extension>
+   <extension-point id="historyPageSource" name="Semantic File System History Page" schema="schema/historyPageSource.exsd"/>
+   <extension-point id="contentProvider" name="Semantic File System Content Provider" schema="schema/org.eclipse.core.resources.semantic.spi.contentProvider.exsd"/>
+   <extension-point id="pathContentProviderMapping" name="Path to Semantic File System Content Provider Mapping" schema="schema/org.eclipse.core.resources.semantic.spi.pathContentProviderMapping.exsd"/>
+   <extension
+         point="org.eclipse.core.resources.semantic.contentProvider">
+      <contentProvider
+            class="org.eclipse.core.internal.resources.semantic.provider.DefaultContentProvider"
+            id="org.eclipse.core.resources.semantic.provider.DefaultContentProvider">
+      </contentProvider>
+   </extension>
 </plugin>

@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.e4.demo.e4photo.withSFS;singleton:=true
 Bundle-Version: 0.9.1.qualifier
 Bundle-Activator: org.eclipse.e4.demo.e4photo.withsfs.Activator
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
- org.eclipse.core.resources.semantic.api;bundle-version="0.1.0",
+ org.eclipse.core.resources.semantic;bundle-version="0.1.0",
  org.eclipse.e4.core.services;bundle-version="0.9.1",
  org.eclipse.core.resources;bundle-version="3.4.2",
  org.eclipse.e4.ui.services;bundle-version="0.9.1",

@@ -16,7 +16,14 @@
 	<plugin-suite>
 		org.eclipse.core.resources.semantic.test.suite.SfsTestSuite
 	</plugin-suite>
-	<code-coverage>org.eclipse.core.resources.semantic</code-coverage>
+	<!-- add all plug-ins covered by this test coding -->
+	<code-coverage>
+		org.eclipse.core.resources.semantic,
+		org.eclipse.core.resources.semantic.api,
+		org.eclipse.core.resources.semantic.shared,
+		org.eclipse.core.resources.semantic.spi,
+		org.eclipse.core.resources.semantic.ui
+	</code-coverage>
 </run>
 
 </test>

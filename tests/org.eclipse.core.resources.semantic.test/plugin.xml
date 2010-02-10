@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2009 SAP AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Eduard Bartsch (SAP AG) - initial API and implementation
+        Mathias Kinzler (SAP AG) - initial API and implementation
+ -->
+<plugin>
+   <extension
+         point="org.eclipse.core.resources.semantic.contentProvider">
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.PlainTestContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.PlainTestContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.MemoryCachingTestContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.MemoryCachingTestContentProvider">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.NullContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.NullContentProvider">
+      </contentProvider>
+   </extension>
+   <extension
+         point="org.eclipse.core.resources.semantic.pathContentProviderMapping">
+      <mapping
+            contentProviderId="org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider"
+            path="A/B/C">
+      </mapping>
+      <mapping
+            contentProviderId="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider"
+            path="A/B/D">
+      </mapping>
+      <mapping
+            contentProviderId="org.eclipse.core.resources.semantic.test.provider.PlainTestContentProvider"
+            path="PlainTestContentProvider">
+      </mapping>
+      <mapping
+            contentProviderId="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider"
+            path="CachingTestContentProvider">
+      </mapping>
+   </extension>
+</plugin>
