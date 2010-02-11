@@ -20,6 +20,7 @@
 
    <requires>
       <import plugin="org.eclipse.core.resources"/>
+      <import feature="org.eclipse.emf.ecore" version="2.6.0" match="compatible"/>
    </requires>
 
    <plugin

@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.resources.tests.feature"
       label="%featureName"
-      version="0.9.0.qualifier"
+      version="0.10.0.qualifier"
       provider-name="%providerName">
 
    <description>
@@ -22,31 +22,7 @@
    </requires>
 
    <plugin
-         id="org.eclipse.core.tests.resources"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.tests.resources.saveparticipant"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.tests.resources.saveparticipant1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.tests.resources.saveparticipant2"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.tests.resources.saveparticipant3"
+         id="org.eclipse.core.resources.semantic.test"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
