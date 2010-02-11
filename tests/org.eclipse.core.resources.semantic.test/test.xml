@@ -26,6 +26,7 @@
 		<ant target="ui-test" antfile="${library-file}" dir="${eclipse-home}">
 			<property name="data-dir" value="${sniff-folder}" />
 			<property name="plugin-name" value="${plugin-name}" />
+			<property name="extraVMargs" value="-Dorg.eclipse.swt.browser.XULRunnerPath=/shared/common/mozilla-xulrunner181-1.8.1.4-30.ppc" />
 			<property name="classname" value="org.eclipse.core.resources.semantic.test.suite.SfsTestSuite" />
 		</ant>
 	</target>
