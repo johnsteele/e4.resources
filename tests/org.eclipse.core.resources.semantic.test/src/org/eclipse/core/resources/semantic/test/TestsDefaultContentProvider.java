@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 
 import junit.framework.Assert;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -32,8 +33,10 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -605,6 +608,23 @@ public class TestsDefaultContentProvider {
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+	}
+
+	/**
+	 * TODO create some SPI test class
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testFileStoreBehaviorAfterRemove() throws Exception {
+
+		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
+		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+		IPath beforePath = store.getPath();
+		store.remove(null);
+		IPath afterPath = store.getPath();
+		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath);
 
 	}
 

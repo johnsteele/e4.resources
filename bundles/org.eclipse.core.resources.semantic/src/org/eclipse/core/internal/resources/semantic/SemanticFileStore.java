@@ -66,6 +66,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	private final ISemanticFileSystemLog log;
 	private ISemanticContentProvider provider;
 
+	private IPath previousPath;
+
 	SemanticFileStore(SemanticFileSystem fs, ResourceTreeNode node) {
 		super(fs, node);
 		this.log = fs.getLog();
@@ -1435,6 +1437,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForRead();
 
+			if (this.previousPath != null) {
+				return this.previousPath;
+			}
+
 			StringBuilder sb = new StringBuilder(50);
 			sb.append('/');
 			sb.append(this.node.getName());
@@ -1470,9 +1476,19 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		IFileStore parent = getParent();
 
 		if (parent != null) {
-			if (parent instanceof SemanticFileStore) {
-				SemanticFileStore sparent = (SemanticFileStore) parent;
 
+			if (parent instanceof SemanticFileStore) {
+
+				try {
+					this.fs.lockForWrite();
+					// keep the last path so that getPath returns something meaningful after remove
+					this.previousPath = getPath();
+
+				} finally {
+					this.fs.unlockForWrite();
+				}
+
+				SemanticFileStore sparent = (SemanticFileStore) parent;
 				sparent.removeChild(getName());
 			} else {
 				// TODO 0.1: this needs to be handled if a resource is contained
