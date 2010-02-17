@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2009 SAP AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Eduard Bartsch (SAP AG) - initial API and implementation
+        Mathias Kinzler (SAP AG) - initial API and implementation
+ -->
+<plugin>
+
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.core.resources.semantic.examples.category"
+            name="Semantic File System">
+      </category>
+      <wizard
+            category="org.eclipse.core.resources.semantic.examples.category"
+            class="org.eclipse.core.resources.semantic.examples.NewDemoSemanticProjectWizard"
+            icon="icons/newprj_wiz.gif"
+            id="org.eclipse.core.resources.semantic.examples_demoProjectWizard"
+            name="Demo Project"
+            project="true">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.core.resources.semantic.examples.remote.RemoteStoreEditor"
+            extensions="xml"
+            id="org.eclipse.core.resources.semantic.examples.editors.RemoteStoreEditor"
+            name="RemoteStore Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddFromRemote"
+            id="org.eclipse.core.resources.semantic.examples_addFromRemote"
+            name="Add Resource From Remote">
+      </command>
+      <command
+            defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddRestResource"
+            id="org.eclipse.core.resources.semantic.examples_addRESTResource"
+            name="Add Demo REST Resource">
+      </command>
+      <command
+            defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddFileFromRemote"
+            id="org.eclipse.core.resources.semantic.examples_addFileFromRemote"
+            name="Add a Local File System Resource">
+      </command>
+      <command
+            defaultHandler="org.eclipse.core.resources.semantic.examples.HandleCreateRemotely"
+            id="org.eclipse.core.resources.semantic.examples_createRemote"
+            name="Create a remote Resource">
+      </command>
+      <command
+            defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddWsFileFromRemote"
+            id="org.eclipse.core.resources.semantic.examples_addWSDLResource"
+            name="Add a WSDL Resource">
+      </command>
+   </extension>
+
+
+</plugin>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/PurchaseOrder/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PurchaseOrder" targetNamespace="http://www.example.org/PurchaseOrder/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.example.org/PurchaseOrder/" xmlns:Q1="http://www.example.org/customer">
+            <xsd:import schemaLocation="customer.xsd" namespace="http://www.example.org/customer"></xsd:import>
+            <xsd:element name="createPurchaseOrder">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="ID" type="xsd:string" />
+          	<xsd:element name="customer" type="Q1:Customer"></xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="createPurchaseOrderResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="out" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="createPurchaseOrderRequest">
+    <wsdl:part element="tns:createPurchaseOrder" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="createPurchaseOrderResponse">
+    <wsdl:part element="tns:createPurchaseOrderResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="PurchaseOrder">
+    <wsdl:operation name="createPurchaseOrder">
+      <wsdl:input message="tns:createPurchaseOrderRequest"/>
+      <wsdl:output message="tns:createPurchaseOrderResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PurchaseOrderSOAP" type="tns:PurchaseOrder">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="createPurchaseOrder">
+      <soap:operation soapAction="http://www.example.org/PurchaseOrder/createPurchaseOrder"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PurchaseOrder">
+    <wsdl:port binding="tns:PurchaseOrderSOAP" name="PurchaseOrderSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

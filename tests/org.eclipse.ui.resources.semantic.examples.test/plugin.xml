@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.resources.semantic.contentProvider">
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider"
+            id="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider">
+      </contentProvider>
+   </extension>
+
+</plugin>
