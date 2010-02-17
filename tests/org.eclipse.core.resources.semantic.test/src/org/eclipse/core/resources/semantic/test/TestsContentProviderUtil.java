@@ -50,15 +50,18 @@ import org.junit.BeforeClass;
  */
 public abstract class TestsContentProviderUtil {
 
-	static final QualifiedName TEMPLATE_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Hello");
-	static final QualifiedName DUMMY_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy1");
-	static final QualifiedName DUMMY_PROP2 = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy2");
+	// TODO the following are public currently because of test failures
 
-	final String projectName;
-	final String providerName;
-	protected IProject testProject;
-	final int options;
-	final boolean autoRefresh;
+	public static final QualifiedName TEMPLATE_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Hello");
+	public static final QualifiedName DUMMY_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy1");
+	public static final QualifiedName DUMMY_PROP2 = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy2");
+
+	public final String projectName;
+	public final String providerName;
+
+	public IProject testProject;
+	public final int options;
+	public final boolean autoRefresh;
 
 	/**
 	 * The constructor

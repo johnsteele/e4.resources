@@ -15,14 +15,8 @@ import org.eclipse.core.resources.semantic.test.TestCacheService;
 import org.eclipse.core.resources.semantic.test.TestsCachingProvider;
 import org.eclipse.core.resources.semantic.test.TestsDefaultContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsFederatingProvider;
-import org.eclipse.core.resources.semantic.test.TestsMemoryCachingProvider;
 import org.eclipse.core.resources.semantic.test.TestsNullContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsPlainProvider;
-import org.eclipse.core.resources.semantic.test.TestsRepositoryProvider;
-import org.eclipse.core.resources.semantic.test.TestsRestContentProvider;
-import org.eclipse.core.resources.semantic.test.TestsSFSUi;
-import org.eclipse.core.resources.semantic.test.TestsSampleCompositeResourceProvider;
-import org.eclipse.core.resources.semantic.test.TestsSynchronization;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -32,15 +26,9 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses( { TestsDefaultContentProvider.class, //
 	TestsPlainProvider.class, //
-	TestsRestContentProvider.class,//
 	TestsCachingProvider.class,//
 	TestsFederatingProvider.class,//
-	TestsMemoryCachingProvider.class,//
-	TestsNullContentProvider.class,//
-	TestsRepositoryProvider.class,//
-		TestsSampleCompositeResourceProvider.class,//
-	TestsSFSUi.class,//
-	TestsSynchronization.class,//
+		TestsNullContentProvider.class,//
 	TestCacheService.class
 
 })

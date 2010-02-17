@@ -35,7 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
+
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
@@ -166,7 +166,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		try {
 			db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 			throw new CoreException(error);
 		}
 		Document doc = db.newDocument();
@@ -184,7 +184,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		try {
 			transformer = tf.newTransformer();
 		} catch (TransformerConfigurationException e) {
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 			throw new CoreException(error);
 		}
 		transformer.setOutputProperty(OutputKeys.STANDALONE, "no"); //$NON-NLS-1$
@@ -192,19 +192,21 @@ public class RemoteStore extends RemoteStoreTransient {
 		try {
 			transformer.transform(domSource, result);
 		} catch (TransformerException e) {
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 			throw new CoreException(error);
 		}
 
+		IFile file = this.myContainer.getProject().getFile(RemoteStore.FILENAME);
+
 		InputStream is;
 		try {
-			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes("UTF-8")); //$NON-NLS-1$
+			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes(file.getCharset(true)));
 		} catch (UnsupportedEncodingException e) {
-			// $JL-EXC$
+			// $JL-EXC$ ignore here
+			//$JL-I18N$
 			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes());
 		}
 
-		IFile file = this.myContainer.getProject().getFile(RemoteStore.FILENAME);
 		if (!file.exists()) {
 			file.create(is, false, null);
 		} else {
@@ -233,13 +235,13 @@ public class RemoteStore extends RemoteStoreTransient {
 				try {
 					SAXParserFactory.newInstance().newSAXParser().parse(file.getContents(), handler);
 				} catch (SAXException e) {
-					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 					throw new CoreException(error);
 				} catch (IOException e) {
-					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 					throw new CoreException(error);
 				} catch (ParserConfigurationException e) {
-					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, null, e);
+					IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null, e);
 					throw new CoreException(error);
 				}
 			} finally {
@@ -305,7 +307,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		return true;
 	}
 
-	private static byte[] stringToBytes(String string) {
+	static byte[] stringToBytes(String string) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		int token = 0;
@@ -320,7 +322,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		return bos.toByteArray();
 	}
 
-	private static String bytesToString(byte[] bytes) {
+	static String bytesToString(byte[] bytes) {
 		StringBuilder sb = new StringBuilder();
 
 		for (byte c : bytes) {

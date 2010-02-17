@@ -9,7 +9,7 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.resources.semantic.examples;
+package org.eclipse.core.resources.semantic.examples.providers;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -154,7 +154,7 @@ public class RESTUtil {
 	public static StringBuffer readStreamIntoStringBuffer(InputStream is, String encoding) throws IOException {
 		StringBuffer buf = new StringBuffer();
 		char[] buffer = new char[4096];
-
+		//$JL-I18N$
 		Reader r = new InputStreamReader(is, encoding);
 
 		int len;

@@ -19,10 +19,7 @@
 	<!-- add all plug-ins covered by this test coding -->
 	<code-coverage>
 		org.eclipse.core.resources.semantic,
-		org.eclipse.core.resources.semantic.api,
-		org.eclipse.core.resources.semantic.shared,
-		org.eclipse.core.resources.semantic.spi,
-		org.eclipse.core.resources.semantic.ui
+		org.eclipse.ui.resources.semantic
 	</code-coverage>
 </run>
 

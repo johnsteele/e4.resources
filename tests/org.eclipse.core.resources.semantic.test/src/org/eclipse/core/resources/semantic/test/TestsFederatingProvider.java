@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import junit.framework.Assert;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.internal.resources.semantic.provider.DefaultContentProvider;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -36,7 +37,6 @@ import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider;
 import org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider;
-import org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -159,7 +159,10 @@ public class TestsFederatingProvider {
 							TestsFederatingProvider.this.options, monitor);
 					sstore = (ISemanticFileStore) EFS.getStore(restSFile.getAdaptedResource().getLocationURI());
 					cp = sstore.getEffectiveContentProvider();
-					Assert.assertEquals("Wrong content provider", RestTestContentProvider.class.getName(), cp.getClass().getName());
+					// TODO fix this when using another content provider
+					Assert
+					.assertEquals("Wrong content provider", DefaultContentProvider.class.getName(), cp.getClass()
+							.getName());
 
 					Assert.assertFalse("Resource should not exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource().exists());
 					Assert.assertFalse("Resource should not exist " + restSFile.getAdaptedResource().getLocationURI(), restSFile.getAdaptedResource()

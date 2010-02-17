@@ -12,6 +12,7 @@
 package org.eclipse.core.resources.semantic.examples.remote;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 /**
@@ -29,6 +30,14 @@ public class RemoteStoreTransient {
 	 */
 	public RemoteStoreTransient(IContainer container) {
 		this.myContainer = container;
+	}
+
+	/**
+	 * @return the default encoding of the container
+	 * @throws CoreException
+	 */
+	public String getDefaultCharset() throws CoreException {
+		return this.myContainer.getDefaultCharset(true);
 	}
 
 	/**

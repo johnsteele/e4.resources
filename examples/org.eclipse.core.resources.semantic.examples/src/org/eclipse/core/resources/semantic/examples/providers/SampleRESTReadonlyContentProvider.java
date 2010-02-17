@@ -21,9 +21,8 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.SyncDirection;
-import org.eclipse.core.resources.semantic.examples.RESTUtil;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
-import org.eclipse.core.resources.semantic.examples.RESTUtil.IRESTCallback;
+import org.eclipse.core.resources.semantic.examples.providers.RESTUtil.IRESTCallback;
+import org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
@@ -176,12 +175,12 @@ public class SampleRESTReadonlyContentProvider extends CachingContentProvider im
 
 	public IStatus validateEdit(ISemanticFileStore[] stores, Object shell) {
 		// silently reject
-		return new Status(IStatus.CANCEL, SemanticResourcesPluginExamples.PLUGIN_ID, null);
+		return new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null);
 	}
 
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
 		// silently reject
-		return new Status(IStatus.CANCEL, SemanticResourcesPluginExamples.PLUGIN_ID, null);
+		return new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID, null);
 	}
 
 	public void addFileFromRemoteByURI(ISemanticFileStore parentStore, String name, URI uri, IProgressMonitor monitor) throws CoreException {
@@ -208,7 +207,7 @@ public class SampleRESTReadonlyContentProvider extends CachingContentProvider im
 		// TODO 0.1: what to do on folders?
 		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
 			this.deleteCache(semanticFileStore, monitor);
-			MultiStatus status = new MultiStatus(SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, NLS.bind(
+			MultiStatus status = new MultiStatus(SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, NLS.bind(
 					Messages.SampleRESTReadonlyContentProvider_MethodResult_XMSG, "setURISting"), null); //$NON-NLS-1$
 			this.fillCache(semanticFileStore, monitor, status);
 

@@ -22,8 +22,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.semantic.SyncDirection;
-import org.eclipse.core.resources.semantic.examples.RESTUtil;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
+import org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
@@ -66,7 +65,7 @@ public class SampleWSDLXSDContentProvider extends SampleRESTReadonlyContentProvi
 
 		} catch (IOException e) {
 			// $JL-EXC$ ignore
-			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage(), e));
+			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, e.getMessage(), e));
 		} finally {
 			Util.safeClose(is);
 		}

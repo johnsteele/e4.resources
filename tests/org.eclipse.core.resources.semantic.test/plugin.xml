@@ -19,10 +19,6 @@
             id="org.eclipse.core.resources.semantic.test.provider.PlainTestContentProvider">
       </contentProvider>
       <contentProvider
-            class="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider"
-            id="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider">
-      </contentProvider>
-      <contentProvider
             class="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider"
             id="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider">
       </contentProvider>

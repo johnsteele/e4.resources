@@ -323,7 +323,7 @@ ISemanticContentProviderLocking {
 					Util.safeClose(os);
 				}
 				// TODO test timestamps after sync out
-				srv.setContentTimestamp(storePath, file.getTimestamp());
+				setResourceTimestamp(store, file.getTimestamp(), monitor);
 
 			}
 

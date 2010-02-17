@@ -25,11 +25,11 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.SyncDirection;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStore;
+import org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
@@ -53,10 +53,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.ITag;
@@ -67,13 +64,13 @@ import org.eclipse.team.core.history.ITag;
  */
 public class RemoteStoreContentProvider extends CachingContentProvider implements ISemanticContentProviderRemote {
 	/** If set, this should use the own project for remote storage */
-	public static final QualifiedName USE_PROJECT = new QualifiedName(SemanticResourcesPluginExamples.PLUGIN_ID, "UseOwnProject"); //$NON-NLS-1$
+	public static final QualifiedName USE_PROJECT = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "UseOwnProject"); //$NON-NLS-1$
 
-	private static final IStatus OKSTATUS = new Status(IStatus.OK, SemanticResourcesPluginExamples.PLUGIN_ID, ""); //$NON-NLS-1$
-	private static final IStatus CANCELSTATUS = new Status(IStatus.CANCEL, SemanticResourcesPluginExamples.PLUGIN_ID,
+	private static final IStatus OKSTATUS = new Status(IStatus.OK, SemanticResourcesPluginExamplesCore.PLUGIN_ID, ""); //$NON-NLS-1$
+	private static final IStatus CANCELSTATUS = new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
 			Messages.RemoteStoreContentProvider_Canceld_XMSG);
 
-	private static final QualifiedName ATTR_READONLY = new QualifiedName(SemanticResourcesPluginExamples.PLUGIN_ID, "ReadOnly"); //$NON-NLS-1$
+	private static final QualifiedName ATTR_READONLY = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "ReadOnly"); //$NON-NLS-1$
 
 	private final static class RuleFactory implements ISemanticResourceRuleFactory {
 
@@ -288,17 +285,17 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 				if (srv.hasContent(semanticFileStore.getPath())) {
 					localTime = srv.getContentTimestamp(semanticFileStore.getPath());
 				}
-				if (localTime > remoteTime) {
+				if (direction == SyncDirection.OUTGOING || localTime > remoteTime) {
 					// outgoing
 					OutputStream os = file.getOutputStream(false);
 					Util.transferStreams(srv.getContent(semanticFileStore.getPath()), os, monitor);
 					file.setTimestamp(srv.getContentTimestamp(semanticFileStore.getPath()));
 					store.serialize(monitor);
-				} else if (remoteTime > localTime) {
+				} else if (direction == SyncDirection.INCOMING || remoteTime > localTime) {
 					// incoming
 					srv.addContent(semanticFileStore.getPath(), new ByteArrayInputStream(file.getContent()), ISemanticFileSystem.NONE,
 							monitor);
-					srv.setContentTimestamp(semanticFileStore.getPath(), remoteTime);
+					setResourceTimestamp(semanticFileStore, remoteTime, monitor);
 				}
 
 			} catch (CoreException e) {
@@ -325,7 +322,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 			this.addFolderFromRemote(parentStore, name, monitor);
 			break;
 		case PROJECT_TYPE:
-			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
 					Messages.RemoteStoreContentProvider_CannotCreateProject_XMSG));
 		}
 	}
@@ -339,7 +336,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 					Messages.RemoteStoreContentProvider_RemoteItemNotFound_XMSG);
 		}
 		if (item.getType() != Type.FILE) {
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID,
+			IStatus error = new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
 					Messages.RemoteStoreContentProvider_RemoteNotFile_XMSG);
 			throw new CoreException(error);
 		}
@@ -416,85 +413,29 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 	}
 
 	public IStatus validateRemoteCreate(ISemanticFileStore parentStore, String childName, final Object shell) {
-		if (shell == null) {
-			return OKSTATUS;
-		}
-		final boolean[] result = new boolean[] { false };
-		Display.getDefault().syncExec(new Runnable() {
-
-			public void run() {
-				result[0] = MessageDialog.openConfirm((Shell) shell, Messages.RemoteStoreContentProvider_Confirm_XGRP,
-						Messages.RemoteStoreContentProvider_ConfirmCreate_XMSG);
-
-			}
-		});
-
-		if (result[0]) {
-			return OKSTATUS;
-		}
-		return CANCELSTATUS;
+		return OKSTATUS;
 	}
 
 	public IStatus validateRemoteDelete(ISemanticFileStore semanticFileStore, final Object shell) {
 
-		if (shell == null) {
-			return OKSTATUS;
-		}
-		final boolean[] result = new boolean[] { false };
-		Display.getDefault().syncExec(new Runnable() {
-
-			public void run() {
-				result[0] = MessageDialog.openConfirm((Shell) shell, Messages.RemoteStoreContentProvider_Confirm_XGRP,
-						Messages.RemoteStoreContentProvider_ConfirmRemoteDelete_XMSG);
-
-			}
-		});
-
-		if (result[0]) {
-			return OKSTATUS;
-		}
-		return CANCELSTATUS;
+		return OKSTATUS;
 	}
 
 	public IStatus validateEdit(ISemanticFileStore[] stores, final Object shell) {
 
 		if (shell != null) {
 
-			MultiStatus multi = new MultiStatus(SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK,
+			MultiStatus multi = new MultiStatus(SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK,
 					Messages.RemoteStoreContentProvider_ValidateEdit_XGRP, null);
-
-			final boolean[] result = new boolean[1];
 
 			for (ISemanticFileStore store : stores) {
 
-				result[0] = false;
-
-				Runnable runnable = new Runnable() {
-
-					public void run() {
-						result[0] = MessageDialog.openConfirm((Shell) shell, Messages.RemoteStoreContentProvider_Confirm_XGRP,
-								Messages.RemoteStoreContentProvider_ConfirmEdit_XGRP);
-
-					}
-				};
-
-				Display current = Display.getCurrent();
-				if (current == null) {
-					Display.getDefault().syncExec(runnable);
-				} else {
-					runnable.run();
-				}
-
-				if (result[0]) {
-					try {
-						this.setReadOnly(store, false, null);
-						continue;
-					} catch (CoreException e) {
-						SemanticResourcesPluginExamples.getDefault().getLog().log(e.getStatus());
-						multi.add(e.getStatus());
-					}
-				} else {
-					multi.add(CANCELSTATUS);
+				try {
+					this.setReadOnly(store, false, null);
+					continue;
+				} catch (CoreException e) {
+					SemanticResourcesPluginExamplesCore.getDefault().getLog().log(e.getStatus());
+					multi.add(e.getStatus());
 				}
 
 			}
@@ -600,7 +541,8 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 					try {
 						deleteCache(store, actMonitor);
 					} catch (CoreException ce) {
-						// $JL-EXC$ TODO trace? we simply hope to delete this upon
+						// $JL-EXC$ TODO trace? we simply hope to delete this
+						// upon
 						// re-create
 					}
 					store.remove(actMonitor);

@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.resources.semantic.ISemanticProject;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
 import org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -27,7 +26,7 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public class RemoteStoreAdapter implements IAdapterFactory {
 
-	private final static QualifiedName STORE = new QualifiedName(SemanticResourcesPluginExamples.PLUGIN_ID, "TransientStore"); //$NON-NLS-1$
+	private final static QualifiedName STORE = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "TransientStore"); //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -51,7 +50,7 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 								return store;
 							} catch (CoreException e) {
 								// $JL-EXC$
-								SemanticResourcesPluginExamples.getDefault().getLog().log(e.getStatus());
+								SemanticResourcesPluginExamplesCore.getDefault().getLog().log(e.getStatus());
 							}
 						}
 						return null;
@@ -67,7 +66,7 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 				newStore.deserialize();
 			} catch (CoreException e) {
 				// $JL-EXC$
-				SemanticResourcesPluginExamples.getDefault().getLog().log(e.getStatus());
+				SemanticResourcesPluginExamplesCore.getDefault().getLog().log(e.getStatus());
 			}
 
 			return newStore;
@@ -91,7 +90,7 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 				resource.setSessionProperty(STORE, newStore);
 			} catch (CoreException e) {
 				// $JL-EXC$
-				SemanticResourcesPluginExamples.getDefault().getLog().log(e.getStatus());
+				SemanticResourcesPluginExamplesCore.getDefault().getLog().log(e.getStatus());
 			}
 
 			return newStore;

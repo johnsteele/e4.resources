@@ -21,9 +21,8 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.SyncDirection;
-import org.eclipse.core.resources.semantic.examples.RESTUtil;
-import org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples;
-import org.eclipse.core.resources.semantic.examples.RESTUtil.IRESTCallback;
+import org.eclipse.core.resources.semantic.examples.providers.RESTUtil.IRESTCallback;
+import org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
@@ -116,7 +115,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 
 			if ((options & ISemanticFileSystem.VALIDATE_REMOVE_RAISE_ERROR_ON_SCOPE_EXTENSION) != 0) {
 				if (counter[0] > 1) {
-					return new Status(IStatus.CANCEL, SemanticResourcesPluginExamples.PLUGIN_ID, NLS.bind(
+					return new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID, NLS.bind(
 							Messages.SampleCompositeResourceContentProvider_CannotDeletePartOfCompositeResource_XMSG, semanticFileStore
 									.getPath().toString()));
 				}
@@ -124,7 +123,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 
 			if ((options & ISemanticFileSystem.VALIDATE_REMOVE_IGNORE_RESOURCE_STATE) == 0) {
 				if (counterNonReadOnly[0] > 0) {
-					return new Status(IStatus.CANCEL, SemanticResourcesPluginExamples.PLUGIN_ID, NLS.bind(
+					return new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID, NLS.bind(
 							Messages.SampleCompositeResourceContentProvider_SomeResourcesAreCheckedOut_XMSG, semanticFileStore.getPath()
 									.toString()));
 				}
@@ -216,13 +215,13 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 			this.visitCompositeParts(semanticFileStore, new IVisitor() {
 				public void visit(ISemanticFileStore store) throws CoreException {
 					dropCache(store, monitor, SampleCompositeResourceContentProvider.this.deleteAllVisitor, new MultiStatus(
-							SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, null, null));
+							SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, null, null));
 					store.remove(monitor);
 				}
 			}, monitor);
 		} else {
 			dropCache(semanticFileStore, monitor, SampleCompositeResourceContentProvider.this.deleteAllVisitor, new MultiStatus(
-					SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, null, null));
+					SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, null, null));
 			semanticFileStore.remove(monitor);
 		}
 	}
@@ -233,7 +232,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 				public void visit(ISemanticFileStore store) throws CoreException {
 					if (!store.isLocalOnly()) {
 						dropCache(store, monitor, SampleCompositeResourceContentProvider.this.deleteAllVisitor, new MultiStatus(
-								SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, null, null));
+								SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, null, null));
 						setReadOnlyInternal(store, true);
 					}
 				}
@@ -282,7 +281,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 	}
 
 	public IStatus validateEdit(ISemanticFileStore[] semanticFileStore, Object shell) {
-		MultiStatus status = new MultiStatus(SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, null, null);
+		MultiStatus status = new MultiStatus(SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, null, null);
 		for (ISemanticFileStore iSemanticFileStore : semanticFileStore) {
 			// silently mark as writable
 			try {
@@ -307,7 +306,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 			if (!store.isLocalOnly()) {
 				setURIStringInternal(store, uri.toString());
 				dropCache(store, monitor, SampleCompositeResourceContentProvider.this.deleteAllVisitor, new MultiStatus(
-						SemanticResourcesPluginExamples.PLUGIN_ID, IStatus.OK, null, null));
+						SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, null, null));
 				setReadOnlyInternal(store, true);
 			}
 		} else {

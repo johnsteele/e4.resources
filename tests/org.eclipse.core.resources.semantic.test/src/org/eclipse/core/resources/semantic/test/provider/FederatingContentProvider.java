@@ -43,7 +43,8 @@ public class FederatingContentProvider extends ContentProvider implements ISeman
 
 	static {
 		pathTemplatMap.put(new Path("A/B").makeRelative(), FederatedContentProvider.class.getName());
-		pathTemplatMap.put(new Path("A/C").makeRelative(), RestTestContentProvider.class.getName());
+		// TODO use another content provider
+		pathTemplatMap.put(new Path("A/C").makeRelative(), "org.eclipse.core.resources.semantic.provider.DefaultContentProvider");
 	}
 
 	public String getFederatedProviderIDForPath(IPath path) {

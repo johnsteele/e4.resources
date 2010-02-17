@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Examples how to use Semantic File System
 Bundle-SymbolicName: org.eclipse.core.resources.semantic.examples;singleton:=true
 Bundle-Version: 0.1.0.qualifier
-Bundle-Activator: org.eclipse.core.resources.semantic.examples.SemanticResourcesPluginExamples
+Bundle-Activator: org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore
 Require-Bundle: org.eclipse.ui;bundle-version="3.4.2",
  org.eclipse.core.runtime;bundle-version="3.4.0",
  org.eclipse.core.resources;bundle-version="3.4.2",
@@ -17,6 +17,5 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.4.2",
  org.eclipse.core.expressions;bundle-version="3.4.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.core.resources.semantic.examples,
- org.eclipse.core.resources.semantic.examples.providers,
+Export-Package: org.eclipse.core.resources.semantic.examples.providers,
  org.eclipse.core.resources.semantic.examples.remote
