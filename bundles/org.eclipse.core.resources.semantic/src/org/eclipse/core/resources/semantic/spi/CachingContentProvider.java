@@ -28,7 +28,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.osgi.util.NLS;
+
+
 
 /**
  * This will delegate calls to openInputStream and openOutputStream to local
@@ -59,6 +62,8 @@ import org.eclipse.osgi.util.NLS;
  * 
  */
 public abstract class CachingContentProvider extends ContentProvider {
+	
+	private static final QualifiedName RESOURCE_TIMESTAMP = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID, "ResourceTimestamp"); //$NON-NLS-1$
 	// TODO 0.1: add convenience/helper methods to cleanup cache along with
 	// file/folder removal
 	// TODO 0.1: add helpers for write-through error handling
@@ -426,11 +431,19 @@ public abstract class CachingContentProvider extends ContentProvider {
 	}
 
 	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+		
+
+		String stampString = semanticFileStore.getPersistentProperty(RESOURCE_TIMESTAMP);
+		if (stampString != null){
+			return Long.parseLong(stampString);
+		}
+		// the cache service can also give some information, but depending on the
+		// underlying file system, precision may be seconds, not milliseconds
 		ICacheService cacheService = this.getCacheService();
 		IPath path = semanticFileStore.getPath();
 		long timestamp = cacheService.getContentTimestamp(path);
 
-		if (timestamp >= 0) {
+		if (timestamp >= 0) {			
 			return timestamp;
 		}
 
@@ -456,18 +469,24 @@ public abstract class CachingContentProvider extends ContentProvider {
 	}
 
 	public void setResourceTimestamp(ISemanticFileStore semanticFileStore, long timestamp, IProgressMonitor monitor) throws CoreException {
+		
+		semanticFileStore.setPersistentProperty(RESOURCE_TIMESTAMP, Long.toString(timestamp));
+		
+		// we also update the cache information, but this is additional information only
 		ICacheService cacheService = this.getCacheService();
 		IPath path = semanticFileStore.getPath();
 
 		if (cacheService.hasContent(path)) {
 			cacheService.setContentTimestamp(path, timestamp);
-		} else {
-			// ugly as it is, this will set the timestamp on the cache file
-			// properly
-			InputStream is = openInputStream(semanticFileStore, monitor);
-			Util.safeClose(is);
-			cacheService.setContentTimestamp(path, timestamp);
 		}
+		// TODO we probably don't want to get a cache update, do we?
+//		else {
+//			// ugly as it is, this will set the timestamp on the cache file
+//			// properly
+//			InputStream is = openInputStream(semanticFileStore, monitor);
+//			Util.safeClose(is);
+//			cacheService.setContentTimestamp(path, timestamp);
+//		}
 	}
 
 }
