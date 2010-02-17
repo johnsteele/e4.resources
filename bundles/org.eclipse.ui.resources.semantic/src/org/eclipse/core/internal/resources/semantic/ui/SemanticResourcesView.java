@@ -419,6 +419,9 @@ public class SemanticResourcesView extends ViewPart {
 				}
 			};
 
+			// don't show this in the UI
+			refreshJob.setSystem(true);
+
 			IWorkbenchSiteProgressService service = (IWorkbenchSiteProgressService) getSite().getService(
 					IWorkbenchSiteProgressService.class);
 			// keep track of this job
