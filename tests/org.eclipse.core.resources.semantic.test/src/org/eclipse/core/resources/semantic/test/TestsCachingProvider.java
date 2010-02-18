@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 
 /**
@@ -141,11 +142,17 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 			};
 
 			try {
-				// re-adding should fail as long as the inputstream is still open
-				// (actually the delete failed, but this is ignore until re-add is
+				// re-adding should fail as long as the inputstream is still
+				// open
+				// (actually the delete failed, but this is ignore until re-add
+				// is
 				// encountered)
 				ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
-				Assert.fail("Should have failed");
+
+				if (Platform.OS_WIN32.equals(Platform.getOS())) {
+					// fails only on Windows since UNIX file system can handle delete of open files
+					Assert.fail("Should have failed");
+				}
 			} catch (CoreException e) {
 				// $JL-EXC$ expected
 			}
@@ -208,7 +215,6 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 		assertContentsEqual(file, "NewString");
 		Assert.assertEquals("Wrong remote content", "Hello", new String(this.file1.getContent(), "UTF-8"));
 
-
 		// setcontent with remote update
 		runnable = new IWorkspaceRunnable() {
 
@@ -234,10 +240,8 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 
 		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
-
 		assertContentsEqual(file, "ThirdString");
 		Assert.assertEquals("Wrong remote content", "ThirdString", new String(this.file1.getContent(), "UTF-8"));
-
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -274,8 +278,8 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 
 				File localFile = EFS.getStore(sFile.getAdaptedFile().getLocationURI()).toLocalFile(EFS.CACHE, monitor);
 				Assert.assertNotNull("Cached Local File should not be null", localFile);
-				Assert.assertTrue("Cached file should be in Eclipse file cache", localFile.getPath().contains(
-				"org.eclipse.core.filesystem"));
+				Assert.assertTrue("Cached file should be in Eclipse file cache", localFile.getPath()
+						.contains("org.eclipse.core.filesystem"));
 
 				localFile = EFS.getStore(sFile.getAdaptedFile().getLocationURI()).toLocalFile(EFS.NONE, monitor);
 				Assert.assertNotNull("Uncached Local File should not be null", localFile);
