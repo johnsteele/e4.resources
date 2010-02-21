@@ -68,13 +68,11 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
  * View on the content of the Semantic File System.
  * 
  * Also used in the {@link FileSystemContributor} implementation of
- * {@link SemanticFileSystemContributor} which uses the controls here in
- * {@link BrowseSFSDialog}.
+ * {@link SemanticFileSystemContributor} which uses the controls here in {@link BrowseSFSDialog}.
  * <p>
- * Depending on whether this is actually used as view or as dialog, the buttons
- * will either be implemented as {@link ToolBar} or as {@link Action}
- * contributed to the {@link ToolBarManager}; in addition, refresh will behave
- * differently (blocking the UI in case of the dialog while working
+ * Depending on whether this is actually used as view or as dialog, the buttons will either be
+ * implemented as {@link ToolBar} or as {@link Action} contributed to the {@link ToolBarManager}; in
+ * addition, refresh will behave differently (blocking the UI in case of the dialog while working
  * asynchronously in view mode.
  * 
  */
@@ -108,7 +106,8 @@ public class SemanticResourcesView extends ViewPart {
 		ToolBar tb;
 
 		if (getViewSite() == null) {
-			// pop-up mode: we use right-to-left so that this looks more like the view tool bar manager
+			// pop-up mode: we use right-to-left so that this looks more like the view tool bar
+			// manager
 			tb = new ToolBar(main, SWT.HORIZONTAL | SWT.RIGHT_TO_LEFT);
 		} else {
 			// view mode: we don't add a tool bar, as we use the view tool bar manager
@@ -350,17 +349,19 @@ public class SemanticResourcesView extends ViewPart {
 		Display.getDefault().syncExec(new Runnable() {
 
 			public void run() {
-				Object[] expandeObjects = SemanticResourcesView.this.sfsTree.getExpandedElements();
+				Object[] expandedObjects = SemanticResourcesView.this.sfsTree.getExpandedElements();
 				SemanticResourcesView.this.sfsTree.setInput(newInput);
-				SemanticResourcesView.this.sfsTree.setExpandedElements(expandeObjects);
+				SemanticResourcesView.this.sfsTree.setExpandedElements(expandedObjects);
 
 				if (SemanticResourcesView.this.selectedPath != null) {
 					SFSBrowserTreeObject selected = (SFSBrowserTreeObject) SemanticResourcesView.this.propsTable.getInput();
 					SemanticResourcesView.this.propsTable.refresh();
 					SemanticResourcesView.this.propsTable.expandAll();
-					SemanticResourcesView.this.existsBox.setSelection(selected.getInfo().exists());
-					SemanticResourcesView.this.timestampText.setText(SemanticResourcesView.df.format(new Date(selected.getInfo()
-							.getLastModified())));
+					if (selected != null) {
+						SemanticResourcesView.this.existsBox.setSelection(selected.getInfo().exists());
+						SemanticResourcesView.this.timestampText.setText(SemanticResourcesView.df.format(new Date(selected.getInfo()
+								.getLastModified())));
+					}
 				} else {
 					SemanticResourcesView.this.propsTable.setInput(null);
 					SemanticResourcesView.this.existsBox.setSelection(false);
