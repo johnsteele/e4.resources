@@ -69,7 +69,7 @@ public class CacheService implements ICacheService {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
 			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] { path.toString(), new Boolean(append) });
+					new Object[] {path.toString(), new Boolean(append)});
 		}
 
 		ITemporaryContentHandle tempHandle;
@@ -98,7 +98,7 @@ public class CacheService implements ICacheService {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
 			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] { path.toString(), DFFORTRACE.format(new Date(timestamp)), new Boolean(append) });
+					new Object[] {path.toString(), DFFORTRACE.format(new Date(timestamp)), new Boolean(append)});
 		}
 
 		ITemporaryContentHandle tempHandle;
@@ -149,7 +149,7 @@ public class CacheService implements ICacheService {
 						available = -1;
 					}
 					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-							"InputStream[" + available + "]");
+							"InputStream[" + available + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 			}
@@ -217,7 +217,7 @@ public class CacheService implements ICacheService {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
 			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] { path.toString(), DFFORTRACE.format(new Date(timestamp)) });
+					new Object[] {path.toString(), DFFORTRACE.format(new Date(timestamp))});
 		}
 
 		try {

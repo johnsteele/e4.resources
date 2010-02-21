@@ -14,13 +14,13 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Export-Package: org.eclipse.core.internal.resources.semantic;x-friends:="org.eclipse.core.resources.semantic.test,org.eclipse.ui.resources.semantic",
- org.eclipse.core.internal.resources.semantic.cacheservice;x-internal:=true,
+ org.eclipse.core.internal.resources.semantic.cacheservice;x-friends:="org.eclipse.core.resources.semantic.test",
  org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;x-internal:=true,
  org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;x-internal:=true,
  org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.util;x-internal:=true,
- org.eclipse.core.internal.resources.semantic.provider;x-internal:=true,
+ org.eclipse.core.internal.resources.semantic.provider;x-friends:="org.eclipse.core.resources.semantic.test,,org.eclipse.ui.resources.semantic.examples",
  org.eclipse.core.internal.resources.semantic.spi;x-internal:=true,
  org.eclipse.core.internal.resources.semantic.team;x-internal:=true,
- org.eclipse.core.internal.resources.semantic.util;x-friends:="org.eclipse.core.resources.semantic.test,org.eclipse.ui.resources.semantic",
+ org.eclipse.core.internal.resources.semantic.util;x-friends:="org.eclipse.core.resources.semantic.test,org.eclipse.ui.resources.semantic,org.eclipse.ui.resources.semantic.examples.test",
  org.eclipse.core.resources.semantic,
  org.eclipse.core.resources.semantic.spi

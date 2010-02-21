@@ -67,8 +67,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 	public static final QualifiedName USE_PROJECT = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "UseOwnProject"); //$NON-NLS-1$
 
 	private static final IStatus OKSTATUS = new Status(IStatus.OK, SemanticResourcesPluginExamplesCore.PLUGIN_ID, ""); //$NON-NLS-1$
-	private static final IStatus CANCELSTATUS = new Status(IStatus.CANCEL, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
-			Messages.RemoteStoreContentProvider_Canceld_XMSG);
+	// private static final IStatus CANCELSTATUS = new Status(IStatus.CANCEL,
+	// SemanticResourcesPluginExamplesCore.PLUGIN_ID,
+	// Messages.RemoteStoreContentProvider_Canceld_XMSG);
 
 	private static final QualifiedName ATTR_READONLY = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "ReadOnly"); //$NON-NLS-1$
 
@@ -206,7 +207,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 						}
 					};
 
-					return new IFileRevision[] { null, remote };
+					return new IFileRevision[] {null, remote};
 				}
 			};
 		}
@@ -312,18 +313,18 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
 			throws CoreException {
 		switch (resourceType) {
-		case UNKNOWN_TYPE:
-			this.addResourceFromRemote(parentStore, name, monitor);
-			break;
-		case FILE_TYPE:
-			this.addFileFromRemote(parentStore, name, monitor);
-			break;
-		case FOLDER_TYPE:
-			this.addFolderFromRemote(parentStore, name, monitor);
-			break;
-		case PROJECT_TYPE:
-			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
-					Messages.RemoteStoreContentProvider_CannotCreateProject_XMSG));
+			case UNKNOWN_TYPE :
+				this.addResourceFromRemote(parentStore, name, monitor);
+				break;
+			case FILE_TYPE :
+				this.addFileFromRemote(parentStore, name, monitor);
+				break;
+			case FOLDER_TYPE :
+				this.addFolderFromRemote(parentStore, name, monitor);
+				break;
+			case PROJECT_TYPE :
+				throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID,
+						Messages.RemoteStoreContentProvider_CannotCreateProject_XMSG));
 		}
 	}
 
@@ -566,7 +567,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 	}
 
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
-		return validateEdit(new ISemanticFileStore[] { semanticFileStore }, null);
+		return validateEdit(new ISemanticFileStore[] {semanticFileStore}, null);
 	}
 
 }

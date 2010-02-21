@@ -40,6 +40,7 @@ public class CreateDemoProjectPage extends WizardPage {
 	String projectName;
 	String directoryName = ""; //$NON-NLS-1$
 	boolean useOtherProject = false;
+
 	@SuppressWarnings("unused")
 	// currently not evaluated, could be used to fine-tune the UI
 	private Set<Scenario> scenarios = new HashSet<Scenario>();
@@ -145,6 +146,14 @@ public class CreateDemoProjectPage extends WizardPage {
 
 		setControl(main);
 
+	}
+
+	/**
+	 * 
+	 * @return set of scenarios
+	 */
+	public Set<Scenario> getScenarios() {
+		return scenarios;
 	}
 
 	/**

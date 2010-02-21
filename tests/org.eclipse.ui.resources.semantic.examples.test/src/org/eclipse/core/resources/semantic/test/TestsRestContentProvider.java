@@ -92,8 +92,7 @@ public class TestsRestContentProvider {
 	public void beforeMethod() throws Exception {
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(
-				this.projectName);
+		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		if (project.exists()) {
 			throw new IllegalStateException("Project exists");
@@ -101,14 +100,10 @@ public class TestsRestContentProvider {
 
 		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				IProjectDescription description = workspace
-						.newProjectDescription(TestsRestContentProvider.this.projectName);
+				IProjectDescription description = workspace.newProjectDescription(TestsRestContentProvider.this.projectName);
 
 				try {
-					description
-							.setLocationURI(new URI(ISemanticFileSystem.SCHEME
-									+ ":/"
-									+ TestsRestContentProvider.this.projectName));
+					description.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestsRestContentProvider.this.projectName));
 				} catch (URISyntaxException e) {
 					// really not likely, though
 					throw new RuntimeException(e);
@@ -116,29 +111,23 @@ public class TestsRestContentProvider {
 				project.create(description, monitor);
 				project.open(monitor);
 
-				RemoteStoreTransient store = (RemoteStoreTransient) project
-						.getAdapter(RemoteStoreTransient.class);
+				RemoteStoreTransient store = (RemoteStoreTransient) project.getAdapter(RemoteStoreTransient.class);
 				RemoteFolder f1 = store.getRootFolder().addFolder("Folder1");
 				f1.addFolder("Folder11");
 
 				// for SFS, we map this to the team provider
-				RepositoryProvider.map(project,
-						ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+				RepositoryProvider.map(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
 
-				ISemanticProject spr = (ISemanticProject) project
-						.getAdapter(ISemanticProject.class);
+				ISemanticProject spr = (ISemanticProject) project.getAdapter(ISemanticProject.class);
 
-				spr.addFolder("root",
-						TestsRestContentProvider.this.providerName, null,
-						TestsRestContentProvider.this.options, monitor);
+				spr.addFolder("root", TestsRestContentProvider.this.providerName, null, TestsRestContentProvider.this.options, monitor);
 
 				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 
 		};
 
-		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE,
-				null);
+		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
 
 		this.testProject = project;
 
@@ -153,11 +142,9 @@ public class TestsRestContentProvider {
 	public void afterMethod() throws Exception {
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(
-				this.projectName);
+		final IProject project = workspace.getRoot().getProject(this.projectName);
 
-		RemoteStoreTransient store = (RemoteStoreTransient) project
-				.getAdapter(RemoteStoreTransient.class);
+		RemoteStoreTransient store = (RemoteStoreTransient) project.getAdapter(RemoteStoreTransient.class);
 		store.reset();
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
@@ -193,8 +180,7 @@ public class TestsRestContentProvider {
 
 		IFolder root = this.testProject.getFolder("root");
 
-		final ISemanticFolder sf = (ISemanticFolder) root
-				.getAdapter(ISemanticFolder.class);
+		final ISemanticFolder sf = (ISemanticFolder) root.getAdapter(ISemanticFolder.class);
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -202,15 +188,10 @@ public class TestsRestContentProvider {
 
 				ISemanticFile uriFile;
 				try {
-					uriFile = sf.addFile("file", new URI(dummyuri),
-							TestsRestContentProvider.this.options, monitor);
-					sf.getAdaptedResource().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
-					ISemanticResourceInfo info = uriFile.fetchResourceInfo(
-							ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-							monitor);
-					Assert.assertFalse("Remote existence", info
-							.existsRemotely());
+					uriFile = sf.addFile("file", new URI(dummyuri), TestsRestContentProvider.this.options, monitor);
+					sf.getAdaptedResource().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					ISemanticResourceInfo info = uriFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, monitor);
+					Assert.assertFalse("Remote existence", info.existsRemotely());
 					try {
 						Util.safeClose(uriFile.getAdaptedFile().getContents());
 						Assert.fail("Should have failed");
@@ -218,14 +199,10 @@ public class TestsRestContentProvider {
 						// $JL-EXC$ expected
 					}
 
-					uriFile = sf.addFile("file2", new URI(googleuri),
-							TestsRestContentProvider.this.options, monitor);
-					sf.getAdaptedResource().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
+					uriFile = sf.addFile("file2", new URI(googleuri), TestsRestContentProvider.this.options, monitor);
+					sf.getAdaptedResource().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
-					info = uriFile.fetchResourceInfo(
-							ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-							monitor);
+					info = uriFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, monitor);
 					// TODO this currently fails in the test environment (no
 					// proxy)
 					// Assert.assertTrue("Remote existence",
@@ -241,27 +218,22 @@ public class TestsRestContentProvider {
 					}
 				} catch (URISyntaxException e) {
 					// $JL-EXC$
-					throw new CoreException(new Status(IStatus.ERROR,
-							TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
 				}
 
-				String uriString = uriFile.fetchResourceInfo(
-						ISemanticFileSystem.RESOURCE_INFO_URI_STRING, monitor)
-						.getRemoteURIString();
+				String uriString = uriFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_URI_STRING, monitor).getRemoteURIString();
 
 				Assert.assertEquals(googleuri, uriString);
 
 				try {
-					IResource[] resources = sf.findURI(new URI(googleuri),
-							monitor);
+					IResource[] resources = sf.findURI(new URI(googleuri), monitor);
 
 					Assert.assertEquals(1, resources.length);
 
 					Assert.assertEquals("file2", resources[0].getName());
 				} catch (URISyntaxException e) {
 					// $JL-EXC$
-					throw new CoreException(new Status(IStatus.ERROR,
-							TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
 				}
 
 			}
@@ -276,8 +248,7 @@ public class TestsRestContentProvider {
 	 * @throws Exception
 	 */
 	@Test
-	public void testAddFileWithUriChangeSyncInocmingAndRevert()
-			throws Exception {
+	public void testAddFileWithUriChangeSyncInocmingAndRevert() throws Exception {
 
 		IFolder root = this.testProject.getFolder("root");
 
@@ -287,8 +258,7 @@ public class TestsRestContentProvider {
 			new FileOutputStream(file).close();
 		}
 
-		final ISemanticFolder sf = (ISemanticFolder) root
-				.getAdapter(ISemanticFolder.class);
+		final ISemanticFolder sf = (ISemanticFolder) root.getAdapter(ISemanticFolder.class);
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -296,18 +266,12 @@ public class TestsRestContentProvider {
 
 				ISemanticFile uriFile;
 				try {
-					uriFile = sf.addFile("file2", createURI4File(file),
-							TestsRestContentProvider.this.options, monitor);
-					sf.getAdaptedResource().getProject().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
+					uriFile = sf.addFile("file2", createURI4File(file), TestsRestContentProvider.this.options, monitor);
+					sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 					assertContentsEqual(uriFile.getAdaptedFile(), "");
 
-					ISemanticResourceInfo info = uriFile.fetchResourceInfo(
-							ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-							monitor);
-					Assert
-							.assertTrue("Remote existence", info
-									.existsRemotely());
+					ISemanticResourceInfo info = uriFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, monitor);
+					Assert.assertTrue("Remote existence", info.existsRemotely());
 
 					FileOutputStream os = null;
 					try {
@@ -322,16 +286,12 @@ public class TestsRestContentProvider {
 
 					assertContentsEqual(uriFile.getAdaptedFile(), "");
 
-					uriFile.synchronizeContentWithRemote(
-							SyncDirection.INCOMING,
-							TestsRestContentProvider.this.options, monitor);
+					uriFile.synchronizeContentWithRemote(SyncDirection.INCOMING, TestsRestContentProvider.this.options, monitor);
 
-					sf.getAdaptedResource().getProject().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
+					sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 					assertContentsEqual(uriFile.getAdaptedFile(), "Hello World");
 
-					long firstTime = uriFile.getAdaptedFile()
-							.getLocalTimeStamp();
+					long firstTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
 					try {
 						// make sure we get another file timestamp
@@ -343,33 +303,24 @@ public class TestsRestContentProvider {
 
 					try {
 						uriFile.validateEdit(null);
-						uriFile.getAdaptedFile().setContents(
-								new ByteArrayInputStream("Another world"
-										.getBytes("UTF-8")), IResource.NONE,
+						uriFile.getAdaptedFile().setContents(new ByteArrayInputStream("Another world".getBytes("UTF-8")), IResource.NONE,
 								monitor);
 					} catch (UnsupportedEncodingException e) {
 						throw new RuntimeException(e);
 					}
 
-					assertContentsEqual(uriFile.getAdaptedFile(),
-							"Another world");
-					long secondTime = uriFile.getAdaptedFile()
-							.getLocalTimeStamp();
+					assertContentsEqual(uriFile.getAdaptedFile(), "Another world");
+					long secondTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
-					Assert.assertTrue("Timstamps should differ",
-							secondTime > firstTime);
+					Assert.assertTrue("Timstamps should differ", secondTime > firstTime);
 
-					uriFile.revertChanges(
-							TestsRestContentProvider.this.options, monitor);
-					sf.getAdaptedResource().getProject().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
+					uriFile.revertChanges(TestsRestContentProvider.this.options, monitor);
+					sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 					assertContentsEqual(uriFile.getAdaptedFile(), "Hello World");
 
-					long thirdTime = uriFile.getAdaptedFile()
-							.getLocalTimeStamp();
+					long thirdTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
-					Assert.assertTrue("Timestamp should be the same",
-							thirdTime == firstTime);
+					Assert.assertTrue("Timestamp should be the same", thirdTime == firstTime);
 
 					try {
 						// make sure we get another file timestamp
@@ -381,26 +332,20 @@ public class TestsRestContentProvider {
 
 					try {
 						uriFile.validateEdit(null);
-						uriFile.getAdaptedFile().setContents(
-								new ByteArrayInputStream("Yet another world"
-										.getBytes("UTF-8")), IResource.NONE,
-								monitor);
+						uriFile.getAdaptedFile().setContents(new ByteArrayInputStream("Yet another world".getBytes("UTF-8")),
+								IResource.NONE, monitor);
 					} catch (UnsupportedEncodingException e) {
 						throw new RuntimeException(e);
 					}
 
-					assertContentsEqual(uriFile.getAdaptedFile(),
-							"Yet another world");
-					long fourthTime = uriFile.getAdaptedFile()
-							.getLocalTimeStamp();
+					assertContentsEqual(uriFile.getAdaptedFile(), "Yet another world");
+					long fourthTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
-					Assert.assertTrue("Timstamps should differ",
-							fourthTime > secondTime);
+					Assert.assertTrue("Timstamps should differ", fourthTime > secondTime);
 
 				} catch (URISyntaxException e) {
 					// $JL-EXC$
-					throw new CoreException(new Status(IStatus.ERROR,
-							TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
 				}
 
 			}
@@ -415,8 +360,7 @@ public class TestsRestContentProvider {
 	 * @throws Exception
 	 */
 	@Test
-	public void testAddFileWithUriChangeSyncOutgoingAndRevert()
-			throws Exception {
+	public void testAddFileWithUriChangeSyncOutgoingAndRevert() throws Exception {
 
 		IFolder root = this.testProject.getFolder("root");
 
@@ -428,8 +372,7 @@ public class TestsRestContentProvider {
 			os.close();
 		}
 
-		final ISemanticFolder sf = (ISemanticFolder) root
-				.getAdapter(ISemanticFolder.class);
+		final ISemanticFolder sf = (ISemanticFolder) root.getAdapter(ISemanticFolder.class);
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -438,24 +381,21 @@ public class TestsRestContentProvider {
 				ISemanticFile uriFile;
 
 				try {
-					uriFile = sf.addFile("file2", createURI4File(file),
-							TestsRestContentProvider.this.options, monitor);
+					uriFile = sf.addFile("file2", createURI4File(file), TestsRestContentProvider.this.options, monitor);
 				} catch (URISyntaxException e2) {
 					throw new RuntimeException(e2);
 				}
-				sf.getAdaptedResource().getProject().refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
+				sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 				assertContentsEqual(uriFile.getAdaptedFile(), "I'm remote");
 
-				long firstTime = uriFile.getAdaptedFile().getLocalTimeStamp();
+				// long firstTime =
+				// uriFile.getAdaptedFile().getLocalTimeStamp();
 
 				try {
 					uriFile.validateEdit(null);
-					uriFile.getAdaptedFile().setContents(
-							new ByteArrayInputStream("New content"
-									.getBytes("UTF-8")), IResource.NONE,
-							monitor);
+					uriFile.getAdaptedFile()
+							.setContents(new ByteArrayInputStream("New content".getBytes("UTF-8")), IResource.NONE, monitor);
 				} catch (UnsupportedEncodingException e1) {
 					throw new RuntimeException(e1);
 				}
@@ -470,10 +410,8 @@ public class TestsRestContentProvider {
 				// filestamp,
 				// firstTime);
 				// folder sync
-				sf.synchronizeContentWithRemote(SyncDirection.OUTGOING,
-						TestsRestContentProvider.this.options, monitor);
-				sf.getAdaptedResource().getProject().refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
+				sf.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsRestContentProvider.this.options, monitor);
+				sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 				assertContentsEqual(file, "New content");
 
@@ -481,8 +419,7 @@ public class TestsRestContentProvider {
 
 				// TODO above Assert.assertTrue("Timstamps should differ",
 				// thirdTime > filestamp);
-				Assert.assertEquals("Timestamp should be the same", file
-						.lastModified(), thirdTime);
+				Assert.assertEquals("Timestamp should be the same", file.lastModified(), thirdTime);
 
 			}
 		};
@@ -503,7 +440,7 @@ public class TestsRestContentProvider {
 		final IFolder root = this.testProject.getFolder("root");
 
 		final File file = createTestFile("ANewFile.txt");
-		boolean created = file.createNewFile();
+		// boolean created = file.createNewFile();
 
 		if (file.exists()) {
 			if (!file.delete()) {
@@ -512,26 +449,21 @@ public class TestsRestContentProvider {
 
 		}
 
-		final ISemanticFolder sf = (ISemanticFolder) root
-				.getAdapter(ISemanticFolder.class);
+		final ISemanticFolder sf = (ISemanticFolder) root.getAdapter(ISemanticFolder.class);
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
 				ISemanticFile uriFile;
 				try {
-					uriFile = sf.createFileRemotely("filenew",
-							new ByteArrayInputStream("Hello World".getBytes()),
-							createURI4File(file),
+					uriFile = sf.createFileRemotely("filenew", new ByteArrayInputStream("Hello World".getBytes()), createURI4File(file),
 							TestsRestContentProvider.this.options, monitor);
-					uriFile.getAdaptedFile().getParent().refreshLocal(
-							IResource.DEPTH_INFINITE, monitor);
+					uriFile.getAdaptedFile().getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 				} catch (URISyntaxException e) {
 					throw new RuntimeException(e);
 				}
-				sf.getAdaptedResource().getProject().refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
+				sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 				assertContentsEqual(uriFile.getAdaptedFile(), "Hello World");
 
 			}
@@ -549,8 +481,7 @@ public class TestsRestContentProvider {
 			byte[] buffer = new byte[size];
 			is.read(buffer);
 			Util.safeClose(is);
-			Assert.assertEquals("Wrong content", test, new String(buffer,
-					"UTF-8"));
+			Assert.assertEquals("Wrong content", test, new String(buffer, "UTF-8"));
 
 		} catch (Exception e) {
 			// $JL-EXC$
@@ -566,8 +497,7 @@ public class TestsRestContentProvider {
 			byte[] buffer = new byte[is.available()];
 			is.read(buffer);
 			Util.safeClose(is);
-			Assert.assertEquals("Wrong content", test, new String(buffer,
-					"UTF-8"));
+			Assert.assertEquals("Wrong content", test, new String(buffer, "UTF-8"));
 
 		} catch (Exception e) {
 			// $JL-EXC$

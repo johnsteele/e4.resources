@@ -100,7 +100,7 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 
 					try {
 						description.setLocationURI(new URI(ISemanticFileSystem.SCHEME, null, "/" + projectName, null)); //$NON-NLS-1$
-						description.setNatureIds(new String[] { SemanticResourcesPluginExamples.EXAPMLE_NATURE });
+						description.setNatureIds(new String[] {SemanticResourcesPluginExamples.EXAPMLE_NATURE});
 					} catch (URISyntaxException e) {
 						IStatus status = new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage(), e);
 						SemanticResourcesPluginExamples.getDefault().getLog().log(status);
@@ -190,23 +190,22 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 
 	}
 
-	@SuppressWarnings("nls")
 	void copyMimes(IProgressMonitor monitor, File tempFolder) throws CoreException {
-		File mimesFolder = new File(tempFolder.getPath() + "/mimes");
+		File mimesFolder = new File(tempFolder.getPath() + "/mimes"); //$NON-NLS-1$
 		mimesFolder.mkdir();
 
-		File compositeFolder = new File(tempFolder.getPath() + "/composites");
+		File compositeFolder = new File(tempFolder.getPath() + "/composites"); //$NON-NLS-1$
 		compositeFolder.mkdir();
 
-		copyMime(mimesFolder, "/mimes/wsdl+xsd/address.xsd", "address.xsd", monitor);
-		copyMime(mimesFolder, "/mimes/wsdl+xsd/customer.xsd", "customer.xsd", monitor);
-		copyMime(mimesFolder, "/mimes/wsdl+xsd/PurchaseOrder.wsdl", "PurchaseOrder.wsdl", monitor);
-		copyMime(mimesFolder, "/mimes/wsdl+xsd/SalesOrder.wsdl", "SalesOrder.wsdl", monitor);
-		copyMime(compositeFolder, "/mimes/composite/aaa.txt", "aaa.txt", monitor);
-		copyMime(compositeFolder, "/mimes/composite/test.txt", "test.txt", monitor);
-		copyMime(compositeFolder, "/mimes/composite/test_en.txt", "test_en.txt", monitor);
-		copyMime(compositeFolder, "/mimes/composite/test_en_US.txt", "test_en_US.txt", monitor);
-		copyMime(compositeFolder, "/mimes/composite/test2.txt", "test2.txt", monitor);
+		copyMime(mimesFolder, "/mimes/wsdl+xsd/address.xsd", "address.xsd", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(mimesFolder, "/mimes/wsdl+xsd/customer.xsd", "customer.xsd", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(mimesFolder, "/mimes/wsdl+xsd/PurchaseOrder.wsdl", "PurchaseOrder.wsdl", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(mimesFolder, "/mimes/wsdl+xsd/SalesOrder.wsdl", "SalesOrder.wsdl", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(compositeFolder, "/mimes/composite/aaa.txt", "aaa.txt", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(compositeFolder, "/mimes/composite/test.txt", "test.txt", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(compositeFolder, "/mimes/composite/test_en.txt", "test_en.txt", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(compositeFolder, "/mimes/composite/test_en_US.txt", "test_en_US.txt", monitor); //$NON-NLS-1$ //$NON-NLS-2$
+		copyMime(compositeFolder, "/mimes/composite/test2.txt", "test2.txt", monitor); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

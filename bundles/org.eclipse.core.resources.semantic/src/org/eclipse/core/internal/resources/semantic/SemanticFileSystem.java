@@ -238,8 +238,8 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 	private void loadSemanticDB(String metadataLocation) {
 		try {
-			@SuppressWarnings("unused")
 			SemanticResourceDBPackage pkg = SemanticResourceDBPackage.eINSTANCE;
+			pkg.eClass();
 
 			try {
 				this.lockForWrite();
