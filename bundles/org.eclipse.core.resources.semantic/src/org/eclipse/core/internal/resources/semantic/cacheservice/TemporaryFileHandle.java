@@ -100,18 +100,7 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 			this.factory.doRename(this.getFile(), this.cacheFile);
 		}
 
-		if (!this.cacheFile.setLastModified(timestamp)) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_SETTING_TIMESTAMP, new Path(this.cacheFile
-					.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_TimstampSetOnCommit_XMSG, this.cacheFile
-					.getAbsolutePath()));
-		}
-		// TODO 0.1: non-millisecond accuracy systems
-//		long lastModified = this.cacheFile.lastModified();
-//		if (lastModified != timestamp) {
-//			throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_SETTING_TIMESTAMP, new Path(this.cacheFile
-//					.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_TimstampSetOnCommit_XMSG, this.cacheFile
-//					.getAbsolutePath()));
-//		}
+		this.factory.setLastModified(cacheFile, timestamp);
 	}
 
 	public IPath getKey() {

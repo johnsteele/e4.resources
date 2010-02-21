@@ -16,10 +16,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,12 +44,18 @@ import org.eclipse.core.runtime.Path;
 public class FileHandleFactory implements IContentHandleFactory {
 
 	private static final String FAILED_DELETIONS_DOLLAR = ".failedDeletions.$$$"; //$NON-NLS-1$
+	private static final String ALTERNATIVE_FILES_DOLLAR = ".alternativeFiles.$$$"; //$NON-NLS-1$
+	private static final String FAILED_DELETIONS_OF_ALTERNATIVES_DOLLAR = ".failedDeletionsOfAlternatives.$$$"; //$NON-NLS-1$
 	private static final String DOT_SEPARATOR = "."; //$NON-NLS-1$
 	private static final String TEMP_FILE_EXTENSION = ".$$$"; //$NON-NLS-1$
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	private final Lock writeLock = this.rwl.writeLock();
 	private HashSet<String> failedDeletions = new HashSet<String>();
+	private HashMap<String, String> activeAlternativeFileMapping = new HashMap<String, String>();
+	private HashSet<String> deletionsOfAlternatives = new HashSet<String>();
 	private final File deletionsFile;
+	private final File alternativesMappingFile;
+	private final File deletionsOfAlternativesFile;
 
 	private final File cacheRoot;
 	private long uniqueID = 0;
@@ -59,6 +67,8 @@ public class FileHandleFactory implements IContentHandleFactory {
 	public FileHandleFactory(File cacheRoot) {
 		this.cacheRoot = cacheRoot;
 		this.deletionsFile = new File(this.cacheRoot, FAILED_DELETIONS_DOLLAR);
+		this.alternativesMappingFile = new File(this.cacheRoot, ALTERNATIVE_FILES_DOLLAR);
+		this.deletionsOfAlternativesFile = new File(this.cacheRoot, FAILED_DELETIONS_OF_ALTERNATIVES_DOLLAR);
 
 		try {
 			lockForWrite();
@@ -134,17 +144,14 @@ public class FileHandleFactory implements IContentHandleFactory {
 		try {
 			lockForWrite();
 
-			if (target.exists()) {
-				try {
-					this.doDelete(target);
-				} catch (CoreException e) {
-					// delete source content
-					this.tryDelete(source);
-					throw e;
-				}
+			if (!this.cleanupBeforeRename(target)) {
+				// make the source content as new alternate content
+				addAlternativeFile(source, target);
+				return;
 			}
 
 			if (!source.renameTo(target)) {
+				// should never happen
 				IPath path = new Path(target.getAbsolutePath());
 				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_CACHEFILE_RENAME_FAILED, path, MessageFormat
 						.format(Messages.FileHandleFactory_TempFileNotRenamed_XMSG, target.getAbsolutePath()));
@@ -152,6 +159,36 @@ public class FileHandleFactory implements IContentHandleFactory {
 		} finally {
 			unlockForWrite();
 		}
+	}
+
+	/*
+	 * returns true if the target could be deleted
+	 */
+	private boolean cleanupBeforeRename(File target) {
+		String targetPath = target.getAbsolutePath();
+
+		// check whether an alternative file is used and try to delete it since
+		// it is obsolete now
+		tryToDeleteAlternativeFile(targetPath);
+
+		this.retryToDeleteAlternatives();
+
+		// clear the pending deletions flag since target will exist after rename
+		reportDeletionSucceeded(target);
+
+		// check whether a file exists with original file name and try to delete
+		// it before rename
+		if (target.exists()) {
+			if (!target.delete()) {
+				// alternative name should be used
+				// the original file should not be added to failedDeletions here
+				// failed deletion will be retried on next rename or on cache
+				// entry deletion
+				return false;
+			}
+		}
+		// if is safe to rename to original file name
+		return true;
 	}
 
 	/**
@@ -164,6 +201,7 @@ public class FileHandleFactory implements IContentHandleFactory {
 	public boolean checkFileExists(File file) {
 		try {
 			lockForWrite();
+
 			if (this.hasFailedDeletion(file)) {
 				// try deletion again
 				tryDelete(file);
@@ -171,32 +209,6 @@ public class FileHandleFactory implements IContentHandleFactory {
 				return false;
 			}
 			return file.exists();
-		} finally {
-			unlockForWrite();
-		}
-	}
-
-	/**
-	 * Deletes the file and compacts the file system
-	 * 
-	 * @param file
-	 *            the file
-	 * @throws CoreException
-	 *             upon failure
-	 */
-	public void doDelete(File file) throws CoreException {
-		try {
-			lockForWrite();
-
-			if (!file.delete()) {
-				this.reportDeletionFailed(file);
-				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_CACHEFILE_DELETION_FAILED, new Path(file
-						.getAbsolutePath()), MessageFormat.format(Messages.FileHandleFactory_CacheFileNotDeleted_XMSG, file
-						.getAbsolutePath()));
-			}
-
-			this.reportDeletionSucceeded(file);
-			this.compactFileSystem(file);
 		} finally {
 			unlockForWrite();
 		}
@@ -212,13 +224,82 @@ public class FileHandleFactory implements IContentHandleFactory {
 		try {
 			lockForWrite();
 
+			tryToDeleteAlternativeFile(file.getAbsolutePath());
+
 			if (!file.delete()) {
 				this.reportDeletionFailed(file);
 				return;
 			}
 
 			this.reportDeletionSucceeded(file);
+			this.retryToDeleteAlternatives();
 			this.compactFileSystem(file);
+		} finally {
+			unlockForWrite();
+		}
+	}
+
+	/**
+	 * returns the active file handle for the cache file
+	 * 
+	 * @param file
+	 */
+	public File getActiveFileHandle(File file) {
+		try {
+			lockForWrite();
+			String alternatePath = this.activeAlternativeFileMapping.get(file.getAbsolutePath());
+			if (alternatePath != null) {
+				return new File(alternatePath);
+			}
+			return file;
+		} finally {
+			unlockForWrite();
+		}
+	}
+
+	/**
+	 * 
+	 * @param cacheFile
+	 * @return last modified
+	 */
+	public long getLastModified(File cacheFile) {
+		try {
+			lockForWrite();
+			return getActiveFileHandle(cacheFile).lastModified();
+		} finally {
+			unlockForWrite();
+		}
+	}
+
+	/**
+	 * 
+	 * @param cacheFile
+	 * @param timestamp
+	 * @throws CoreException
+	 */
+	public void setLastModified(File cacheFile, long timestamp) throws CoreException {
+		try {
+			lockForWrite();
+			if (!getActiveFileHandle(cacheFile).setLastModified(timestamp)) {
+				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_SETTING_TIMESTAMP, new Path(cacheFile
+						.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_TimstampSetOnCommit_XMSG, cacheFile
+						.getAbsolutePath()));
+			}
+		} finally {
+			unlockForWrite();
+		}
+	}
+
+	/**
+	 * 
+	 * @param cacheFile
+	 * @return input stream
+	 * @throws FileNotFoundException
+	 */
+	public InputStream openInputStream(File cacheFile) throws FileNotFoundException {
+		try {
+			lockForWrite();
+			return new FileInputStream(getActiveFileHandle(cacheFile));
 		} finally {
 			unlockForWrite();
 		}
@@ -251,14 +332,39 @@ public class FileHandleFactory implements IContentHandleFactory {
 		}
 	}
 
+	private void retryToDeleteAlternatives() {
+		boolean saveNeeded = false;
+		HashSet<String> deletions = this.deletionsOfAlternatives;
+
+		for (String filePath : deletions) {
+			File file = new File(filePath);
+
+			if (file.exists()) {
+				if (file.delete()) {
+					deletions.remove(filePath);
+					saveNeeded = true;
+				}
+			} else {
+				saveNeeded = true;
+				deletions.remove(filePath);
+			}
+		}
+		if (saveNeeded) {
+			this.saveDeletionsOfAlternatives();
+		}
+	}
+
 	private void reportDeletionFailed(File file) {
 		this.failedDeletions.add(file.getAbsolutePath());
-		this.save();
+		this.saveFailedDeletions();
 	}
 
 	private void reportDeletionSucceeded(File file) {
-		this.failedDeletions.remove(file.getAbsolutePath());
-		this.save();
+		String path = file.getAbsolutePath();
+		if (this.failedDeletions.contains(path)) {
+			this.failedDeletions.remove(path);
+			this.saveFailedDeletions();
+		}
 	}
 
 	private boolean hasFailedDeletion(File file) {
@@ -271,59 +377,125 @@ public class FileHandleFactory implements IContentHandleFactory {
 		return new FileOutputStream(file, appendMode);
 	}
 
-	private void save() {
+	private void addAlternativeFile(File source, File target) {
+		this.activeAlternativeFileMapping.put(target.getAbsolutePath(), source.getAbsolutePath());
+		this.saveAlternativeMapping();
+	}
+
+	private void tryToDeleteAlternativeFile(String targetPath) {
+		String alternatePath = this.activeAlternativeFileMapping.get(targetPath);
+		if (alternatePath != null) {
+			File alternateFile = new File(alternatePath);
+
+			if (!alternateFile.delete()) {
+				// remember failed deletion in order to retry it later
+				this.deletionsOfAlternatives.add(alternatePath);
+				this.saveDeletionsOfAlternatives();
+			}
+
+			this.activeAlternativeFileMapping.remove(targetPath);
+			this.saveAlternativeMapping();
+		}
+	}
+
+	private void saveFailedDeletions() {
 		if (!this.failedDeletions.isEmpty()) {
-			FileOutputStream fos = null;
-			ObjectOutputStream oos = null;
-			try {
-				fos = new FileOutputStream(this.deletionsFile);
-				oos = new ObjectOutputStream(fos);
-
-				oos.writeObject(this.failedDeletions);
-
-			} catch (IOException e) {
-				IPath path = new Path(this.deletionsFile.getAbsolutePath());
-				safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_METADATA, path,
-						Messages.FileHandleFactory_FileHandleFactory_FileHandleFactory_SaveError_XMSG, e));
-			} finally {
-				Util.safeClose(fos);
-				Util.safeClose(oos);
-			}
+			writeObjectToMetadataFile(this.deletionsFile, this.failedDeletions);
 		} else {
-			if (this.deletionsFile.exists()) {
-				if (!this.deletionsFile.delete()) {
-					// TODO 0.1: should we be more robust here and switch to
-					// another file?
-					IPath path = new Path(this.deletionsFile.getAbsolutePath());
-					safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_METADATA, path,
-							Messages.FileHandleFactory_FileHandleFactory_FileHandleFactory_SaveError_XMSG));
-				}
-			}
+			removeMetadataFile(this.deletionsFile);
+		}
+	}
+
+	private void saveDeletionsOfAlternatives() {
+		if (!this.deletionsOfAlternatives.isEmpty()) {
+			writeObjectToMetadataFile(this.deletionsOfAlternativesFile, this.deletionsOfAlternatives);
+		} else {
+			removeMetadataFile(this.deletionsOfAlternativesFile);
+		}
+	}
+
+	private void saveAlternativeMapping() {
+		if (!this.activeAlternativeFileMapping.isEmpty()) {
+			writeObjectToMetadataFile(this.alternativesMappingFile, this.activeAlternativeFileMapping);
+		} else {
+			removeMetadataFile(this.alternativesMappingFile);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private void load() {
 		if (this.deletionsFile.exists()) {
-			FileInputStream fis = null;
-			ObjectInputStream ois = null;
-			try {
-				fis = new FileInputStream(this.deletionsFile);
-				ois = new ObjectInputStream(fis);
-
-				this.failedDeletions = (HashSet<String>) ois.readObject();
-			} catch (IOException e) {
-				IPath path = new Path(this.deletionsFile.getAbsolutePath());
-				safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_INITIALIZATION_ERROR, path,
-						Messages.FileHandleFactory_FileHandleFactory_LoadError_XMSG, e));
-			} catch (ClassNotFoundException e) {
-				IPath path = new Path(this.deletionsFile.getAbsolutePath());
-				safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_INITIALIZATION_ERROR, path,
-						Messages.FileHandleFactory_FileHandleFactory_LoadError_XMSG, e));
-			} finally {
-				Util.safeClose(fis);
-				Util.safeClose(ois);
+			HashSet<String> object = (HashSet<String>) readObjectFromMetadataFile(this.deletionsFile);
+			if (object != null) {
+				this.failedDeletions = object;
+			}
+		}
+		if (this.deletionsOfAlternativesFile.exists()) {
+			HashSet<String> object = (HashSet<String>) readObjectFromMetadataFile(this.deletionsOfAlternativesFile);
+			if (object != null) {
+				this.deletionsOfAlternatives = object;
+			}
+		}
+		if (this.alternativesMappingFile.exists()) {
+			HashMap<String, String> object = (HashMap<String, String>) readObjectFromMetadataFile(this.alternativesMappingFile);
+			if (object != null) {
+				this.activeAlternativeFileMapping = object;
 			}
 		}
 	}
+
+	private Object readObjectFromMetadataFile(File file) {
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
+		try {
+			fis = new FileInputStream(file);
+			ois = new ObjectInputStream(fis);
+
+			return ois.readObject();
+		} catch (IOException e) {
+			IPath path = new Path(file.getAbsolutePath());
+			safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_INITIALIZATION_ERROR, path,
+					Messages.FileHandleFactory_FileHandleFactory_LoadError_XMSG, e));
+		} catch (ClassNotFoundException e) {
+			IPath path = new Path(file.getAbsolutePath());
+			safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_INITIALIZATION_ERROR, path,
+					Messages.FileHandleFactory_FileHandleFactory_LoadError_XMSG, e));
+		} finally {
+			Util.safeClose(fis);
+			Util.safeClose(ois);
+		}
+		return null;
+	}
+
+	private void removeMetadataFile(File file) {
+		if (file.exists()) {
+			if (!file.delete()) {
+				// TODO 0.1: should we be more robust here and switch to
+				// another file?
+				IPath path = new Path(file.getAbsolutePath());
+				safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_METADATA, path,
+						Messages.FileHandleFactory_FileHandleFactory_FileHandleFactory_SaveError_XMSG));
+			}
+		}
+	}
+
+	private void writeObjectToMetadataFile(File file, Object object) {
+		FileOutputStream fos = null;
+		ObjectOutputStream oos = null;
+		try {
+			fos = new FileOutputStream(file);
+			oos = new ObjectOutputStream(fos);
+
+			oos.writeObject(object);
+
+		} catch (IOException e) {
+			IPath path = new Path(file.getAbsolutePath());
+			safeLog(new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_METADATA, path,
+					Messages.FileHandleFactory_FileHandleFactory_FileHandleFactory_SaveError_XMSG, e));
+		} finally {
+			Util.safeClose(fos);
+			Util.safeClose(oos);
+		}
+	}
+
 }

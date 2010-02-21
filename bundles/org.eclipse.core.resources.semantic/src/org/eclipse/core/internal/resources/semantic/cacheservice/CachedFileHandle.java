@@ -12,7 +12,6 @@
 package org.eclipse.core.internal.resources.semantic.cacheservice;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -42,23 +41,16 @@ class CachedFileHandle implements ICachedContentHandle {
 		this.cacheFile = cacheFile;
 	}
 
-	/**
-	 * @return the file holding the cached data
-	 */
-	public File getFile() {
-		return this.cacheFile;
-	}
-
 	public boolean exists() {
 		return this.factory.checkFileExists(this.cacheFile);
 	}
 
 	public long lastModified() {
-		return this.cacheFile.lastModified();
+		return this.factory.getLastModified(this.cacheFile);
 	}
 
-	public void setLastModified(long timestamp) {
-		this.cacheFile.setLastModified(timestamp);
+	public void setLastModified(long timestamp) throws CoreException {
+		this.factory.setLastModified(this.cacheFile, timestamp);
 	}
 
 	public void delete() {
@@ -67,7 +59,7 @@ class CachedFileHandle implements ICachedContentHandle {
 
 	public InputStream openInputStream() throws CoreException {
 		try {
-			return new FileInputStream(this.cacheFile);
+			return this.factory.openInputStream(this.cacheFile);
 		} catch (FileNotFoundException e) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.CACHED_CONTENT_NOT_FOUND, new Path(this.cacheFile
 					.getAbsolutePath()), null, e);

@@ -121,10 +121,8 @@ public class TestCacheService {
 			removeFromCache(service, path);
 		} catch (CoreException e) {
 			// $JL-EXC$ ignore exception
+			Assert.fail("Removal should not fail even if file open");
 
-			// the cache file must still be there but hasContent must report false
-			Assert.assertTrue(!service.hasContent(path));
-			Assert.assertTrue(cacheFile.exists());
 		} finally {
 			// this will close the stream so that a file can be deleted
 			Util.safeClose(is);
@@ -137,17 +135,71 @@ public class TestCacheService {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testConcurrentAccess() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath path = new Path("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		writeToCache(service, path, input);
+
+		// this will open an input stream that will prevent a file from being deleted
+		InputStream is = service.getContent(path);
+
+		try {
+			writeToCache(service, path, new ByteArrayInputStream("test2".getBytes("UTF-8")));
+
+			readFromCache(service, path, "test2");
+
+			// this will open an input stream that will prevent an alternative file from being
+			// deleted
+			InputStream is2 = service.getContent(path);
+
+			try {
+				writeToCache(service, path, new ByteArrayInputStream("test3".getBytes("UTF-8")));
+
+				readFromCache(service, path, "test3");
+			} finally {
+				// this will close the stream so that an alternative file can be deleted
+				Util.safeClose(is2);
+			}
+		} catch (CoreException e) {
+			// $JL-EXC$ ignore exception
+			Assert.fail("Should not fail even if file open");
+
+		} finally {
+			// this will close the stream so that a file can be deleted
+			Util.safeClose(is);
+		}
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		Assert.assertTrue(cacheFile.exists());
+
+		// this should remove the alternate files and go back to original
+		writeToCache(service, path, new ByteArrayInputStream("test4".getBytes("UTF-8")));
+
+		Assert.assertTrue(cacheFile.exists());
+
+		Assert.assertTrue(service.hasContent(path));
+	}
+
+	/**
 	 * @param service
 	 * @param path
 	 * @throws CoreException
 	 */
 	public void manipulateTimestamp(ICacheService service, IPath path) throws CoreException {
 		// TODO removed due to problems with less than millisecond accuracy
-//		long timestamp = 1234567890123L;
-//
-//		service.setContentTimestamp(path, timestamp);
-//
-//		Assert.assertEquals(timestamp, service.getContentTimestamp(path));
+		// long timestamp = 1234567890123L;
+		//
+		// service.setContentTimestamp(path, timestamp);
+		//
+		// Assert.assertEquals(timestamp, service.getContentTimestamp(path));
 	}
 
 	/**

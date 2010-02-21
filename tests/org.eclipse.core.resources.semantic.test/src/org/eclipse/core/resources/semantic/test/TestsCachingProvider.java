@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 
 /**
@@ -142,19 +141,13 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 			};
 
 			try {
-				// re-adding should fail as long as the inputstream is still
-				// open
-				// (actually the delete failed, but this is ignore until re-add
-				// is
-				// encountered)
+				// re-adding should not fail even if the input stream is still open
 				ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
-				if (Platform.OS_WIN32.equals(Platform.getOS())) {
-					// fails only on Windows since UNIX file system can handle delete of open files
-					Assert.fail("Should have failed");
-				}
 			} catch (CoreException e) {
 				// $JL-EXC$ expected
+
+				Assert.fail("Should not fail");
 			}
 		} finally {
 			Util.safeClose(is);
