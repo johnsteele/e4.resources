@@ -106,6 +106,9 @@ public class HandleAddFromRemote extends HandlerUtilities {
 			try {
 				submit(Display.getCurrent().getActiveShell(), new IRunnableWithProgress() {
 
+					/**
+					 * @throws InterruptedException
+					 */
 					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 

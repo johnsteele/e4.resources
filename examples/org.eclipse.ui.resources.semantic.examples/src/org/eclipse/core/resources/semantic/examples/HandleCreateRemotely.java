@@ -44,13 +44,14 @@ public class HandleCreateRemotely extends HandlerUtilities {
 			addPage(new CreateRemotelyPage(this.parentFolder));
 		}
 
+		@Override
 		public boolean performFinish() {
 
 			final CreateRemotelyPage page = (CreateRemotelyPage) getPage(CreateRemotelyPage.PAGENAME);
 
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException {
 
 					IWorkspaceRunnable inner = new IWorkspaceRunnable() {
 
@@ -94,6 +95,9 @@ public class HandleCreateRemotely extends HandlerUtilities {
 		}
 	}
 
+	/**
+	 * @throws ExecutionException
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		final ISemanticFolder sFolder = getSelectedObject(event, ISemanticFolder.class, true);

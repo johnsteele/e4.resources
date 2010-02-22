@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/impl/SemanticDBImpl.java#2 $
+ * $Id: SemanticDBImpl.java,v 1.1 2010/02/10 20:56:39 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -34,17 +34,20 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl#getRoots <em>Roots</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl#getRoots
+ * <em>Roots</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
 @SuppressWarnings("unqualified-field-access")
 public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 	/**
-	 * The cached value of the '{@link #getRoots() <em>Roots</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getRoots() <em>Roots</em>}' containment
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getRoots()
 	 * @generated
 	 * @ordered
@@ -53,6 +56,7 @@ public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected SemanticDBImpl() {
@@ -61,55 +65,65 @@ public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	protected EClass eStaticClass() {
 		return SemanticResourceDBPackage.Literals.SEMANTIC_DB;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<TreeRoot> getRoots() {
 		if (roots == null) {
-			roots = new EObjectContainmentWithInverseEList<TreeRoot>(TreeRoot.class, this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS, SemanticResourceDBPackage.TREE_ROOT__PARENT_DB);
+			roots = new EObjectContainmentWithInverseEList<TreeRoot>(TreeRoot.class, this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS,
+					SemanticResourceDBPackage.TREE_ROOT__PARENT_DB);
 		}
 		return roots;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getRoots()).basicAdd(otherEnd, msgs);
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
+				return ((InternalEList<InternalEObject>) (InternalEList<?>) getRoots()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
-				return ((InternalEList<?>)getRoots()).basicRemove(otherEnd, msgs);
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
+				return ((InternalEList<?>) getRoots()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
 				return getRoots();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -117,14 +131,16 @@ public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
 				getRoots().clear();
-				getRoots().addAll((Collection<? extends TreeRoot>)newValue);
+				getRoots().addAll((Collection<? extends TreeRoot>) newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -132,11 +148,13 @@ public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
 				getRoots().clear();
 				return;
 		}
@@ -145,11 +163,13 @@ public class SemanticDBImpl extends EObjectImpl implements SemanticDB {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS:
+			case SemanticResourceDBPackage.SEMANTIC_DB__ROOTS :
 				return roots != null && !roots.isEmpty();
 		}
 		return super.eIsSet(featureID);

@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.internal.resources.semantic.cacheservice.ICacheUpdateCallback;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;

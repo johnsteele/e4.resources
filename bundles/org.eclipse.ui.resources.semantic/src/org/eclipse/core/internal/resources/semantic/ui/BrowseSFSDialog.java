@@ -47,6 +47,7 @@ public class BrowseSFSDialog extends Dialog {
 		}
 	}
 
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(Messages.BrowseSFSDialog_Browser_XGRP);
@@ -63,6 +64,7 @@ public class BrowseSFSDialog extends Dialog {
 		return ""; //$NON-NLS-1$
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite main = new Composite(parent, SWT.NONE);

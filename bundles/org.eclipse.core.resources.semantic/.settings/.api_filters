@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.core.resources.semantic" version="2">
+    <resource path="src/org/eclipse/core/internal/resources/semantic/SemanticFileInfo.java" type="org.eclipse.core.internal.resources.semantic.SemanticFileInfo">
+        <filter id="571473929">
+            <message_arguments>
+                <message_argument value="FileInfo"/>
+                <message_argument value="SemanticFileInfo"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/core/internal/resources/semantic/team/DelegatingResourceRuleFactory.java" type="org.eclipse.core.internal.resources.semantic.team.DelegatingResourceRuleFactory">
+        <filter id="574619656">
+            <message_arguments>
+                <message_argument value="IResourceRuleFactory"/>
+                <message_argument value="DelegatingResourceRuleFactory"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/core/resources/semantic/spi/SemanticFileRevision.java" type="org.eclipse.core.resources.semantic.spi.SemanticFileRevision">
+        <filter id="574619656">
+            <message_arguments>
+                <message_argument value="IFileRevision"/>
+                <message_argument value="SemanticFileRevision"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

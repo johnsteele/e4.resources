@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/util/SemanticResourceDBAdapterFactory.java#3 $
+ * $Id: SemanticResourceDBAdapterFactory.java,v 1.1 2010/02/10 20:56:40 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.util;
 
@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.EObject;
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage
  * @generated
  */
-@SuppressWarnings( { "unqualified-field-access" })
+@SuppressWarnings({"unqualified-field-access"})
 public class SemanticResourceDBAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -62,6 +62,7 @@ public class SemanticResourceDBAdapterFactory extends AdapterFactoryImpl {
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
+	@Override
 	public boolean isFactoryForType(Object object) {
 		if (object == modelPackage) {
 			return true;
@@ -79,18 +80,22 @@ public class SemanticResourceDBAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	protected SemanticResourceDBSwitch<Adapter> modelSwitch = new SemanticResourceDBSwitch<Adapter>() {
+		@Override
 		public Adapter caseResourceTreeNode(ResourceTreeNode object) {
 			return createResourceTreeNodeAdapter();
 		}
 
+		@Override
 		public Adapter caseSemanticDB(SemanticDB object) {
 			return createSemanticDBAdapter();
 		}
 
+		@Override
 		public Adapter caseTreeRoot(TreeRoot object) {
 			return createTreeRootAdapter();
 		}
 
+		@Override
 		public Adapter defaultCase(EObject object) {
 			return createEObjectAdapter();
 		}
@@ -105,6 +110,7 @@ public class SemanticResourceDBAdapterFactory extends AdapterFactoryImpl {
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
+	@Override
 	public Adapter createAdapter(Notifier target) {
 		return modelSwitch.doSwitch((EObject) target);
 	}

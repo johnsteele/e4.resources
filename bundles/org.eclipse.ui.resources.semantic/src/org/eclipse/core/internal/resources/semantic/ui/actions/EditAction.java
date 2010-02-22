@@ -34,6 +34,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class EditAction extends ActionBase {
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);
@@ -45,7 +46,7 @@ public class EditAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -72,7 +73,7 @@ public class EditAction extends ActionBase {
 					try {
 						IWorkspace ws = ResourcesPlugin.getWorkspace();
 						// we use the validate edit rule
-						ISchedulingRule rule = ws.getRuleFactory().validateEditRule(new IResource[] { file.getAdaptedResource() });
+						ISchedulingRule rule = ws.getRuleFactory().validateEditRule(new IResource[] {file.getAdaptedResource()});
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
 						throw new InvocationTargetException(ce);

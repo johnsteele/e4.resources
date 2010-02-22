@@ -85,10 +85,10 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	 * Constructor
 	 */
 	public TestsSFSUi() {
-		super(true, "TestsSemanticFileSystemUI",
-				CachingTestContentProvider.class.getName());
+		super(true, "TestsSemanticFileSystemUI", CachingTestContentProvider.class.getName());
 	}
 
+	@Override
 	@Before
 	public void beforeMethod() throws Exception {
 
@@ -101,13 +101,10 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				IProjectDescription description = workspace
-						.newProjectDescription(TestsSFSUi.this.projectName);
+				IProjectDescription description = workspace.newProjectDescription(TestsSFSUi.this.projectName);
 
 				try {
-					description.setLocationURI(new URI(
-							ISemanticFileSystem.SCHEME + ":/"
-									+ TestsSFSUi.this.projectName));
+					description.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestsSFSUi.this.projectName));
 				} catch (URISyntaxException e) {
 					// really not likely, though
 					throw new RuntimeException(e);
@@ -115,12 +112,10 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 				TestsSFSUi.this.testProject.create(description, monitor);
 				TestsSFSUi.this.testProject.open(monitor);
 
-				RemoteStoreTransient store = (RemoteStoreTransient) TestsSFSUi.this.testProject
-						.getAdapter(RemoteStoreTransient.class);
+				RemoteStoreTransient store = (RemoteStoreTransient) TestsSFSUi.this.testProject.getAdapter(RemoteStoreTransient.class);
 				RemoteFolder f1 = store.getRootFolder().addFolder("Folder1");
 				try {
-					TestsSFSUi.this.file1 = f1.addFile("File1", "Hello"
-							.getBytes("UTF-8"), store.newTime());
+					TestsSFSUi.this.file1 = f1.addFile("File1", "Hello".getBytes("UTF-8"), store.newTime());
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -128,33 +123,27 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 				f1.addFolder("Folder11");
 
 				// for SFS, we map this to the team provider
-				RepositoryProvider.map(TestsSFSUi.this.testProject,
-						ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+				RepositoryProvider.map(TestsSFSUi.this.testProject, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
 
-				ISemanticProject spr = (ISemanticProject) TestsSFSUi.this.testProject
-						.getAdapter(ISemanticProject.class);
+				ISemanticProject spr = (ISemanticProject) TestsSFSUi.this.testProject.getAdapter(ISemanticProject.class);
 
 				Map<QualifiedName, String> properties = new HashMap<QualifiedName, String>();
 				properties.put(TEMPLATE_PROP, "World");
 
-				spr.addFolder("root", TestsSFSUi.this.providerName, properties,
-						TestsSFSUi.this.options, monitor);
+				spr.addFolder("root", TestsSFSUi.this.providerName, properties, TestsSFSUi.this.options, monitor);
 
-				TestsSFSUi.this.testProject.refreshLocal(
-						IResource.DEPTH_INFINITE, monitor);
+				TestsSFSUi.this.testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 			}
 
 		};
 
-		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE,
-				null);
+		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
 
-		String projectName = this.testProject.getName();
-		String[] roots = ((ISemanticFileSystem) EFS
-				.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
+		String projectName1 = this.testProject.getName();
+		String[] roots = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
 		for (String root : roots) {
-			if (root.equals(projectName)) {
+			if (root.equals(projectName1)) {
 				return;
 			}
 		}
@@ -162,16 +151,15 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 	}
 
+	@Override
 	@After
 	public void afterMethod() throws Exception {
 
-		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject
-				.getAdapter(RemoteStoreTransient.class);
+		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject.getAdapter(RemoteStoreTransient.class);
 		store.reset();
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(
-				this.projectName);
+		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		this.testProject = null;
 
@@ -199,9 +187,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -210,26 +197,22 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		Shell shell = new Shell(Display.getCurrent());
 
-		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(shell,
-				this.testProject,
+		PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(shell, this.testProject,
 				"org.eclipse.core.resources.semantic.propertyPage", null, null);
 		dialog.setBlockOnOpen(false);
 		dialog.open();
 		dialog.close();
 
-		IFolder folder = this.testProject.getFolder("root")
-				.getFolder("Folder1");
+		IFolder folder = this.testProject.getFolder("root").getFolder("Folder1");
 
-		dialog = PreferencesUtil.createPropertyDialogOn(shell, folder,
-				"org.eclipse.core.resources.semantic.propertyPage", null, null);
+		dialog = PreferencesUtil.createPropertyDialogOn(shell, folder, "org.eclipse.core.resources.semantic.propertyPage", null, null);
 		dialog.setBlockOnOpen(false);
 		dialog.open();
 		dialog.close();
 
 		IFile file = folder.getFile("File1");
 
-		dialog = PreferencesUtil.createPropertyDialogOn(shell, file,
-				"org.eclipse.core.resources.semantic.propertyPage", null, null);
+		dialog = PreferencesUtil.createPropertyDialogOn(shell, file, "org.eclipse.core.resources.semantic.propertyPage", null, null);
 		dialog.setBlockOnOpen(false);
 		dialog.open();
 		dialog.close();
@@ -244,8 +227,7 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		Shell shell = new Shell(Display.getCurrent());
 
-		PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
-				shell, "org.eclipse.core.resources.semantic.preferencePage",
+		PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell, "org.eclipse.core.resources.semantic.preferencePage",
 				null, null);
 		dialog.setBlockOnOpen(false);
 		dialog.open();
@@ -260,9 +242,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	@Test
 	public void testBrowser() throws CoreException {
 
-		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().showView(
-						"org.eclipse.core.resources.semantic.resourceView");
+		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
+				"org.eclipse.core.resources.semantic.resourceView");
 		Assert.assertNotNull("View should not be null", part);
 
 	}
@@ -275,15 +256,10 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	public void testContributor() throws CoreException {
 
 		FileSystemContributor contributor = null;
-		FileSystemConfiguration[] configs = FileSystemSupportRegistry
-				.getInstance().getConfigurations();
+		FileSystemConfiguration[] configs = FileSystemSupportRegistry.getInstance().getConfigurations();
 		for (FileSystemConfiguration config : configs) {
-			if (config
-					.getContributor()
-					.getClass()
-					.getName()
-					.equals(
-							"org.eclipse.core.internal.resources.semantic.ui.SemanticFileSystemContributor")) {
+			if (config.getContributor().getClass().getName().equals(
+					"org.eclipse.core.internal.resources.semantic.ui.SemanticFileSystemContributor")) {
 				contributor = config.getContributor();
 			}
 		}
@@ -294,19 +270,15 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		URI test1 = contributor.getURI("/test/Uri");
 
-		Assert.assertEquals("URI result", "semanticfs:/test/Uri", test1
-				.toString());
+		Assert.assertEquals("URI result", "semanticfs:/test/Uri", test1.toString());
 
 		test1 = contributor.getURI("semanticfs:\\test/Uri2");
 
-		Assert.assertEquals("URI result", "semanticfs:/test/Uri2", test1
-				.toString());
+		Assert.assertEquals("URI result", "semanticfs:/test/Uri2", test1.toString());
 
-		URI test = contributor.browseFileSystem("semanticfs:/"
-				+ this.testProject.getName() + "/" + "root", null);
+		URI test = contributor.browseFileSystem("semanticfs:/" + this.testProject.getName() + "/" + "root", null);
 
-		Assert.assertEquals("URI result",
-				"semanticfs:/TestsSemanticFileSystemUI/root", test.toString());
+		Assert.assertEquals("URI result", "semanticfs:/TestsSemanticFileSystemUI/root", test.toString());
 
 	}
 
@@ -326,30 +298,25 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
-		Assert.assertEquals("Lock state", false, sFile.fetchResourceInfo(
-				ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
+		Assert.assertEquals("Lock state", false, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
 		runCommandByAction("LockCommand", sFile);
 
-		Assert.assertEquals("Lock state", true, sFile.fetchResourceInfo(
-				ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
+		Assert.assertEquals("Lock state", true, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
 		runCommandByAction("UnlockCommand", sFile);
 
-		Assert.assertEquals("Lock state", false, sFile.fetchResourceInfo(
-				ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
+		Assert.assertEquals("Lock state", false, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
 	}
 
@@ -366,33 +333,23 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
-		Assert.assertEquals("File existence", true, sFile.getAdaptedFile()
-				.exists());
+		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
 		runCommandByAction("RemoveCommand", sFile);
 
-		Assert.assertEquals("File existence", false, sFile.getAdaptedFile()
-				.exists());
-		Assert
-				.assertEquals(
-						"Remote File existence",
-						true,
-						sFile
-								.fetchResourceInfo(
-										ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-										null).existsRemotely());
+		Assert.assertEquals("File existence", false, sFile.getAdaptedFile().exists());
+		Assert.assertEquals("Remote File existence", true, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, null)
+				.existsRemotely());
 
 	}
 
@@ -408,24 +365,20 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
 		// make sure to hide the history view
-		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().showView(IHistoryView.VIEW_ID);
+		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IHistoryView.VIEW_ID);
 
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.hideView(part);
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(part);
 
 		final List<String> partIds = new ArrayList<String>();
 
@@ -472,16 +425,13 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 			}
 		};
 
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService()
-				.addPartListener(listener);
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().addPartListener(listener);
 
 		runCommandByAction("RemoteHistoryCommand", sFile);
 
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService()
-				.removePartListener(listener);
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().removePartListener(listener);
 
-		Assert.assertTrue("History part should have been opened", partIds
-				.contains(IHistoryView.VIEW_ID));
+		Assert.assertTrue("History part should have been opened", partIds.contains(IHistoryView.VIEW_ID));
 
 	}
 
@@ -499,17 +449,16 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		final ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		final ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1"))
+				.getAdapter(ISemanticFile.class);
 
 		assertContentsEqual(sFile.getAdaptedFile(), "Hello");
 
@@ -524,9 +473,7 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 				Assert.assertTrue("Validate Edit should be ok", stat.isOK());
 
 				try {
-					sFile.getAdaptedFile().setContents(
-							new ByteArrayInputStream("Test".getBytes("UTF-8")),
-							IResource.NONE, null);
+					sFile.getAdaptedFile().setContents(new ByteArrayInputStream("Test".getBytes("UTF-8")), IResource.NONE, null);
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -540,8 +487,7 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		runCommandByAction("SynchronizeCommand", sFile);
 
-		Assert.assertEquals("Remote content", "Test", new String(this.file1
-				.getContent(), "UTF-8"));
+		Assert.assertEquals("Remote content", "Test", new String(this.file1.getContent(), "UTF-8"));
 
 		// sync inbound
 
@@ -554,8 +500,7 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 			Util.safeClose(os);
 		}
 
-		Assert.assertEquals("Remote content", "NewRemote", new String(
-				this.file1.getContent(), "UTF-8"));
+		Assert.assertEquals("Remote content", "NewRemote", new String(this.file1.getContent(), "UTF-8"));
 
 		runCommandByAction("SynchronizeCommand", sFile);
 
@@ -576,33 +521,23 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
-		Assert.assertEquals("File existence", true, sFile.getAdaptedFile()
-				.exists());
+		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
 		runCommandByAction("DeleteCommand", sFile);
 
-		Assert.assertEquals("File existence", false, sFile.getAdaptedFile()
-				.exists());
-		Assert
-				.assertEquals(
-						"Remote File existence",
-						false,
-						sFile
-								.fetchResourceInfo(
-										ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-										null).existsRemotely());
+		Assert.assertEquals("File existence", false, sFile.getAdaptedFile().exists());
+		Assert.assertEquals("Remote File existence", false, sFile
+				.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, null).existsRemotely());
 
 	}
 
@@ -619,25 +554,21 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
-		Assert.assertEquals("File existence", true, sFile.getAdaptedFile()
-				.exists());
+		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
 		runCommandByAction("DiffCommand", sFile);
 
-		Assert.assertEquals("File existence", true, sFile.getAdaptedFile()
-				.exists());
+		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
 	}
 
@@ -655,37 +586,28 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject
-						.getFolder("root").getFolder("Folder1").getAdapter(
-								ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
+						ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
 
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 
-		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(
-				new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root/Folder1/File1")).getAdapter(ISemanticFile.class);
 
-		Assert
-				.assertEquals("Read-only state", true, sFile.fetchResourceInfo(
-						ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
-						.isReadOnly());
+		Assert.assertEquals("Read-only state", true, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
+				.isReadOnly());
 
 		runCommandByAction("OpenForEditCommand", sFile);
 
-		Assert
-				.assertEquals("Read-only state", false, sFile
-						.fetchResourceInfo(
-								ISemanticFileSystem.RESOURCE_INFO_READ_ONLY,
-								null).isReadOnly());
+		Assert.assertEquals("Read-only state", false, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
+				.isReadOnly());
 
 		runCommandByAction("RevertCommand", sFile);
 
-		Assert
-				.assertEquals("Read-only state", true, sFile.fetchResourceInfo(
-						ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
-						.isReadOnly());
+		Assert.assertEquals("Read-only state", true, sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
+				.isReadOnly());
 
 	}
 
@@ -698,26 +620,21 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		// org.eclipse.core.internal.resources.semantic.ui.UnmapAction
 
-		ISemanticProject project = (ISemanticProject) this.testProject
-				.getAdapter(ISemanticProject.class);
+		ISemanticProject project = (ISemanticProject) this.testProject.getAdapter(ISemanticProject.class);
 
-		Assert.assertNotNull("Mapping", RepositoryProvider.getProvider(
-				this.testProject, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER));
+		Assert.assertNotNull("Mapping", RepositoryProvider.getProvider(this.testProject, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER));
 
 		runCommandByAction("UnshareCommand", project);
 
-		Assert.assertNull("Mapping", RepositoryProvider.getProvider(
-				this.testProject, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER));
+		Assert.assertNull("Mapping", RepositoryProvider.getProvider(this.testProject, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER));
 
 	}
 
-	private void runCommandByAction(final String actionName,
-			final ISemanticResource resource) throws Exception {
+	private void runCommandByAction(final String actionName, final ISemanticResource resource) throws Exception {
 
 		// make sure project explorer is selected
-		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().showView(
-						"org.eclipse.ui.navigator.ProjectExplorer"); // Project
+		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
+				"org.eclipse.ui.navigator.ProjectExplorer"); // Project
 		// Explorer
 		// view
 		// id is
@@ -726,26 +643,19 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		// 3.4
 		// compatibility
 
-		ICommandService csrv = (ICommandService) part.getSite().getService(
-				ICommandService.class);
-		Command commandToRun = csrv
-				.getCommand("org.eclipse.core.resources.semantic.ui."
-						+ actionName);
+		ICommandService csrv = (ICommandService) part.getSite().getService(ICommandService.class);
+		Command commandToRun = csrv.getCommand("org.eclipse.core.resources.semantic.ui." + actionName);
 
 		if (commandToRun == null || !commandToRun.isDefined()) {
 			throw new RuntimeException("Command not found for " + actionName);
 		}
 
-		IHandlerService srv = (IHandlerService) part.getSite().getService(
-				IHandlerService.class);
+		IHandlerService srv = (IHandlerService) part.getSite().getService(IHandlerService.class);
 		IEvaluationContext ctx = srv.createContextSnapshot(true);
-		ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME,
-				new StructuredSelection(resource));
-		ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME,
-				new StructuredSelection(resource));
+		ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, new StructuredSelection(resource));
+		ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, new StructuredSelection(resource));
 
-		ExecutionEvent event = new ExecutionEvent(commandToRun,
-				new HashMap<String, String>(), resource, ctx);
+		ExecutionEvent event = new ExecutionEvent(commandToRun, new HashMap<String, String>(), resource, ctx);
 		commandToRun.executeWithChecks(event);
 
 	}

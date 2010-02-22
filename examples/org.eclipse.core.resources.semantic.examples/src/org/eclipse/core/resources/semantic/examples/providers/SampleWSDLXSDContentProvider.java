@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.Status;
  */
 public class SampleWSDLXSDContentProvider extends SampleRESTReadonlyContentProvider {
 
+	@Override
 	public void addFileFromRemoteByURI(ISemanticFileStore parentStore, String name, URI uri, IProgressMonitor monitor) throws CoreException {
 		super.addFileFromRemoteByURI(parentStore, name, uri, monitor);
 		this.addDependentFiles((ISemanticFileStore) parentStore.getChild(name), uri.toString(), monitor);
@@ -156,6 +157,7 @@ public class SampleWSDLXSDContentProvider extends SampleRESTReadonlyContentProvi
 		return uris;
 	}
 
+	@Override
 	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction, IProgressMonitor monitor,
 			MultiStatus status) {
 		super.synchronizeContentWithRemote(semanticFileStore, direction, monitor, status);

@@ -52,7 +52,7 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 	private final IResource resource;
 
-	SemanticResourceAdapterImpl(IResource resource, @SuppressWarnings("unused") ISemanticFileSystem fileSystem) {
+	SemanticResourceAdapterImpl(IResource resource, ISemanticFileSystem fileSystem) {
 		this.resource = resource;
 	}
 
@@ -107,7 +107,8 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 				// TODO 0.1: we need to investigate again what to do when rule
 				// is null
 				if (SfsTraceLocation.CORE.isActive()) {
-					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG);
+					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
+							Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG);
 					SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE.getLocation());
 				}
 
@@ -145,20 +146,20 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 		ISchedulingRule checkRule;
 
 		switch (ruleType) {
-		case DELETE:
-			checkRule = rf.deleteRule(actResource);
-			break;
-		case CREATE:
-			checkRule = rf.createRule(actResource);
-			break;
-		case MODIFY:
-			checkRule = rf.modifyRule(actResource);
-			break;
-		case VALIDATE_EDIT:
-			checkRule = rf.validateEditRule(new IResource[] { actResource });
-			break;
-		default:
-			throw new RuntimeException(Messages.SemanticResourceAdapterImpl_UnknownRuleType_XMSG);
+			case DELETE :
+				checkRule = rf.deleteRule(actResource);
+				break;
+			case CREATE :
+				checkRule = rf.createRule(actResource);
+				break;
+			case MODIFY :
+				checkRule = rf.modifyRule(actResource);
+				break;
+			case VALIDATE_EDIT :
+				checkRule = rf.validateEditRule(new IResource[] {actResource});
+				break;
+			default :
+				throw new RuntimeException(Messages.SemanticResourceAdapterImpl_UnknownRuleType_XMSG);
 		}
 		return checkRule;
 	}

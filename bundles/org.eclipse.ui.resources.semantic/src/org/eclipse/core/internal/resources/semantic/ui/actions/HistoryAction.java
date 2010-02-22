@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class HistoryAction extends ActionBase {
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);

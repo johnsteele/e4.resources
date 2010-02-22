@@ -50,7 +50,7 @@ abstract class HandlerUtilities implements IHandler {
 		// nothing to dispose
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected <T> T getSelectedObject(ExecutionEvent evt, Class T, boolean adapt) {
 
 		IEvaluationContext ctx = (IEvaluationContext) evt.getApplicationContext();

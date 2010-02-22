@@ -37,6 +37,7 @@ public class SemanticResourcesPlugin extends Plugin implements DebugOptionsListe
 
 	private static BundleContext context;
 
+	@Override
 	public void start(BundleContext actContext) throws Exception {
 		super.start(actContext);
 		context = actContext;
@@ -46,6 +47,7 @@ public class SemanticResourcesPlugin extends Plugin implements DebugOptionsListe
 
 	}
 
+	@Override
 	public void stop(BundleContext actContext) throws Exception {
 		super.stop(actContext);
 		context = null;

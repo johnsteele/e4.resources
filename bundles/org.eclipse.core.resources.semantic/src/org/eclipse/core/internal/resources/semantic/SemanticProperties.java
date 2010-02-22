@@ -61,6 +61,9 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public Map<QualifiedName, String> getPersistentProperties() throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -98,11 +101,14 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public String getPersistentProperty(QualifiedName key) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(),
-					new Object[] { getPathForTrace().toString(), key });
+					new Object[] {getPathForTrace().toString(), key});
 		}
 
 		String result = null;
@@ -163,6 +169,9 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 
 	protected abstract void notifyPersistentPropertySet(String keyString, String oldValue, String newValue) throws CoreException;
 
+	/**
+	 * @throws CoreException
+	 */
 	public void setSessionProperty(QualifiedName key, Object value) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -191,6 +200,9 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public Map<QualifiedName, Object> getSessionProperties() throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -219,11 +231,14 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 		}
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public Object getSessionProperty(QualifiedName key) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(),
-					new Object[] { getPathForTrace().toString(), key });
+					new Object[] {getPathForTrace().toString(), key});
 		}
 
 		Object result = null;

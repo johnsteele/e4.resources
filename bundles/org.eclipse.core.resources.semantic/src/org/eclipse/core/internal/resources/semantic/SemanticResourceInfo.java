@@ -42,6 +42,9 @@ public class SemanticResourceInfo implements ISemanticResourceInfo {
 		return this.info.getRemoteUriString();
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public String getContentType() throws CoreException {
 		return this.info.getContentType();
 	}
@@ -54,6 +57,9 @@ public class SemanticResourceInfo implements ISemanticResourceInfo {
 		return this.info.isLocked();
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public boolean isLockingSupported() throws CoreException {
 		return this.info.isLockingSupported();
 	}

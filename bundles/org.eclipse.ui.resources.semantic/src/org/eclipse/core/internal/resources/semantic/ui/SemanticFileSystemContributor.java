@@ -25,6 +25,7 @@ import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
  */
 public class SemanticFileSystemContributor extends FileSystemContributor {
 
+	@Override
 	public URI getURI(String aString) {
 		try {
 			String string;
@@ -50,6 +51,7 @@ public class SemanticFileSystemContributor extends FileSystemContributor {
 
 	}
 
+	@Override
 	public URI browseFileSystem(String initialPath, Shell shell) {
 
 		if (shell == null) {

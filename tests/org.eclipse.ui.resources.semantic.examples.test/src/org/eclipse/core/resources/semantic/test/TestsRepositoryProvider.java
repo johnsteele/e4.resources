@@ -43,8 +43,7 @@ public class TestsRepositoryProvider {
 	public void testRepositoryConfigurationWizard() throws CoreException {
 
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint =
-			registry.getExtensionPoint("org.eclipse.team.ui.configurationWizards");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.team.ui.configurationWizards");
 		for (IExtension extension : extensionPoint.getExtensions()) {
 			// TODO access UI Plugin ID
 			if (!extension.getNamespaceIdentifier().equals("org.eclipse.ui.resources.semantic")) {
@@ -64,16 +63,16 @@ public class TestsRepositoryProvider {
 							project.create(monitor);
 							project.open(monitor);
 
-							RepositoryProvider test = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+							RepositoryProvider test1 = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
 
-							Assert.assertNull("Repository provider should not be mapped", test);
+							Assert.assertNull("Repository provider should not be mapped", test1);
 
 							cw.init(PlatformUI.getWorkbench(), project);
 							cw.performFinish();
 
-							test = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+							test1 = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
 
-							Assert.assertNotNull("Repository provider should be mapped", test);
+							Assert.assertNotNull("Repository provider should be mapped", test1);
 
 							project.close(monitor);
 							project.delete(false, monitor);
@@ -84,7 +83,6 @@ public class TestsRepositoryProvider {
 					ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
 					return;
-
 
 				}
 			}

@@ -108,6 +108,7 @@ public abstract class TestsContentProviderUtil {
 	public static void resetTrace() {
 		// currently not used
 	}
+
 	/**
 	 * Resets the trace locations
 	 * 
@@ -163,8 +164,8 @@ public abstract class TestsContentProviderUtil {
 				Map<QualifiedName, String> properties = new HashMap<QualifiedName, String>();
 				properties.put(TEMPLATE_PROP, "World");
 
-				spr.addFolder("root", TestsContentProviderUtil.this.providerName, properties,
-						TestsContentProviderUtil.this.options, monitor);
+				spr.addFolder("root", TestsContentProviderUtil.this.providerName, properties, TestsContentProviderUtil.this.options,
+						monitor);
 
 				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
@@ -176,10 +177,10 @@ public abstract class TestsContentProviderUtil {
 
 		this.testProject = project;
 
-		String projectName = this.testProject.getName();
+		String projectName1 = this.testProject.getName();
 		String[] roots = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
 		for (String root : roots) {
-			if (root.equals(projectName)) {
+			if (root.equals(projectName1)) {
 				return;
 			}
 		}
@@ -217,7 +218,6 @@ public abstract class TestsContentProviderUtil {
 
 	}
 
-
 	protected void assertContentsEqual(IFile file, String test) {
 		InputStream is = null;
 		try {
@@ -253,6 +253,5 @@ public abstract class TestsContentProviderUtil {
 			Util.safeClose(is);
 		}
 	}
-
 
 }

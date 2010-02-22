@@ -122,6 +122,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		}
 	}
 
+	@Override
 	public IFileStore getStore(URI uri) {
 		if (ISemanticFileSystem.SCHEME.equals(uri.getScheme())) {
 			return getFileStoreImplementation(uri);
@@ -377,6 +378,9 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 			this.fs = fs;
 		}
 
+		/**
+		 * @throws CoreException
+		 */
 		public IPath[] locateURI(URI uri) throws CoreException {
 			try {
 				this.fs.lockForWrite();
@@ -395,6 +399,9 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 			}
 		}
 
+		/**
+		 * @throws CoreException
+		 */
 		public IPath[] locateURI(URI uri, IPath rootpath) throws CoreException {
 			try {
 				this.fs.lockForWrite();
@@ -487,6 +494,9 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public ISemanticURILocatorService getURILocatorService(IProgressMonitor monitor) throws CoreException {
 		try {
 			this.lockForWrite();

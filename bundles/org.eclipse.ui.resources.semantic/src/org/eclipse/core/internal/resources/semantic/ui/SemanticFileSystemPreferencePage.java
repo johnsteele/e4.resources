@@ -42,6 +42,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class SemanticFileSystemPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		Composite main = new Composite(parent, SWT.NONE);

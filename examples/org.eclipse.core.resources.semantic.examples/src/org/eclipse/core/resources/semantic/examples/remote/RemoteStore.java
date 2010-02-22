@@ -35,7 +35,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
@@ -76,6 +75,10 @@ public class RemoteStore extends RemoteStoreTransient {
 			this.currentFolder = rootFolder;
 		}
 
+		/**
+		 * @throws SAXException
+		 */
+		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 			Map<String, String> nameValuePairs = new HashMap<String, String>();
@@ -104,6 +107,7 @@ public class RemoteStore extends RemoteStoreTransient {
 			}
 		}
 
+		@Override
 		public void characters(char ch[], int start, int length) throws SAXException {
 			if (this.currentFile == null && this.currentVersion.equals("")) { //$NON-NLS-1$
 				return;
@@ -133,6 +137,10 @@ public class RemoteStore extends RemoteStoreTransient {
 			}
 		}
 
+		/**
+		 * @throws SAXException
+		 */
+		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			if (qName.equals(Type.FOLDER.name())) {
 				this.currentFolder = this.currentFolder.getParent();
@@ -203,7 +211,7 @@ public class RemoteStore extends RemoteStoreTransient {
 			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes(file.getCharset(true)));
 		} catch (UnsupportedEncodingException e) {
 			// $JL-EXC$ ignore here
-			//$JL-I18N$
+			// $JL-I18N$
 			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes());
 		}
 
@@ -284,6 +292,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -291,6 +300,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		return result;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -314,7 +324,7 @@ public class RemoteStore extends RemoteStoreTransient {
 
 		while (token + 1 < string.length()) {
 
-			byte value = (byte) (Integer.parseInt(new String(new char[] { string.charAt(token), string.charAt(++token) }), 16) - 128);
+			byte value = (byte) (Integer.parseInt(new String(new char[] {string.charAt(token), string.charAt(++token)}), 16) - 128);
 			bos.write(value);
 			token++;
 		}

@@ -41,6 +41,7 @@ public class SemanticResourceVariant extends CachedResourceVariant {
 		this.myStore = store;
 	}
 
+	@Override
 	protected void fetchContents(IProgressMonitor monitor) throws TeamException {
 		try {
 			setContents(this.myRevision.getStorage(monitor).getContents(), monitor);
@@ -51,10 +52,12 @@ public class SemanticResourceVariant extends CachedResourceVariant {
 
 	}
 
+	@Override
 	protected String getCacheId() {
 		return SemanticResourcesPlugin.PLUGIN_ID;
 	}
 
+	@Override
 	protected String getCachePath() {
 		return this.myStore.getPath().append(this.myRevision.getContentIdentifier()).toString();
 	}

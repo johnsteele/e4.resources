@@ -51,6 +51,7 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 		super(false, "TestRemoteStoreContentProvider", RemoteStoreContentProvider.class.getName());
 	}
 
+	@Override
 	@Before
 	public void beforeMethod() throws Exception {
 
@@ -67,7 +68,7 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 
 				try {
 					description
-					.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestRemoteStoreContentProvider.this.projectName));
+							.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestRemoteStoreContentProvider.this.projectName));
 				} catch (URISyntaxException e) {
 					// really not likely, though
 					throw new RuntimeException(e);
@@ -109,10 +110,10 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 
 		this.testProject = project;
 
-		String projectName = this.testProject.getName();
+		String projectName1 = this.testProject.getName();
 		String[] roots = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
 		for (String root : roots) {
-			if (root.equals(projectName)) {
+			if (root.equals(projectName1)) {
 				return;
 			}
 		}
@@ -120,6 +121,7 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 
 	}
 
+	@Override
 	@After
 	public void afterMethod() throws Exception {
 

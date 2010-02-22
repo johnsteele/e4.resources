@@ -55,21 +55,25 @@ public class RemoteFile extends RemoteItem {
 
 		private boolean isOpen = false;
 
+		@Override
 		public synchronized void write(byte[] b, int off, int len) {
 			this.isOpen = true;
 			super.write(b, off, len);
 		}
 
+		@Override
 		public synchronized void write(int b) {
 			this.isOpen = true;
 			super.write(b);
 		}
 
+		@Override
 		public synchronized void write(byte[] b) throws IOException {
 			this.isOpen = true;
 			super.write(b);
 		}
 
+		@Override
 		public synchronized void close() throws IOException {
 			super.close();
 			if (this.isOpen) {
@@ -80,6 +84,7 @@ public class RemoteFile extends RemoteItem {
 			}
 		}
 
+		@Override
 		public synchronized void reset() {
 			super.reset();
 			if (this.isOpen) {

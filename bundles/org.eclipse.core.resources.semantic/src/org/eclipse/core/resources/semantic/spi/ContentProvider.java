@@ -153,7 +153,7 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 	// ISemanticContentProvider
 	//
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -167,6 +167,9 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 		return new DefaultSemanticResourceRuleFactory(this.rootStore);
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public IStatus validateRemove(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor) throws CoreException {
 		return new Status(IStatus.OK, SemanticResourcesPlugin.PLUGIN_ID, ""); //$NON-NLS-1$
 	}

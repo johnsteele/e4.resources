@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.core.internal.resources.semantic.spi.SfsSpiTraceLocation;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
+import org.eclipse.core.resources.semantic.spi.ICacheUpdateCallback;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;

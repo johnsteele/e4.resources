@@ -126,7 +126,7 @@ public class SemanticFileHistoryProvider extends FileHistoryProvider implements 
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.getName().equals("org.eclipse.team.ui.history.IHistoryPageSource")) { //$NON-NLS-1$
 

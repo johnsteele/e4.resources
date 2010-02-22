@@ -20,10 +20,10 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
-import org.eclipse.core.internal.resources.semantic.cacheservice.ICacheUpdateCallback;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
+import org.eclipse.core.resources.semantic.spi.ICacheUpdateCallback;
 import org.eclipse.core.resources.semantic.spi.SemanticFileCache;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +36,6 @@ import org.junit.Test;
 /**
  * 
  */
-@SuppressWarnings("restriction")
 public class TestCacheService {
 
 	/**
@@ -114,7 +113,8 @@ public class TestCacheService {
 
 		appendToCache(service, path, input);
 
-		// this will open an input stream that will prevent a file from being deleted
+		// this will open an input stream that will prevent a file from being
+		// deleted
 		InputStream is = service.getContent(path);
 
 		try {
@@ -128,7 +128,8 @@ public class TestCacheService {
 			Util.safeClose(is);
 		}
 
-		// the cache file must be removed during check method and both checks return false
+		// the cache file must be removed during check method and both checks
+		// return false
 		Assert.assertTrue(!service.hasContent(path));
 		Assert.assertTrue(!cacheFile.exists());
 		Assert.assertTrue(!cacheFile.getParentFile().exists());
@@ -147,7 +148,8 @@ public class TestCacheService {
 
 		writeToCache(service, path, input);
 
-		// this will open an input stream that will prevent a file from being deleted
+		// this will open an input stream that will prevent a file from being
+		// deleted
 		InputStream is = service.getContent(path);
 
 		try {
@@ -155,7 +157,8 @@ public class TestCacheService {
 
 			readFromCache(service, path, "test2");
 
-			// this will open an input stream that will prevent an alternative file from being
+			// this will open an input stream that will prevent an alternative
+			// file from being
 			// deleted
 			InputStream is2 = service.getContent(path);
 
@@ -164,7 +167,8 @@ public class TestCacheService {
 
 				readFromCache(service, path, "test3");
 			} finally {
-				// this will close the stream so that an alternative file can be deleted
+				// this will close the stream so that an alternative file can be
+				// deleted
 				Util.safeClose(is2);
 			}
 		} catch (CoreException e) {

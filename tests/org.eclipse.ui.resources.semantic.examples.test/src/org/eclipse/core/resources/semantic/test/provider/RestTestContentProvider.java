@@ -47,6 +47,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 
+	@Override
 	public ISemanticSpiResourceInfo fetchResourceInfo(
 			ISemanticFileStore semanticFileStore, int options,
 			IProgressMonitor monitor) throws CoreException {
@@ -88,6 +89,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 						.getContentTypeInternal(semanticFileStore));
 	}
 
+	@Override
 	public void revertChanges(ISemanticFileStore semanticFileStore,
 			IProgressMonitor monitor) throws CoreException {
 
@@ -115,6 +117,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 		this.setReadOnly(semanticFileStore, true, monitor);
 	}
 
+	@Override
 	public void synchronizeContentWithRemote(
 			ISemanticFileStore semanticFileStore, SyncDirection direction,
 			IProgressMonitor monitor, MultiStatus status) {
@@ -216,6 +219,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 	// not supported
 	//
 
+	@Override
 	public void addResource(ISemanticFileStore childStore, String name,
 			ResourceType resourceType, IProgressMonitor monitor)
 			throws CoreException {
@@ -233,6 +237,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 		}
 	}
 
+	@Override
 	public IStatus validateEdit(ISemanticFileStore[] stores, Object shell) {
 		for (ISemanticFileStore store : stores) {
 			try {
@@ -245,6 +250,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 				SemanticResourcesPluginExamples.PLUGIN_ID, null);
 	}
 
+	@Override
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
 		return validateEdit(new ISemanticFileStore[] { semanticFileStore },
 				null);

@@ -45,10 +45,15 @@ import org.eclipse.osgi.util.NLS;
  */
 public class SampleRESTReadonlyContentProvider extends CachingContentProvider implements ISemanticContentProviderREST {
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public ICacheServiceFactory getCacheServiceFactory() throws CoreException {
 		return new FileCacheServiceFactory();
 	}
 
+	@Override
 	public InputStream openInputStreamInternal(final ISemanticFileStore store, IProgressMonitor monitor,
 			final ICacheTimestampSetter timeStampSetter) throws CoreException {
 		String remoteURI = this.getURIStringInternal(store);
@@ -89,12 +94,12 @@ public class SampleRESTReadonlyContentProvider extends CachingContentProvider im
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
 			throws CoreException {
 		switch (resourceType) {
-		case FOLDER_TYPE:
-			parentStore.addChildFolder(name);
-			break;
-		default:
-			throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, parentStore.getPath(),
-					Messages.SampleRESTReadonlyContentProvider_MethodNotSupported_XMSG);
+			case FOLDER_TYPE :
+				parentStore.addChildFolder(name);
+				break;
+			default :
+				throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, parentStore.getPath(),
+						Messages.SampleRESTReadonlyContentProvider_MethodNotSupported_XMSG);
 		}
 	}
 
@@ -136,6 +141,9 @@ public class SampleRESTReadonlyContentProvider extends CachingContentProvider im
 		semanticFileStore.remove(monitor);
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
 		// silently ignore since there is nothing to revert because no editing
 		// allowed

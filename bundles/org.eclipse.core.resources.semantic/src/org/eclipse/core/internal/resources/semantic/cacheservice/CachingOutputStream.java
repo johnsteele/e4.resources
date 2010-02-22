@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
+import org.eclipse.core.resources.semantic.spi.ICacheUpdateCallback;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -36,6 +37,7 @@ class CachingOutputStream extends OutputStream {
 
 	}
 
+	@Override
 	@SuppressWarnings("boxing")
 	public void close() throws IOException {
 		InputStream stream = null;
@@ -68,18 +70,22 @@ class CachingOutputStream extends OutputStream {
 		}
 	}
 
+	@Override
 	public void flush() throws IOException {
 		this.fileHandle.flush();
 	}
 
+	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
 		this.fileHandle.write(b, off, len);
 	}
 
+	@Override
 	public void write(byte[] b) throws IOException {
 		this.fileHandle.write(b);
 	}
 
+	@Override
 	public void write(int b) throws IOException {
 		this.fileHandle.write(b);
 	}

@@ -92,6 +92,9 @@ public abstract class SemanticFileRevision implements IFileRevision {
 		return false;
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException {
 		return this;
 	}

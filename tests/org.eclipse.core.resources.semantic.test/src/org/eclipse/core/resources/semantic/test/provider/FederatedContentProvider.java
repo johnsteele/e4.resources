@@ -41,31 +41,31 @@ public class FederatedContentProvider extends ContentProvider {
 	private final static QualifiedName TIMESTAMP = new QualifiedName(TestPlugin.PLUGIN_ID, "Timestamp");
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		ISemanticFileStore newChild;
 
 		switch (resourceType) {
 
-		case FILE_TYPE:
-			parentStore.addChildFile(name);
-			newChild = (ISemanticFileStore) parentStore.getChild(name);
-			setTimestamp(newChild, System.currentTimeMillis());
-			setReadOnly(newChild, true, monitor);
-			break;
-		case FOLDER_TYPE:
-			parentStore.addChildFolder(name);
-			newChild = (ISemanticFileStore) parentStore.getChild(name);
-			setTimestamp(newChild, System.currentTimeMillis());
-			setReadOnly(newChild, true, monitor);
-			break;
-		default:
-			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "Can not add resource of type "
-					+ resourceType.name()));
+			case FILE_TYPE :
+				parentStore.addChildFile(name);
+				newChild = (ISemanticFileStore) parentStore.getChild(name);
+				setTimestamp(newChild, System.currentTimeMillis());
+				setReadOnly(newChild, true, monitor);
+				break;
+			case FOLDER_TYPE :
+				parentStore.addChildFolder(name);
+				newChild = (ISemanticFileStore) parentStore.getChild(name);
+				setTimestamp(newChild, System.currentTimeMillis());
+				setReadOnly(newChild, true, monitor);
+				break;
+			default :
+				throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "Can not add resource of type "
+						+ resourceType.name()));
 		}
 	}
 
 	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		return new SemanticSpiResourceInfo(options, false, false, semanticFileStore.getPersistentProperty(READONLY) != null, true, null,
 				null);
 	}
@@ -74,18 +74,20 @@ public class FederatedContentProvider extends ContentProvider {
 		return getTimestampe(semanticFileStore);
 	}
 
-	public InputStream openInputStream(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public InputStream openInputStream(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		return new ByteArrayInputStream(new byte[0]);
 	}
 
-	public OutputStream openOutputStream(ISemanticFileStore childStore, int options, IProgressMonitor monitor) throws CoreException {
+	public OutputStream openOutputStream(ISemanticFileStore childStore, int options, IProgressMonitor monitor) {
 		return new OutputStream() {
 
-			public void write(int b) throws IOException {
+			@Override
+			public void write(int b) {
 				// we don't need this
 
 			}
 
+			@Override
 			public void close() throws IOException {
 				// we don't need this
 				super.close();
@@ -99,7 +101,7 @@ public class FederatedContentProvider extends ContentProvider {
 
 	}
 
-	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 
 	}
@@ -118,8 +120,8 @@ public class FederatedContentProvider extends ContentProvider {
 
 	}
 
-	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction,
-			IProgressMonitor monitor, MultiStatus status) {
+	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction, IProgressMonitor monitor,
+			MultiStatus status) {
 		throw new RuntimeException("Not supported");
 	}
 

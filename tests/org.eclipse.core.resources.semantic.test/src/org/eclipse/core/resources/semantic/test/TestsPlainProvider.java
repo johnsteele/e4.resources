@@ -28,6 +28,7 @@ public class TestsPlainProvider extends TestsContentProviderBase {
 	/**
 	 * Overwritten since it doesn't work in non-caching providers
 	 */
+	@Override
 	public void testChangeFileContentLocalAndRevert() throws Exception {
 		// TODO this doesn't work in a non-caching provider; change the RemoteFile implementation
 		// so that it implements revert

@@ -16,11 +16,13 @@ public class SemanticResourcesPluginExamplesCore extends Plugin {
 		return INSTANCE;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		INSTANCE = this;
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		INSTANCE = null;

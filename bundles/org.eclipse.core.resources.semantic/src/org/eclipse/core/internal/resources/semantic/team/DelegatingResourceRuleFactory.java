@@ -89,7 +89,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -138,7 +139,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -187,7 +189,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -238,7 +241,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -310,7 +314,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -323,7 +328,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(),
-					new Object[] { source.getFullPath().toString(), destination.getFullPath().toString() });
+					new Object[] {source.getFullPath().toString(), destination.getFullPath().toString()});
 		}
 
 		ISchedulingRule result;
@@ -360,7 +365,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -413,7 +419,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -473,7 +480,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 						if (fs instanceof ISemanticFileStore) {
 							ISemanticFileStore sfs = (ISemanticFileStore) fs;
 							ISemanticFileStore ruleStore = sfs.getEffectiveContentProvider().getRuleFactory().validateEditRule(
-									new ISemanticFileStore[] { sfs });
+									new ISemanticFileStore[] {sfs});
 							if (ruleStore != null) {
 								ruleStores.add(ruleStore);
 							} else {
@@ -507,7 +514,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			if (result instanceof IResource) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), ((IResource) result).getFullPath().toString());
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
+						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
@@ -519,7 +527,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 	/*
 	 * Added for compatibility with Eclipse 3.6
 	 */
-	public ISchedulingRule derivedRule(@SuppressWarnings("unused") IResource resource) {
+	public ISchedulingRule derivedRule(IResource resource) {
 		// TODO 0.1 add implementation
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());

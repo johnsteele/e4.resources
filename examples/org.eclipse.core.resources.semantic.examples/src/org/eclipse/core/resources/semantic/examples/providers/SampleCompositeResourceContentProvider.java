@@ -97,6 +97,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 		}
 	}
 
+	@Override
 	public IStatus validateRemove(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor) throws CoreException {
 		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
 			final int[] counter = new int[1];
@@ -134,10 +135,15 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 		return super.validateRemove(semanticFileStore, options, monitor);
 	}
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public ICacheServiceFactory getCacheServiceFactory() throws CoreException {
 		return new FileCacheServiceFactory();
 	}
 
+	@Override
 	public InputStream openInputStreamInternal(final ISemanticFileStore store, IProgressMonitor monitor,
 			final ICacheTimestampSetter timeStampSetter) throws CoreException {
 		String remoteURI = this.getURIStringInternal(store);
@@ -178,13 +184,13 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
 			throws CoreException {
 		switch (resourceType) {
-		case FOLDER_TYPE:
-			parentStore.addChildFolder(name);
-			break;
+			case FOLDER_TYPE :
+				parentStore.addChildFolder(name);
+				break;
 
-		default:
-			throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, parentStore.getPath(),
-					Messages.SampleCompositeResourceContentProvider_NotSupported_XMSG);
+			default :
+				throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, parentStore.getPath(),
+						Messages.SampleCompositeResourceContentProvider_NotSupported_XMSG);
 		}
 	}
 
@@ -294,7 +300,7 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 	}
 
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
-		return validateEdit(new ISemanticFileStore[] { semanticFileStore }, null);
+		return validateEdit(new ISemanticFileStore[] {semanticFileStore}, null);
 	}
 
 	public String getURIString(ISemanticFileStore semanticFileStore) throws CoreException {

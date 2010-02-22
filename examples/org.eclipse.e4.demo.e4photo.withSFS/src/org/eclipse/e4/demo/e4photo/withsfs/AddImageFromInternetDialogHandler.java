@@ -48,10 +48,12 @@ public class AddImageFromInternetDialogHandler {
 
 		}
 
+		@Override
 		public void addPages() {
 			addPage(new AddDemoRESTResourcePage(this.myFolder));
 		}
 
+		@Override
 		public boolean performFinish() {
 
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();

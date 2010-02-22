@@ -63,12 +63,14 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 		super();
 	}
 
+	@Override
 	public void addPages() {
 		setWindowTitle(Messages.CreateDemoProjectPage_CreateProject_XGRP);
 		addPage(new SelectScenarioPage());
 		addPage(new CreateDemoProjectPage());
 	}
 
+	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		if (page instanceof SelectScenarioPage) {
 			SelectScenarioPage prev = (SelectScenarioPage) getPage(SelectScenarioPage.class.getName());
@@ -79,6 +81,7 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 		return super.getNextPage(page);
 	}
 
+	@Override
 	public boolean performFinish() {
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();

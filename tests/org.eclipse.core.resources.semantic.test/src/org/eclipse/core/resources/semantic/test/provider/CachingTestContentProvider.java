@@ -38,11 +38,16 @@ import org.eclipse.team.core.history.ITag;
  */
 public class CachingTestContentProvider extends CachingTestContentProviderBase implements ISemanticContentProviderLocal {
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public ICacheServiceFactory getCacheServiceFactory() throws CoreException {
 		return new FileCacheServiceFactory();
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({"rawtypes"})
 	public Object getAdapter(Class adapter) {
 		if (ISemanticFileHistoryProvider.class == adapter) {
 			return new ISemanticFileHistoryProvider() {
@@ -78,7 +83,7 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 
 					IFileRevision remote = new IFileRevision() {
 
-						public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException {
+						public IFileRevision withAllProperties(IProgressMonitor monitor1) {
 							return this;
 						}
 
@@ -103,9 +108,9 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 							return null;
 						}
 
-						public IStorage getStorage(IProgressMonitor monitor) throws CoreException {
+						public IStorage getStorage(IProgressMonitor monitor1) throws CoreException {
 							SemanticRevisionStorage storage = new SemanticRevisionStorage(semanticFileStore);
-							storage.setContents(new ByteArrayInputStream(file.getContent()), monitor);
+							storage.setContents(new ByteArrayInputStream(file.getContent()), monitor1);
 							return storage;
 						}
 
@@ -130,9 +135,8 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 						}
 					};
 
-					return new IFileRevision[] { null, remote };
+					return new IFileRevision[] {null, remote};
 				}
-
 
 			};
 		}

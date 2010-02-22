@@ -29,6 +29,9 @@ public class MemoryHandleFactory implements IContentHandleFactory {
 		return MemoryCache.getInstance().getOrCreateMemoryStore(path.toString());
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public ITemporaryContentHandle createTemporaryHandle(ICacheService service, IPath path, boolean append) throws CoreException {
 
 		return new TemporaryMemoryHandle(path, append, new ByteArrayOutputStream());

@@ -54,6 +54,7 @@ public class SFSBrowserTreeLabelProvider implements ITableLabelProvider {
 
 		tree.addMouseListener(new MouseAdapter() {
 
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				TreeItem item = tree.getItem(new Point(e.x, e.y));
 				boolean expanded = tv.getExpandedState(item.getData());

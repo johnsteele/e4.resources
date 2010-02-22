@@ -54,58 +54,58 @@ public class FederatingContentProvider extends ContentProvider implements ISeman
 	}
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		switch (resourceType) {
-		case FILE_TYPE:
-			parentStore.addChildResource(name, false, getFederatedProviderIDForPath(parentStore.getPath().append(name)), null);
-			break;
+			case FILE_TYPE :
+				parentStore.addChildResource(name, false, getFederatedProviderIDForPath(parentStore.getPath().append(name)), null);
+				break;
 
-		default:
-			throw new RuntimeException("Not supported");
+			default :
+				throw new RuntimeException("Not supported");
 		}
 
 	}
 
-	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
-	throws CoreException {
+	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor) {
 		return new SemanticSpiResourceInfo(options, false, false, false, false, null, null);
 	}
 
-	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 	}
 
-	public InputStream openInputStream(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public InputStream openInputStream(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 	}
 
 	public OutputStream openOutputStream(ISemanticFileStore childStore, int options, IProgressMonitor monitor) throws CoreException {
 		throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, childStore.getPath(),
-		"can not open output stream for this resource"); //$NON-NLS-1$
+				"can not open output stream for this resource"); //$NON-NLS-1$
 	}
 
-	public void removeResource(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
-		// simply ignore here (would otherwise result in problems during cleanup of test
+	public void removeResource(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
+		// simply ignore here (would otherwise result in problems during cleanup
+		// of test
 
 	}
 
-	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 
 	}
 
-	public void setReadOnly(ISemanticFileStore semanticFileStore, boolean readonly, IProgressMonitor monitor) throws CoreException {
+	public void setReadOnly(ISemanticFileStore semanticFileStore, boolean readonly, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 
 	}
 
-	public void setResourceTimestamp(ISemanticFileStore semanticFileStore, long timestamp, IProgressMonitor monitor) throws CoreException {
+	public void setResourceTimestamp(ISemanticFileStore semanticFileStore, long timestamp, IProgressMonitor monitor) {
 		throw new RuntimeException("Not supported");
 
 	}
 
-	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction,
-			IProgressMonitor monitor, MultiStatus status) {
+	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction, IProgressMonitor monitor,
+			MultiStatus status) {
 		throw new RuntimeException("Not supported");
 
 	}
@@ -121,15 +121,15 @@ public class FederatingContentProvider extends ContentProvider implements ISeman
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, String contentProviderID,
 			Map<QualifiedName, String> properties) throws CoreException {
 		switch (resourceType) {
-		case FILE_TYPE:
-			parentStore.addChildResource(name, false, contentProviderID, properties);
-			break;
-		case FOLDER_TYPE:
-			parentStore.addChildResource(name, true, contentProviderID, properties);
-			break;
-		default:
-			// TODO error handling
-			break;
+			case FILE_TYPE :
+				parentStore.addChildResource(name, false, contentProviderID, properties);
+				break;
+			case FOLDER_TYPE :
+				parentStore.addChildResource(name, true, contentProviderID, properties);
+				break;
+			default :
+				// TODO error handling
+				break;
 		}
 	}
 

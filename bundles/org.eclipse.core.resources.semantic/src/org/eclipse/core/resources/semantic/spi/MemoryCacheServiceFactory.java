@@ -27,6 +27,9 @@ public class MemoryCacheServiceFactory implements ICacheServiceFactory {
 	private static final Lock rl = new ReentrantLock();
 	private static ICacheService service;
 
+	/**
+	 * @throws CoreException
+	 */
 	public ICacheService getCacheService() throws CoreException {
 		try {
 			rl.lock();

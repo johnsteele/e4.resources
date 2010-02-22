@@ -34,6 +34,7 @@ public class SemanticProjectAdapterImpl extends SemanticFolderAdapterImpl implem
 		return this.myProject;
 	}
 
+	@Override
 	public void remove(int options, IProgressMonitor monitor) throws CoreException {
 
 		boolean internalMode = (options & ISemanticFileSystem.INTERNAL_DELETE_PROJECT) > 0;

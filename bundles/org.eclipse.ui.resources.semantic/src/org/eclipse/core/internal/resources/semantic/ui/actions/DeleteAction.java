@@ -32,6 +32,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class DeleteAction extends ActionBase {
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);
@@ -43,7 +44,7 @@ public class DeleteAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {

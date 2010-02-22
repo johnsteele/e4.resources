@@ -98,6 +98,9 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 
 			runnable = new IWorkspaceRunnable() {
 
+				/**
+				 * @throws CoreException
+				 */
 				public void run(IProgressMonitor monitor) throws CoreException {
 					ISemanticFolder sfr = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
 					ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
@@ -122,26 +125,28 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 					ISemanticFolder sfr = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
 					// should work even if cache is deleted logically only
 					ISemanticFile sfile = sfr.addFile("File1", TestsCachingProvider.this.options, monitor);
-					// TODO verify that other operations fail (write/read/timestamp)
+					// TODO verify that other operations fail
+					// (write/read/timestamp)
 					Assert.assertTrue(sfile.getAdaptedFile().equals(file));
 					file.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-					InputStream is = null;
+					InputStream is1 = null;
 					try {
-						is = sfile.getAdaptedFile().getContents();
+						is1 = sfile.getAdaptedFile().getContents();
 						try {
-							Assert.assertTrue("Too few bytes available", is.available() > 0);
+							Assert.assertTrue("Too few bytes available", is1.available() > 0);
 						} catch (IOException e) {
 							// $JL-EXC$
 							Assert.fail(e.getMessage());
 						}
 					} finally {
-						Util.safeClose(is);
+						Util.safeClose(is1);
 					}
 				}
 			};
 
 			try {
-				// re-adding should not fail even if the input stream is still open
+				// re-adding should not fail even if the input stream is still
+				// open
 				ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
 			} catch (CoreException e) {

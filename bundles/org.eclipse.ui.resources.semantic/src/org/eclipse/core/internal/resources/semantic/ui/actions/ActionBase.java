@@ -62,7 +62,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return this.mySelection;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	protected boolean checkSelectionNonLocalOnly() {
 
 		boolean shouldEnable = true;
@@ -101,7 +101,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	protected boolean checkSelectionSemanticResource() {
 
 		boolean shouldEnable = true;
@@ -121,7 +121,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	protected boolean checkFilesWithReadOnlyFlagOnly(boolean readOnly) {
 
 		boolean shouldEnable = true;
@@ -157,7 +157,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	protected boolean checkSelectionLockingSupportedOnly() {
 
 		boolean shouldEnable = true;

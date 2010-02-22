@@ -30,6 +30,7 @@ public class ConfigurationWizard extends Wizard implements IConfigurationWizard 
 
 	private ISemanticFileSystem mySfs;
 
+	@Override
 	public void addPages() {
 		try {
 			// TODO 0.1: dependency injection
@@ -41,6 +42,7 @@ public class ConfigurationWizard extends Wizard implements IConfigurationWizard 
 		addPage(new ConfigurationPage(this.mySfs));
 	}
 
+	@Override
 	public boolean performFinish() {
 
 		if (this.mySfs == null) {

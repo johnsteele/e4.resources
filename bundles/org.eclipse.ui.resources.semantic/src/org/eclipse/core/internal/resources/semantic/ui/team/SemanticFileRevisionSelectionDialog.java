@@ -35,6 +35,7 @@ public class SemanticFileRevisionSelectionDialog extends Dialog {
 		this.myInput = input;
 	}
 
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(this.myTitle);
@@ -48,11 +49,13 @@ public class SemanticFileRevisionSelectionDialog extends Dialog {
 		return this.mySelection;
 	}
 
+	@Override
 	public void create() {
 		super.create();
 		getButton(Window.OK).setEnabled(false);
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite myParent = new Composite(parent, SWT.NONE);
@@ -109,6 +112,7 @@ public class SemanticFileRevisionSelectionDialog extends Dialog {
 		return myParent;
 	}
 
+	@Override
 	protected void okPressed() {
 		this.mySelection = (SemanticFileRevision) ((IStructuredSelection) this.tv.getSelection()).getFirstElement();
 		super.okPressed();

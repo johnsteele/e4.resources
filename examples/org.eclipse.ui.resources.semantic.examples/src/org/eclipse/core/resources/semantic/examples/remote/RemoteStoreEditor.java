@@ -90,6 +90,7 @@ public class RemoteStoreEditor extends EditorPart {
 	TreeViewer tv;
 	boolean dirty = false;
 
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (this.dirty) {
 			try {
@@ -103,10 +104,12 @@ public class RemoteStoreEditor extends EditorPart {
 
 	}
 
+	@Override
 	public void doSaveAs() {
 		// not allowed
 	}
 
+	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		if (input instanceof IFileEditorInput) {
 			this.myFile = ((IFileEditorInput) input).getFile();
@@ -121,14 +124,17 @@ public class RemoteStoreEditor extends EditorPart {
 
 	}
 
+	@Override
 	public boolean isDirty() {
 		return this.dirty;
 	}
 
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		Composite main = new Composite(parent, SWT.NONE);
@@ -145,7 +151,7 @@ public class RemoteStoreEditor extends EditorPart {
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// nothing				
+				// nothing
 			}
 		});
 
@@ -159,7 +165,7 @@ public class RemoteStoreEditor extends EditorPart {
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// nothing				
+				// nothing
 			}
 		});
 
@@ -227,23 +233,23 @@ public class RemoteStoreEditor extends EditorPart {
 			public String getColumnText(Object element, int columnIndex) {
 				RemoteItem item = (RemoteItem) element;
 				switch (columnIndex) {
-				case 0:
-					return item.getName();
+					case 0 :
+						return item.getName();
 
-				default:
-					return null;
+					default :
+						return null;
 				}
 			}
 
 			public Image getColumnImage(Object element, int columnIndex) {
 				switch (columnIndex) {
-				case 0:
-					if (((RemoteItem) element).getType() == Type.FOLDER) {
-						return RemoteStoreEditor.FOLDERIMAGE;
-					}
-					return RemoteStoreEditor.FILEIMAGE;
-				default:
-					return null;
+					case 0 :
+						if (((RemoteItem) element).getType() == Type.FOLDER) {
+							return RemoteStoreEditor.FOLDERIMAGE;
+						}
+						return RemoteStoreEditor.FILEIMAGE;
+					default :
+						return null;
 				}
 			}
 		});
@@ -267,7 +273,7 @@ public class RemoteStoreEditor extends EditorPart {
 
 		final IResourceDeltaVisitor dv = new IResourceDeltaVisitor() {
 
-			public boolean visit(IResourceDelta delta) throws CoreException {
+			public boolean visit(IResourceDelta delta) {
 				if (delta.getKind() == IResourceDelta.REMOVED) {
 					if (delta.getFullPath().equals(RemoteStoreEditor.this.myFile.getFullPath())) {
 						// we should somehow close the editor here
@@ -361,13 +367,13 @@ public class RemoteStoreEditor extends EditorPart {
 							label.getParent().layout(true);
 						} catch (CoreException e) {
 							// $JL-EXC$ ignore here
-							//$JL-I18N$							
+							// $JL-I18N$
 							content.setText(new String(file.getContent()));
 						}
 
 					} catch (UnsupportedEncodingException e) {
 						// $JL-EXC$ ignore here
-						//$JL-I18N$
+						// $JL-I18N$
 						content.setText(new String(file.getContent()));
 					}
 				} else {
@@ -439,6 +445,7 @@ public class RemoteStoreEditor extends EditorPart {
 		}
 	}
 
+	@Override
 	public void setFocus() {
 		// nothing
 	}

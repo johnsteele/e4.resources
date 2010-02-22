@@ -45,10 +45,12 @@ public class HandleAddRestResource extends HandlerUtilities {
 			this.myFolder = folder;
 		}
 
+		@Override
 		public void addPages() {
 			addPage(new AddDemoRESTResourcePage(this.myFolder));
 		}
 
+		@Override
 		public boolean performFinish() {
 
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -78,6 +80,9 @@ public class HandleAddRestResource extends HandlerUtilities {
 
 	}
 
+	/**
+	 * @throws ExecutionException
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		ISemanticFolder sFolder = getSelectedObject(event, ISemanticFolder.class, true);

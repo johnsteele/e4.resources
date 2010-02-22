@@ -56,6 +56,7 @@ public class HandleAddWsFileFromRemote extends HandlerUtilities {
 			setWindowTitle(Messages.HandleAddFileFromRemote_AddLocalResource_XGRP);
 		}
 
+		@Override
 		public boolean performFinish() {
 			AddFileOrFolderFromRemotePage page = (AddFileOrFolderFromRemotePage) getPage(AddFileOrFolderFromRemotePage.PAGE_NAME);
 
@@ -73,6 +74,9 @@ public class HandleAddWsFileFromRemote extends HandlerUtilities {
 		}
 	}
 
+	/**
+	 * @throws ExecutionException
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		final ISemanticFolder sFolder = getSelectedObject(event, ISemanticFolder.class, true);

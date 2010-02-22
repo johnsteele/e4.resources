@@ -64,6 +64,7 @@ ISemanticContentProviderLocking {
 	private static final QualifiedName LOCKHANDLE = new QualifiedName(TestPlugin.PLUGIN_ID, "LockHandle");
 	private static final QualifiedName READONLY = new QualifiedName(TestPlugin.PLUGIN_ID, "ReadOnly");
 
+	@Override
 	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long cacheTimestamp, boolean append,
 			IProgressMonitor monitor) {
 		boolean writeThrough;
@@ -236,6 +237,7 @@ ISemanticContentProviderLocking {
 				null, null);
 	}
 
+	@Override
 	public InputStream openInputStreamInternal(ISemanticFileStore store, IProgressMonitor monitor,
 			ICacheTimestampSetter timeStampSetter) throws CoreException {
 		RemoteItem item = getStore().getItemByPath(store.getPath().removeFirstSegments(2));

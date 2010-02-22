@@ -68,11 +68,13 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
  * View on the content of the Semantic File System.
  * 
  * Also used in the {@link FileSystemContributor} implementation of
- * {@link SemanticFileSystemContributor} which uses the controls here in {@link BrowseSFSDialog}.
+ * {@link SemanticFileSystemContributor} which uses the controls here in
+ * {@link BrowseSFSDialog}.
  * <p>
- * Depending on whether this is actually used as view or as dialog, the buttons will either be
- * implemented as {@link ToolBar} or as {@link Action} contributed to the {@link ToolBarManager}; in
- * addition, refresh will behave differently (blocking the UI in case of the dialog while working
+ * Depending on whether this is actually used as view or as dialog, the buttons
+ * will either be implemented as {@link ToolBar} or as {@link Action}
+ * contributed to the {@link ToolBarManager}; in addition, refresh will behave
+ * differently (blocking the UI in case of the dialog while working
  * asynchronously in view mode.
  * 
  */
@@ -99,6 +101,7 @@ public class SemanticResourcesView extends ViewPart {
 	// refresh rate for auto-refresh
 	static final int REFRESH_RATE = 5000;
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		Composite main = new Composite(parent, SWT.NONE);
@@ -106,11 +109,13 @@ public class SemanticResourcesView extends ViewPart {
 		ToolBar tb;
 
 		if (getViewSite() == null) {
-			// pop-up mode: we use right-to-left so that this looks more like the view tool bar
+			// pop-up mode: we use right-to-left so that this looks more like
+			// the view tool bar
 			// manager
 			tb = new ToolBar(main, SWT.HORIZONTAL | SWT.RIGHT_TO_LEFT);
 		} else {
-			// view mode: we don't add a tool bar, as we use the view tool bar manager
+			// view mode: we don't add a tool bar, as we use the view tool bar
+			// manager
 			tb = null;
 		}
 
@@ -121,7 +126,8 @@ public class SemanticResourcesView extends ViewPart {
 		try {
 			input = getRootObjects();
 		} catch (CoreException e) {
-			// for example, the SFS can not be accessed; in this case, we show a label with the
+			// for example, the SFS can not be accessed; in this case, we show a
+			// label with the
 			// status text and return
 			Label errorLabel = new Label(main, SWT.NONE);
 			errorLabel.setText(e.getStatus().getMessage());
@@ -183,6 +189,7 @@ public class SemanticResourcesView extends ViewPart {
 
 			Action hideNonExisting = new Action(Messages.BrowseSFSDialog_Hide_XCKL, IAction.AS_CHECK_BOX) {
 
+				@Override
 				public void run() {
 					SFSBrowserTreeContentProvider prov = (SFSBrowserTreeContentProvider) SemanticResourcesView.this.sfsTree
 							.getContentProvider();
@@ -196,6 +203,7 @@ public class SemanticResourcesView extends ViewPart {
 
 			Action refresh = new Action(Messages.BrowseSFSDialog_Refresh_XBUT, IAction.AS_PUSH_BUTTON) {
 
+				@Override
 				public void run() {
 					scheduleRefresh(0);
 				}
@@ -205,6 +213,7 @@ public class SemanticResourcesView extends ViewPart {
 
 			Action autoRefreshAction = new Action(Messages.SemanticResourcesView_AutoRefresh_XCKL, IAction.AS_CHECK_BOX) {
 
+				@Override
 				public void run() {
 
 					SemanticResourcesView.this.autoRefresh = isChecked();
@@ -236,6 +245,7 @@ public class SemanticResourcesView extends ViewPart {
 			refresh.setText(Messages.BrowseSFSDialog_Refresh_XBUT);
 			refresh.addSelectionListener(new SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					scheduleRefresh(0);
 				}
@@ -247,6 +257,7 @@ public class SemanticResourcesView extends ViewPart {
 
 			hideNonExisting.addSelectionListener(new SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 
 					SFSBrowserTreeContentProvider prov = (SFSBrowserTreeContentProvider) SemanticResourcesView.this.sfsTree
@@ -314,6 +325,7 @@ public class SemanticResourcesView extends ViewPart {
 
 	}
 
+	@Override
 	public void setFocus() {
 		// nothing to do
 	}
@@ -333,6 +345,7 @@ public class SemanticResourcesView extends ViewPart {
 		this.selectedPath = path;
 	}
 
+	@Override
 	public void dispose() {
 		// make sure to cancel the job
 		if (this.scheduledJob != null) {
@@ -380,12 +393,13 @@ public class SemanticResourcesView extends ViewPart {
 	void scheduleRefresh(long delay) {
 
 		if (getSite() == null) {
-			// pop-up mode: block the UI (we can't display progress in a modal dialog)
+			// pop-up mode: block the UI (we can't display progress in a modal
+			// dialog)
 			try {
 				// cancellation is not supported in the underlying method of SFS
 				PlatformUI.getWorkbench().getProgressService().run(true, false, new IRunnableWithProgress() {
 
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException {
 						try {
 							refreshInternal();
 						} catch (CoreException e) {
@@ -410,6 +424,7 @@ public class SemanticResourcesView extends ViewPart {
 			// view mode: run asynchronously
 			Job refreshJob = new Job(Messages.SemanticResourcesView_RefreshJob_XGRP) {
 
+				@Override
 				public IStatus run(IProgressMonitor monitor) {
 					try {
 						refreshInternal();
@@ -427,8 +442,10 @@ public class SemanticResourcesView extends ViewPart {
 					IWorkbenchSiteProgressService.class);
 			// keep track of this job
 			this.scheduledJob = refreshJob;
-			// by scheduling with the service, we'll get the italic font in the tab
-			// while the job is running (if it is running long enough for the display to update)
+			// by scheduling with the service, we'll get the italic font in the
+			// tab
+			// while the job is running (if it is running long enough for the
+			// display to update)
 			service.schedule(refreshJob, delay);
 		}
 	}

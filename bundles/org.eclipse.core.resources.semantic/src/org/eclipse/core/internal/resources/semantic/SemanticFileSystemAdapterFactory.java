@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
  */
 public class SemanticFileSystemAdapterFactory implements IAdapterFactory {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof IResource) {
 			if (isSemanticStoreScheme((IResource) adaptableObject)) {
@@ -65,9 +65,9 @@ public class SemanticFileSystemAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
-		return new Class[] { ISemanticFolder.class, ISemanticFile.class, ISemanticResource.class, ISemanticProject.class };
+		return new Class[] {ISemanticFolder.class, ISemanticFile.class, ISemanticResource.class, ISemanticProject.class};
 	}
 
 	private boolean isSemanticStoreScheme(IResource resource) {

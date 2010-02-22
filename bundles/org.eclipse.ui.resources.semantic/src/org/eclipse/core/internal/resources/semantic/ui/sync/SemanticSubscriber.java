@@ -58,14 +58,17 @@ public class SemanticSubscriber extends Subscriber {
 		this.threeWay = threeWay;
 	}
 
+	@Override
 	public String getName() {
 		return Messages.SemanticSubscriber_SfsSubsriberName_XGRP;
 	}
 
+	@Override
 	public IResourceVariantComparator getResourceComparator() {
 		return new SemanticResourceVariantComparator(this.threeWay);
 	}
 
+	@Override
 	public synchronized SyncInfo getSyncInfo(IResource resource) throws TeamException {
 
 		SyncInfo syncinfo;
@@ -123,10 +126,12 @@ public class SemanticSubscriber extends Subscriber {
 		return result;
 	}
 
-	public boolean isSupervised(IResource resource) throws TeamException {
+	@Override
+	public boolean isSupervised(IResource resource) {
 		return true;
 	}
 
+	@Override
 	public IResource[] members(IResource resource) throws TeamException {
 		if (resource instanceof IContainer) {
 			try {
@@ -138,6 +143,7 @@ public class SemanticSubscriber extends Subscriber {
 		return new IResource[0];
 	}
 
+	@Override
 	public synchronized void refresh(IResource[] resources, int depth, final IProgressMonitor monitor) throws TeamException {
 
 		final List<ISubscriberChangeEvent> events = new ArrayList<ISubscriberChangeEvent>();
@@ -146,14 +152,17 @@ public class SemanticSubscriber extends Subscriber {
 			try {
 				res.accept(new IResourceVisitor() {
 
-					public boolean visit(IResource resource) throws CoreException {
+					public boolean visit(IResource resource) {
 
 						SyncInfo info = SemanticSubscriber.this.outOfSync.get(resource.getFullPath());
 						if (info != null) {
 							// TODO 0.1: optimize refresh on team sync
-							// we could be a bit more smart here provided we can get the information
-							// whether the remote resource or resources are still the "same" as the info.getRemote()
-							// and info.getBase() (the latter in case of three-way compare) 
+							// we could be a bit more smart here provided we can
+							// get the information
+							// whether the remote resource or resources are
+							// still the "same" as the info.getRemote()
+							// and info.getBase() (the latter in case of
+							// three-way compare)
 							events.add(new SubscriberChangeEvent(SemanticSubscriber.this, 1, resource));
 						}
 						return true;
@@ -169,6 +178,7 @@ public class SemanticSubscriber extends Subscriber {
 
 	}
 
+	@Override
 	public IResource[] roots() {
 		ArrayList<IResource> rootList = new ArrayList<IResource>();
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();

@@ -120,13 +120,17 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({"rawtypes"})
 	public Object getAdapter(Class adapter) {
 
 		if (adapter == ISemanticFileHistoryProvider.class) {
 
 			return new ISemanticFileHistoryProvider() {
 
+				/**
+				 * @throws CoreException
+				 */
 				public IFileRevision getWorkspaceFileRevision(ISemanticFileStore store) throws CoreException {
 					RemoteItem item = getRemoteItem(getStore(), store.getPath());
 					if (item instanceof RemoteFile) {
@@ -135,6 +139,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 					return null;
 				}
 
+				/**
+				 * @throws CoreException
+				 */
 				public IFileHistory getHistoryFor(ISemanticFileStore store, int options, IProgressMonitor monitor) throws CoreException {
 					RemoteItem item = getRemoteItem(getStore(), store.getPath());
 					if (item instanceof RemoteFile) {
@@ -155,6 +162,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 					IFileRevision remote = new IFileRevision() {
 
+						/**
+						 * @throws CoreException
+						 */
 						public IFileRevision withAllProperties(IProgressMonitor actmonitor) throws CoreException {
 							return this;
 						}
@@ -306,6 +316,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 	}
 
+	@Override
 	public ISemanticResourceRuleFactory getRuleFactory() {
 		return new RuleFactory();
 	}
@@ -349,8 +360,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 	}
 
-	private void addFolderFromRemote(ISemanticFileStore parentStore, String name, @SuppressWarnings("unused") IProgressMonitor monitor)
-			throws CoreException {
+	private void addFolderFromRemote(ISemanticFileStore parentStore, String name, IProgressMonitor monitor) throws CoreException {
 		parentStore.addChildFolder(name);
 
 	}
@@ -475,10 +485,15 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 	}
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public ICacheServiceFactory getCacheServiceFactory() throws CoreException {
 		return new FileCacheServiceFactory();
 	}
 
+	@Override
 	public InputStream openInputStreamInternal(ISemanticFileStore store, IProgressMonitor monitor, ICacheTimestampSetter timeStampSetter)
 			throws CoreException {
 		RemoteFile file = (RemoteFile) getRemoteItem(getStore(), store.getPath());
@@ -552,6 +567,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 				}
 			}
 
+			/**
+			 * @throws CoreException
+			 */
 			public boolean shouldVisitChildren(ISemanticFileStore store, IProgressMonitor actMonitor) throws CoreException {
 				return store.getContentProviderID() == null;
 			}

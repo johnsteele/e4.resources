@@ -38,6 +38,7 @@ import org.eclipse.team.ui.synchronize.SyncInfoCompareInput;
  */
 public class DiffAction extends ActionBase {
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);
@@ -51,6 +52,9 @@ public class DiffAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
+			/**
+			 * @throws InterruptedException
+			 */
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				try {
@@ -85,8 +89,8 @@ public class DiffAction extends ActionBase {
 					}
 					IFileRevision hist = fhp.getWorkspaceFileRevision(sfs);
 
-					IResourceVariant[] var = new IResourceVariant[] { new SemanticResourceVariant(hist, sfs),
-							new SemanticResourceVariant(revs[1], sfs) };
+					IResourceVariant[] var = new IResourceVariant[] {new SemanticResourceVariant(hist, sfs),
+							new SemanticResourceVariant(revs[1], sfs)};
 
 					SyncInfo syncinfo = new SyncInfo(file.getAdaptedFile(), var[0], var[1], new SemanticResourceVariantComparator(
 							var[0] != null));

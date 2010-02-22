@@ -58,6 +58,9 @@ class CachedMemoryHandle implements ICachedContentHandle {
 		this.myCache.removeStore(this.myPath);
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public InputStream openInputStream() throws CoreException {
 		return new ByteArrayInputStream(this.myContent);
 	}

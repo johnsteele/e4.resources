@@ -59,6 +59,7 @@ public class SFSBrowserTreeObject {
 
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof SFSBrowserTreeObject) {
 			return ((SFSBrowserTreeObject) obj).getPath().equals(getPath());
@@ -66,6 +67,7 @@ public class SFSBrowserTreeObject {
 		return false;
 	}
 
+	@Override
 	public int hashCode() {
 		return getPath().hashCode();
 	}

@@ -38,7 +38,6 @@ import org.eclipse.ui.services.IServiceLocator;
  * Contribution of the example application
  * 
  */
-@SuppressWarnings("restriction")
 public class ExamplesContribution extends AbstractContributionFactory {
 
 	static ImageDescriptor ADDIMAGE;
@@ -67,7 +66,7 @@ public class ExamplesContribution extends AbstractContributionFactory {
 
 		MyExpression(String providerClass, int... types) {
 			this.types = types;
-			this.providerClasses = new String[] { providerClass };
+			this.providerClasses = new String[] {providerClass};
 		}
 
 		void addProviderClass(String classString) {
@@ -79,7 +78,8 @@ public class ExamplesContribution extends AbstractContributionFactory {
 
 		}
 
-		@SuppressWarnings("unchecked")
+		@Override
+		@SuppressWarnings({"rawtypes"})
 		public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 
 			Object var = context.getDefaultVariable();
@@ -114,7 +114,7 @@ public class ExamplesContribution extends AbstractContributionFactory {
 
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		private <T> T getSelectedObject(IEvaluationContext ctx, Class T, boolean adapt) {
 
 			Object selection = ctx.getVariable("selection"); //$NON-NLS-1$
@@ -150,6 +150,7 @@ public class ExamplesContribution extends AbstractContributionFactory {
 
 	}
 
+	@Override
 	public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 
 		contributeRemoteStoreActions(serviceLocator, additions);

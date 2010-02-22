@@ -88,6 +88,9 @@ public class TestsSampleCompositeResourceProvider extends TestsContentProviderUt
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
+			/**
+			 * @throws CoreException
+			 */
 			public void run(IProgressMonitor monitor) throws CoreException {
 				ISemanticFile sf = (ISemanticFile) testFile.getAdapter(ISemanticFile.class);
 				ISemanticFile sf_en = (ISemanticFile) test_enFile.getAdapter(ISemanticFile.class);
@@ -110,6 +113,9 @@ public class TestsSampleCompositeResourceProvider extends TestsContentProviderUt
 
 		runnable = new IWorkspaceRunnable() {
 
+			/**
+			 * @throws CoreException
+			 */
 			public void run(IProgressMonitor monitor) throws CoreException {
 				ISemanticFile sf = (ISemanticFile) testFile.getAdapter(ISemanticFile.class);
 				ISemanticFile sf_en = (ISemanticFile) test_enFile.getAdapter(ISemanticFile.class);
@@ -168,6 +174,9 @@ public class TestsSampleCompositeResourceProvider extends TestsContentProviderUt
 
 		runnable = new IWorkspaceRunnable() {
 
+			/**
+			 * @throws CoreException
+			 */
 			public void run(IProgressMonitor monitor) throws CoreException {
 				ISemanticFile sf2 = (ISemanticFile) test2File.getAdapter(ISemanticFile.class);
 

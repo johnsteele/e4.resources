@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/TreeNodeType.java#3 $
+ * $Id: TreeNodeType.java,v 1.1 2010/02/10 20:56:41 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 
@@ -274,6 +274,7 @@ public enum TreeNodeType implements Enumerator {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public String toString() {
 		return literal;
 	}

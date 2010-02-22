@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Status;
  */
 public class SemanticFileModificationValidator extends FileModificationValidator {
 
+	@Override
 	public IStatus validateSave(IFile file) {
 
 		ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
@@ -38,6 +39,7 @@ public class SemanticFileModificationValidator extends FileModificationValidator
 
 	}
 
+	@Override
 	public IStatus validateEdit(IFile[] files, FileModificationValidationContext context) {
 		MultiStatus finalState = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, Messages.SemanticFileModificationValidator_ValidateEdit_XGRP,
 				null);

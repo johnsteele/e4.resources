@@ -31,12 +31,10 @@ public class NewProjectHandler {
 
 		String projectName = "Album " + (++counter);
 		final IProject project = workspace.getRoot().getProject(projectName);
-		final IProjectDescription pd = workspace
-				.newProjectDescription(projectName);
+		final IProjectDescription pd = workspace.newProjectDescription(projectName);
 
 		try {
-			pd.setLocationURI(new URI(ISemanticFileSystem.SCHEME, null, "/"
-					+ projectName, null));
+			pd.setLocationURI(new URI(ISemanticFileSystem.SCHEME, null, "/" + projectName, null));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,16 +43,14 @@ public class NewProjectHandler {
 
 		try {
 			workspace.run(new IWorkspaceRunnable() {
-				public void run(IProgressMonitor monitor) throws CoreException {
+				public void run(IProgressMonitor monitor1) throws CoreException {
 					if (!project.exists()) {
-						project.create(pd, monitor);
+						project.create(pd, monitor1);
 					}
 					if (!project.isOpen()) {
-						project.open(monitor);
-						RepositoryProvider.map(project,
-								ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
-						System.out.println("Created at: "
-								+ project.getLocationURI());
+						project.open(monitor1);
+						RepositoryProvider.map(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+						System.out.println("Created at: " + project.getLocationURI());
 					}
 				}
 			}, monitor);

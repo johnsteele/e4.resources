@@ -81,6 +81,7 @@ public class SemanticHistoryPage extends HistoryPage {
 			this.myIndex = colIndex;
 			this.myColumn.addSelectionListener(new SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (TableColumnSorter.this.myViewer.getComparator() != null) {
 						if (TableColumnSorter.this.myViewer.getComparator() == TableColumnSorter.this) {
@@ -126,14 +127,15 @@ public class SemanticHistoryPage extends HistoryPage {
 			}
 		}
 
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			switch (this.direction) {
-			case SWT.UP:
-				return doCompare(e1, e2);
-			case SWT.DOWN:
-				return -1 * doCompare(e1, e2);
-			default:
-				return 0;
+				case SWT.UP :
+					return doCompare(e1, e2);
+				case SWT.DOWN :
+					return -1 * doCompare(e1, e2);
+				default :
+					return 0;
 			}
 
 		}
@@ -205,30 +207,30 @@ public class SemanticHistoryPage extends HistoryPage {
 		public String getColumnText(Object element, int columnIndex) {
 			IFileRevision revision = (IFileRevision) element;
 			switch (columnIndex) {
-			// revision
-			case 0:
-				if (revision.getContentIdentifier() == null) {
+				// revision
+				case 0 :
+					if (revision.getContentIdentifier() == null) {
+						return SemanticHistoryPage.EMPTY;
+					}
+					return revision.getContentIdentifier();
+					// timestamp
+				case 1 :
+					long timestamp = revision.getTimestamp();
+					if (timestamp < 0) {
+						return SemanticHistoryPage.EMPTY;
+					}
+					return new SimpleDateFormat().format(new Date(revision.getTimestamp()));
+					// user
+				case 2 :
+					return revision.getAuthor();
+				case 3 :
+					String comment = revision.getComment();
+					if (comment != null) {
+						return comment;
+					}
 					return SemanticHistoryPage.EMPTY;
-				}
-				return revision.getContentIdentifier();
-				// timestamp
-			case 1:
-				long timestamp = revision.getTimestamp();
-				if (timestamp < 0) {
+				default :
 					return SemanticHistoryPage.EMPTY;
-				}
-				return new SimpleDateFormat().format(new Date(revision.getTimestamp()));
-				// user
-			case 2:
-				return revision.getAuthor();
-			case 3:
-				String comment = revision.getComment();
-				if (comment != null) {
-					return comment;
-				}
-				return SemanticHistoryPage.EMPTY;
-			default:
-				return SemanticHistoryPage.EMPTY;
 			}
 		}
 
@@ -272,6 +274,7 @@ public class SemanticHistoryPage extends HistoryPage {
 
 	}
 
+	@Override
 	public boolean inputSet() {
 
 		if (!(getInput() instanceof IFile)) {
@@ -291,6 +294,7 @@ public class SemanticHistoryPage extends HistoryPage {
 		return true;
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 
 		this.main = new Composite(parent, SWT.NONE);
@@ -392,10 +396,12 @@ public class SemanticHistoryPage extends HistoryPage {
 		}
 	}
 
+	@Override
 	public Control getControl() {
 		return this.main;
 	}
 
+	@Override
 	public void setFocus() {
 		// nothing
 
@@ -419,7 +425,7 @@ public class SemanticHistoryPage extends HistoryPage {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	public Object getAdapter(Class adapter) {
 		return null;
 	}

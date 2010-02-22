@@ -93,9 +93,9 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		TestsContentProviderUtil.resetTrace();
 	}
 
+	@Override
 	@Before
 	public void beforeMethod() throws Exception {
-
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
@@ -122,7 +122,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 				ISemanticProject spr = (ISemanticProject) project.getAdapter(ISemanticProject.class);
 
-
 				RemoteStoreTransient store = (RemoteStoreTransient) project.getAdapter(RemoteStoreTransient.class);
 				store.reset();
 				RemoteFolder f1 = store.getRootFolder().addFolder("Folder1");
@@ -137,8 +136,8 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				Map<QualifiedName, String> properties = new HashMap<QualifiedName, String>();
 				properties.put(TEMPLATE_PROP, "World");
 
-				spr.addFolder("root", TestsContentProviderBase.this.providerName, properties,
-						TestsContentProviderBase.this.options, monitor);
+				spr.addFolder("root", TestsContentProviderBase.this.providerName, properties, TestsContentProviderBase.this.options,
+						monitor);
 
 				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
@@ -150,10 +149,10 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		this.testProject = project;
 
-		String projectName = this.testProject.getName();
+		String projectName1 = this.testProject.getName();
 		String[] roots = ((ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME)).getRootNames();
 		for (String root : roots) {
-			if (root.equals(projectName)) {
+			if (root.equals(projectName1)) {
 				return;
 			}
 		}
@@ -161,6 +160,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 	}
 
+	@Override
 	@After
 	public void afterMethod() throws Exception {
 
@@ -253,7 +253,8 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				ISemanticFolder sfr = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
 				try {
 					sfr.addResource("File1", TestsContentProviderBase.this.options, monitor);
-					// TODO restore after content providers have implemented validateLocalDelete
+					// TODO restore after content providers have implemented
+					// validateLocalDelete
 					// Assert.fail("Exception should have been thrown for adding the same resource");
 				} catch (Exception e) {
 					// $JL-EXC$ expected
@@ -265,20 +266,22 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				} catch (CoreException e) {
 					// $JL-EXC$ expected
 					// TODO fix test
-//					String test = e.getStatus().toString();
-//					Assert.assertTrue("Status as String should contain path", test.contains(sfr.getAdaptedContainer()
-//							.getProjectRelativePath().toString()));
+					// String test = e.getStatus().toString();
+					// Assert.assertTrue("Status as String should contain path",
+					// test.contains(sfr.getAdaptedContainer()
+					// .getProjectRelativePath().toString()));
 				}
 
-				// TODO restore after content provider implement validateLocalDelete
-//				try {
-//					file.delete(false, monitor);
-//					Assert.fail("Exception should have been thrown for local delete of semantic resource");
-//				} catch (OperationCanceledException e) {
-//					// $JL-EXC$ expected
-//					// reset canceled:
-//					monitor.setCanceled(false);
-//				}
+				// TODO restore after content provider implement
+				// validateLocalDelete
+				// try {
+				// file.delete(false, monitor);
+				// Assert.fail("Exception should have been thrown for local delete of semantic resource");
+				// } catch (OperationCanceledException e) {
+				// // $JL-EXC$ expected
+				// // reset canceled:
+				// monitor.setCanceled(false);
+				// }
 
 				try {
 					IFolder test = TestsContentProviderBase.this.testProject.getFolder("FileTarget");
@@ -289,16 +292,18 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 					// reset canceled
 					monitor.setCanceled(false);
 				}
-//// TODO problems due to copying in RESTContentProvider.openInputStreamInternal with folders
-//				try {
-//					IFolder test = TestsContentProviderBase.this.testProject.getFolder("FolderTarget");
-//					parent.move(test.getFullPath(), false, monitor);
-//					Assert.fail("Exception should have been thrown for local move of semantic folder");
-//				} catch (OperationCanceledException e) {
-//					// $JL-EXC$ expected
-//					// reset canceled
-//					monitor.setCanceled(false);
-//				}
+				// // TODO problems due to copying in
+				// RESTContentProvider.openInputStreamInternal with folders
+				// try {
+				// IFolder test =
+				// TestsContentProviderBase.this.testProject.getFolder("FolderTarget");
+				// parent.move(test.getFullPath(), false, monitor);
+				// Assert.fail("Exception should have been thrown for local move of semantic folder");
+				// } catch (OperationCanceledException e) {
+				// // $JL-EXC$ expected
+				// // reset canceled
+				// monitor.setCanceled(false);
+				// }
 
 			}
 		};
@@ -455,26 +460,29 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
-
 		// TODO project close/open should drop session props
-//		runnable = new IWorkspaceRunnable() {
-//
-//			@Override
-//			public void run(IProgressMonitor monitor) throws CoreException {
-//				ISemanticFile sfile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
-//				sfile.setSessionProperty(DUMMY_PROP, "Some Value");
-//				Assert.assertNotNull("Property should not be null", sfile.getSessionProperty(DUMMY_PROP));
-//
-//				TestsContentProviderBase.this.testProject.close(monitor);
-//
-//				TestsContentProviderBase.this.testProject.open(monitor);
-//
-//				Assert.assertNull("Property should be null", sfile.getSessionProperty(DUMMY_PROP));
-//
-//			}
-//		};
-//
-//		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		// runnable = new IWorkspaceRunnable() {
+		//
+		// @Override
+		// public void run(IProgressMonitor monitor) throws CoreException {
+		// ISemanticFile sfile = (ISemanticFile)
+		// file.getAdapter(ISemanticFile.class);
+		// sfile.setSessionProperty(DUMMY_PROP, "Some Value");
+		// Assert.assertNotNull("Property should not be null",
+		// sfile.getSessionProperty(DUMMY_PROP));
+		//
+		// TestsContentProviderBase.this.testProject.close(monitor);
+		//
+		// TestsContentProviderBase.this.testProject.open(monitor);
+		//
+		// Assert.assertNull("Property should be null",
+		// sfile.getSessionProperty(DUMMY_PROP));
+		//
+		// }
+		// };
+		//
+		// ResourcesPlugin.getWorkspace().run(runnable, new
+		// NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -576,7 +584,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 				long localTime = rfile.getAdaptedFile().getLocalTimeStamp();
 				RemoteStoreTransient rstore = (RemoteStoreTransient) TestsContentProviderBase.this.testProject
-				.getAdapter(RemoteStoreTransient.class);
+						.getAdapter(RemoteStoreTransient.class);
 				long newTime = rstore.newTime();
 
 				rfile.getAdaptedFile().setLocalTimeStamp(newTime);
@@ -629,18 +637,15 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		final IFile nofile = parent.getFile("NoFile");
 		Assert.assertFalse(file.exists());
 
-
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
 				ISemanticFile sf = (ISemanticFile) file.getAdapter(ISemanticFile.class);
-				Assert.assertTrue("Should exist remotely", sf.fetchResourceInfo(
-						ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-						monitor).existsRemotely());
+				Assert.assertTrue("Should exist remotely", sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, monitor)
+						.existsRemotely());
 
 				sf = (ISemanticFile) nofile.getAdapter(ISemanticFile.class);
-				Assert.assertFalse("Should not exist remotely", sf.fetchResourceInfo(
-						ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
+				Assert.assertFalse("Should not exist remotely", sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
 						monitor).existsRemotely());
 			}
 		};
@@ -669,9 +674,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
 				sfile.lockResource(TestsContentProviderBase.this.options, monitor);
-				Assert
-				.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
-						.isLocked());
+				Assert.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor).isLocked());
 				sfile.unlockResource(TestsContentProviderBase.this.options, monitor);
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
@@ -693,7 +696,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		final IFolder parent = root.getFolder("Folder1");
 
 		final IFile file = parent.getFile("File1");
-		//Assert.assertTrue("Folder should exist", parent.exists());
+		// Assert.assertTrue("Folder should exist", parent.exists());
 		Assert.assertFalse("File should not exist", file.exists());
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
@@ -754,7 +757,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		final IFolder parent = root.getFolder("Folder1");
 
 		final IFolder folder = parent.getFolder("Folder11");
-		//Assert.assertTrue("Folder should exist", parent.exists());
+		// Assert.assertTrue("Folder should exist", parent.exists());
 		Assert.assertEquals("Folder existence", false, folder.exists());
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
@@ -959,8 +962,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				try {
 					file.setContents(new ByteArrayInputStream("NewString".getBytes("UTF-8")), IResource.KEEP_HISTORY,
 							new NullProgressMonitor());
-					sf.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsContentProviderBase.this.options,
-							monitor);
+					sf.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsContentProviderBase.this.options, monitor);
 					if (!TestsContentProviderBase.this.autoRefresh) {
 						file.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 					}

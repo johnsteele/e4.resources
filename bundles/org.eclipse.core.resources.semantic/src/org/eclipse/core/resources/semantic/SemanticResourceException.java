@@ -59,6 +59,7 @@ public class SemanticResourceException extends CoreException {
 		super(new SemanticResourceStatus(code, path, message, null));
 	}
 
+	@Override
 	public void printStackTrace(PrintStream output) {
 		synchronized (output) {
 			IStatus status = getStatus();
@@ -72,6 +73,7 @@ public class SemanticResourceException extends CoreException {
 		}
 	}
 
+	@Override
 	public void printStackTrace(PrintWriter output) {
 		synchronized (output) {
 			IStatus status = getStatus();

@@ -143,6 +143,7 @@ public class RemoteItemSelectionDialog extends Dialog {
 		this.multiSelect = multiSelect;
 	}
 
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		if (this.multiSelect) {
@@ -160,6 +161,7 @@ public class RemoteItemSelectionDialog extends Dialog {
 		return this.selected;
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite myArea = new Composite(parent, SWT.NONE);
@@ -187,6 +189,7 @@ public class RemoteItemSelectionDialog extends Dialog {
 
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected void okPressed() {
 		IStructuredSelection sel = (IStructuredSelection) this.tv.getSelection();

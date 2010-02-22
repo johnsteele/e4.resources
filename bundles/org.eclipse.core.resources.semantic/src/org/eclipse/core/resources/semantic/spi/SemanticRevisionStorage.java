@@ -81,6 +81,9 @@ public class SemanticRevisionStorage implements IStorage {
 		}
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public InputStream getContents() throws CoreException {
 		if (!this.inputSet) {
 			throw new IllegalStateException("Contents was not set on before calling getContents()"); //$NON-NLS-1$
@@ -100,7 +103,7 @@ public class SemanticRevisionStorage implements IStorage {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}

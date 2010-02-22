@@ -35,6 +35,7 @@ import org.eclipse.osgi.util.NLS;
 public class RemoveAction extends ActionBase {
 	// TODO popup: are you sure (deletes all resources, even checked-out
 	// and local only)?
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);
@@ -42,7 +43,7 @@ public class RemoveAction extends ActionBase {
 		action.setEnabled(checkSelectionSemanticResource());
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	public void run(IAction action) {
 		boolean askForForceRemoval = false;
 

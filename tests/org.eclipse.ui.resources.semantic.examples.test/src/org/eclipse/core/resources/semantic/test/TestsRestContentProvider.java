@@ -511,7 +511,7 @@ public class TestsRestContentProvider {
 		return file;
 	}
 
-	private URI createURI4File(File file) throws URISyntaxException {
+	URI createURI4File(File file) throws URISyntaxException {
 		String filepath = file.getAbsolutePath().replace('\\', '/');
 
 		// Handle differences between Windows and UNIX

@@ -108,6 +108,10 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		}
 	}
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public ICacheServiceFactory getCacheServiceFactory() throws CoreException {
 		return new FileCacheServiceFactory();
 	}
@@ -160,6 +164,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		return new SemanticSpiResourceInfo(options, false, false, readOnly, existsRemotely, uriString, null);
 	}
 
+	@Override
 	public InputStream openInputStreamInternal(ISemanticFileStore childStore, IProgressMonitor monitor, ICacheTimestampSetter setter)
 			throws CoreException {
 
@@ -217,6 +222,9 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 				}
 			}
 
+			/**
+			 * @throws CoreException
+			 */
 			public boolean shouldVisitChildren(ISemanticFileStore store, IProgressMonitor actMonitor) throws CoreException {
 				return store.getContentProviderID() == null;
 			}
@@ -296,7 +304,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 	}
 
 	public IStatus validateSave(ISemanticFileStore childStore) {
-		return validateEdit(new ISemanticFileStore[] { childStore }, null);
+		return validateEdit(new ISemanticFileStore[] {childStore}, null);
 	}
 
 	// not supported stuff
@@ -310,15 +318,15 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, String contentProviderID,
 			Map<QualifiedName, String> properties) throws CoreException {
 		switch (resourceType) {
-		case FILE_TYPE:
-			parentStore.addChildResource(name, false, contentProviderID, properties);
-			break;
-		case FOLDER_TYPE:
-			parentStore.addChildResource(name, true, contentProviderID, properties);
-			break;
-		default:
-			// TODO 0.1 error handling
-			break;
+			case FILE_TYPE :
+				parentStore.addChildResource(name, false, contentProviderID, properties);
+				break;
+			case FOLDER_TYPE :
+				parentStore.addChildResource(name, true, contentProviderID, properties);
+				break;
+			default :
+				// TODO 0.1 error handling
+				break;
 		}
 	}
 

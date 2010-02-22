@@ -39,8 +39,7 @@ public class RefreshAlbumHandler {
 			res = (IResource) sel;
 		} else {
 			// get the first project of nothing is selected
-			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-					.getProjects();
+			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 
 			if (projects.length > 0) {
 				res = projects[0];
@@ -49,44 +48,31 @@ public class RefreshAlbumHandler {
 		if (res != null) {
 			final IProject project = res.getProject();
 
-			final ISemanticProject sproject = (ISemanticProject) project
-					.getAdapter(ISemanticProject.class);
+			final ISemanticProject sproject = (ISemanticProject) project.getAdapter(ISemanticProject.class);
 
 			if (sproject != null) {
 
 				try {
-					new ProgressMonitorDialog(shell).run(true, true,
-							new IRunnableWithProgress() {
+					new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
 
-								public void run(IProgressMonitor monitor)
-										throws InvocationTargetException,
-										InterruptedException {
-									IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
-										public void run(
-												IProgressMonitor actMonitor)
-												throws CoreException {
-											sproject.synchronizeContentWithRemote(
-													SyncDirection.INCOMING,
-													ISemanticFileSystem.NONE,
-													actMonitor);
-										}
-									};
+								public void run(IProgressMonitor actMonitor) throws CoreException {
+									sproject.synchronizeContentWithRemote(SyncDirection.INCOMING, ISemanticFileSystem.NONE, actMonitor);
+								}
+							};
 
-									try {
-										ResourcesPlugin.getWorkspace().run(
-												runnable, project,
-												IWorkspace.AVOID_UPDATE,
-												monitor);
-									} catch (CoreException e) {
-										if (e.getCause() instanceof InterruptedException) {
-											throw (InterruptedException) e
-													.getCause();
-										}
-										throw new InvocationTargetException(e);
-									}
-								};
-							});
+							try {
+								ResourcesPlugin.getWorkspace().run(runnable, project, IWorkspace.AVOID_UPDATE, monitor);
+							} catch (CoreException e) {
+								if (e.getCause() instanceof InterruptedException) {
+									throw (InterruptedException) e.getCause();
+								}
+								throw new InvocationTargetException(e);
+							}
+						}
+					});
 				} catch (InvocationTargetException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

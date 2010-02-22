@@ -32,6 +32,9 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 		this.path = path;
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public void commit(long timestamp) throws CoreException {
 		CachedMemoryHandle handle = MemoryCache.getInstance().getOrCreateMemoryStore(this.path.toString());
 		byte[] content;
@@ -61,6 +64,9 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 
 	}
 
+	/**
+	 * @throws IOException
+	 */
 	public void write(byte[] b, int off, int len) throws IOException {
 		this.bos.write(b, off, len);
 
@@ -71,6 +77,9 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 
 	}
 
+	/**
+	 * @throws IOException
+	 */
 	public void write(int b) throws IOException {
 		this.bos.write(b);
 	}

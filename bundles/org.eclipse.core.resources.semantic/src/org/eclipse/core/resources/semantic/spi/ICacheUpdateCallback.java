@@ -9,7 +9,7 @@
  *    Eduard Bartsch (SAP AG) - initial API and implementation
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.core.internal.resources.semantic.cacheservice;
+package org.eclipse.core.resources.semantic.spi;
 
 import java.io.InputStream;
 

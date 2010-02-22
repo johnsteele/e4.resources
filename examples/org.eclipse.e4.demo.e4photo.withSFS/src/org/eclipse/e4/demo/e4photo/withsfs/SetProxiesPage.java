@@ -13,6 +13,7 @@ package org.eclipse.e4.demo.e4photo.withsfs;
 
 import org.eclipse.core.internal.net.ProxyData;
 import org.eclipse.core.internal.net.ProxySelector;
+import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -31,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
  * Wizard page for adding a REST Demo resource
  * 
  */
+@SuppressWarnings("restriction")
 public class SetProxiesPage extends WizardPage {
 
 	/**
@@ -43,12 +45,6 @@ public class SetProxiesPage extends WizardPage {
 	int httpProxyPort = 0;
 	int httpsProxyPort = 0;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param folder
-	 *            the parent
-	 */
 	public SetProxiesPage() {
 		super(SetProxiesPage.NAME);
 		setTitle("Set Proxies");
@@ -72,11 +68,11 @@ public class SetProxiesPage extends WizardPage {
 		ProxyData[] data = ProxySelector.getProxyData(ProxySelector.getDefaultProvider());
 
 		for (ProxyData proxyData : data) {
-			if (proxyData.getType() == ProxyData.HTTP_PROXY_TYPE) {
+			if (proxyData.getType() == IProxyData.HTTP_PROXY_TYPE) {
 				SetProxiesPage.this.httpProxy = proxyData.getHost();
 				SetProxiesPage.this.httpProxyPort = proxyData.getPort();
 			}
-			if (proxyData.getType() == ProxyData.HTTPS_PROXY_TYPE) {
+			if (proxyData.getType() == IProxyData.HTTPS_PROXY_TYPE) {
 				SetProxiesPage.this.httpsProxy = proxyData.getHost();
 				SetProxiesPage.this.httpsProxyPort = proxyData.getPort();
 			}
@@ -156,29 +152,29 @@ public class SetProxiesPage extends WizardPage {
 				String selection = proxySelector.getText();
 
 				if (selection.equals("Manual")) {
-					ProxyData[] data = ProxySelector.getProxyData(selection);
+					ProxyData[] data1 = ProxySelector.getProxyData(selection);
 
-					for (ProxyData proxyData : data) {
-						if (proxyData.getType() == ProxyData.HTTP_PROXY_TYPE) {
+					for (ProxyData proxyData : data1) {
+						if (proxyData.getType() == IProxyData.HTTP_PROXY_TYPE) {
 							// substitute with valid values
 							proxyData.setHost(SetProxiesPage.this.httpProxy);
 							proxyData.setPort(SetProxiesPage.this.httpProxyPort);
 						}
-						if (proxyData.getType() == ProxyData.HTTPS_PROXY_TYPE) {
+						if (proxyData.getType() == IProxyData.HTTPS_PROXY_TYPE) {
 							// substitute with valid values
 							proxyData.setHost(SetProxiesPage.this.httpsProxy);
 							proxyData.setPort(SetProxiesPage.this.httpsProxyPort);
 						}
 					}
 
-					ProxySelector.setProxyData(selection, data);
+					ProxySelector.setProxyData(selection, data1);
 				}
 
 				ProxySelector.setActiveProvider(selection);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-
+				// nothing to do
 			}
 		});
 

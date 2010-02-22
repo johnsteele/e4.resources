@@ -217,7 +217,7 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 	/**
 	 * @param name
 	 * @param childStore
-	 * @return
+	 * @return resource
 	 */
 	private ISemanticResource wrapChildWithResource(String name, ISemanticFileStoreInternal childStore) {
 		IResource resource = null;

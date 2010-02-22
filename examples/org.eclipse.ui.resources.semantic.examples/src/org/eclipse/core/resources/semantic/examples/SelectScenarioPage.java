@@ -110,6 +110,7 @@ public class SelectScenarioPage extends WizardPage {
 		but.setSelection(this.scenarios.contains(scenario));
 		but.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (but.getSelection()) {
 					SelectScenarioPage.this.scenarios.add(scenario);

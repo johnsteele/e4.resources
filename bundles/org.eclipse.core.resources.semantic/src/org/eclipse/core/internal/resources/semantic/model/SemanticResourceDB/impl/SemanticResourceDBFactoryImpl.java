@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/impl/SemanticResourceDBFactoryImpl.java#3 $
+ * $Id: SemanticResourceDBFactoryImpl.java,v 1.1 2010/02/10 20:56:39 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -73,16 +73,17 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE:
-			return createResourceTreeNode();
-		case SemanticResourceDBPackage.SEMANTIC_DB:
-			return createSemanticDB();
-		case SemanticResourceDBPackage.TREE_ROOT:
-			return createTreeRoot();
-		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE :
+				return createResourceTreeNode();
+			case SemanticResourceDBPackage.SEMANTIC_DB :
+				return createSemanticDB();
+			case SemanticResourceDBPackage.TREE_ROOT :
+				return createTreeRoot();
+			default :
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -91,16 +92,17 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-		case SemanticResourceDBPackage.TREE_NODE_TYPE:
-			return createTreeNodeTypeFromString(eDataType, initialValue);
-		case SemanticResourceDBPackage.PERSISTENT_PROPERTIES:
-			return createPersistentPropertiesFromString(eDataType, initialValue);
-		case SemanticResourceDBPackage.SESSION_PROPERTIES:
-			return createSessionPropertiesFromString(eDataType, initialValue);
-		default:
-			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			case SemanticResourceDBPackage.TREE_NODE_TYPE :
+				return createTreeNodeTypeFromString(eDataType, initialValue);
+			case SemanticResourceDBPackage.PERSISTENT_PROPERTIES :
+				return createPersistentPropertiesFromString(eDataType, initialValue);
+			case SemanticResourceDBPackage.SESSION_PROPERTIES :
+				return createSessionPropertiesFromString(eDataType, initialValue);
+			default :
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -109,16 +111,17 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-		case SemanticResourceDBPackage.TREE_NODE_TYPE:
-			return convertTreeNodeTypeToString(eDataType, instanceValue);
-		case SemanticResourceDBPackage.PERSISTENT_PROPERTIES:
-			return convertPersistentPropertiesToString(eDataType, instanceValue);
-		case SemanticResourceDBPackage.SESSION_PROPERTIES:
-			return convertSessionPropertiesToString(eDataType, instanceValue);
-		default:
-			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			case SemanticResourceDBPackage.TREE_NODE_TYPE :
+				return convertTreeNodeTypeToString(eDataType, instanceValue);
+			case SemanticResourceDBPackage.PERSISTENT_PROPERTIES :
+				return convertPersistentPropertiesToString(eDataType, instanceValue);
+			case SemanticResourceDBPackage.SESSION_PROPERTIES :
+				return convertSessionPropertiesToString(eDataType, instanceValue);
+			default :
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -163,7 +166,8 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	public TreeNodeType createTreeNodeTypeFromString(EDataType eDataType, String initialValue) {
 		TreeNodeType result = TreeNodeType.get(initialValue);
 		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			throw new IllegalArgumentException(
+					"The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return result;
 	}
 
@@ -188,7 +192,7 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	 * 
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public HashMap createPersistentPropertiesFromString(EDataType eDataType, String initialValue) {
 		return (HashMap) super.createFromString(initialValue);
 	}
@@ -215,7 +219,7 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	 * 
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public HashMap createSessionPropertiesFromString(EDataType eDataType, String initialValue) {
 		return (HashMap) super.createFromString(initialValue);
 	}

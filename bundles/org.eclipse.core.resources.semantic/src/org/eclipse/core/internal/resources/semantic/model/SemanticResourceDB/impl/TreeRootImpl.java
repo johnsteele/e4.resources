@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/impl/TreeRootImpl.java#3 $
+ * $Id: TreeRootImpl.java,v 1.1 2010/02/10 20:56:39 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -78,6 +78,7 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	protected EClass eStaticClass() {
 		return SemanticResourceDBPackage.Literals.TREE_ROOT;
 	}
@@ -112,14 +113,16 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * @generated
 	 */
 	public void setParentDB(SemanticDB newParentDB) {
-		if (newParentDB != eInternalContainer() || (eContainerFeatureID() != SemanticResourceDBPackage.TREE_ROOT__PARENT_DB && newParentDB != null)) {
+		if (newParentDB != eInternalContainer()
+				|| (eContainerFeatureID() != SemanticResourceDBPackage.TREE_ROOT__PARENT_DB && newParentDB != null)) {
 			if (EcoreUtil.isAncestor(this, newParentDB))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
 			if (newParentDB != null)
-				msgs = ((InternalEObject) newParentDB).eInverseAdd(this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS, SemanticDB.class, msgs);
+				msgs = ((InternalEObject) newParentDB).eInverseAdd(this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS, SemanticDB.class,
+						msgs);
 			msgs = basicSetParentDB(newParentDB, msgs);
 			if (msgs != null)
 				msgs.dispatch();
@@ -153,12 +156,13 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			if (eInternalContainer() != null)
-				msgs = eBasicRemoveFromContainer(msgs);
-			return basicSetParentDB((SemanticDB) otherEnd, msgs);
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetParentDB((SemanticDB) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -168,10 +172,11 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			return basicSetParentDB(null, msgs);
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				return basicSetParentDB(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -181,10 +186,11 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			return eInternalContainer().eInverseRemove(this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS, SemanticDB.class, msgs);
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				return eInternalContainer().eInverseRemove(this, SemanticResourceDBPackage.SEMANTIC_DB__ROOTS, SemanticDB.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -194,12 +200,13 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			return getParentDB();
-		case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI:
-			return getRootURI();
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				return getParentDB();
+			case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI :
+				return getRootURI();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -209,14 +216,15 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			setParentDB((SemanticDB) newValue);
-			return;
-		case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI:
-			setRootURI((String) newValue);
-			return;
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				setParentDB((SemanticDB) newValue);
+				return;
+			case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI :
+				setRootURI((String) newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -226,14 +234,15 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			setParentDB((SemanticDB) null);
-			return;
-		case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI:
-			setRootURI(ROOT_URI_EDEFAULT);
-			return;
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				setParentDB((SemanticDB) null);
+				return;
+			case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI :
+				setRootURI(ROOT_URI_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -243,12 +252,13 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB:
-			return getParentDB() != null;
-		case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI:
-			return ROOT_URI_EDEFAULT == null ? rootURI != null : !ROOT_URI_EDEFAULT.equals(rootURI);
+			case SemanticResourceDBPackage.TREE_ROOT__PARENT_DB :
+				return getParentDB() != null;
+			case SemanticResourceDBPackage.TREE_ROOT__ROOT_URI :
+				return ROOT_URI_EDEFAULT == null ? rootURI != null : !ROOT_URI_EDEFAULT.equals(rootURI);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -258,6 +268,7 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	 * 
 	 * @generated
 	 */
+	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

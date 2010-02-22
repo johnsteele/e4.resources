@@ -35,12 +35,11 @@ public class NullContentProvider extends ContentProvider {
 
 	private final IStatus error = new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "Not Supported");
 
-	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
-	throws CoreException {
+	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor) {
 		return new SemanticSpiResourceInfo(options, false, false, false, true, null, null);
 	}
 
-	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		return 0;
 	}
 
@@ -48,12 +47,11 @@ public class NullContentProvider extends ContentProvider {
 		throw new CoreException(this.error);
 	}
 
-	public OutputStream openOutputStream(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
-	throws CoreException {
+	public OutputStream openOutputStream(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor) throws CoreException {
 		throw new CoreException(this.error);
 	}
 
-	public void removeResource(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
+	public void removeResource(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) {
 		// do nothing
 	}
 
@@ -69,8 +67,8 @@ public class NullContentProvider extends ContentProvider {
 		throw new CoreException(this.error);
 	}
 
-	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction,
-			IProgressMonitor monitor, MultiStatus status) {
+	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction, IProgressMonitor monitor,
+			MultiStatus status) {
 		status.add(this.error);
 	}
 
@@ -83,7 +81,7 @@ public class NullContentProvider extends ContentProvider {
 	}
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		throw new CoreException(this.error);
 	}
 

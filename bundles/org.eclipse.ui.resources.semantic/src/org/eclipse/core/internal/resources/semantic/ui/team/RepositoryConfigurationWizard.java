@@ -34,6 +34,7 @@ public class RepositoryConfigurationWizard extends Wizard implements IConfigurat
 	private IProject project;
 	private ISemanticFileSystem mySfs;
 
+	@Override
 	public boolean performFinish() {
 		if (this.mySfs == null) {
 			IStatus error = new Status(IStatus.ERROR, SemanticResourcesUIPlugin.PLUGIN_ID,

@@ -28,7 +28,7 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 
 	private final static QualifiedName STORE = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "TransientStore"); //$NON-NLS-1$
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 
 		if (adaptableObject != null && adaptableObject instanceof IContainer && adapterType.equals(RemoteStore.class)) {
@@ -99,9 +99,9 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
-		return new Class[] { RemoteStore.class, RemoteStoreTransient.class };
+		return new Class[] {RemoteStore.class, RemoteStoreTransient.class};
 	}
 
 }

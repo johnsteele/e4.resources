@@ -34,44 +34,59 @@ public class DelegatingRepositoryProviderStub extends RepositoryProvider {
 
 	private ISemanticFileSystem mySfs;
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public void configureProject() throws CoreException {
 		this.getProject();
 
 	}
 
+	@Override
 	public String getID() {
 		return ISemanticFileSystem.SFS_REPOSITORY_PROVIDER;
 	}
 
+	/**
+	 * @throws CoreException
+	 */
 	public void deconfigure() throws CoreException {
 		// nothing to do
 	}
 
+	@Override
 	public IResourceRuleFactory getRuleFactory() {
 		return new DelegatingResourceRuleFactory(getFileSystem());
 	}
 
+	@Override
 	public boolean canHandleLinkedResourceURI() {
 		return true;
 	}
 
+	@Override
 	@Deprecated
 	public IFileModificationValidator getFileModificationValidator() {
 		return getFileModificationValidator2();
 	}
 
+	@Override
 	public FileModificationValidator getFileModificationValidator2() {
 		return new SemanticFileModificationValidator();
 	}
 
+	@Override
 	public IMoveDeleteHook getMoveDeleteHook() {
 		return new MoveDeleteHook(getFileSystem());
 	}
 
+	@Override
 	public IStatus validateCreateLink(IResource resource, int updateFlags, URI location) {
 		return super.validateCreateLink(resource, updateFlags, location);
 	}
 
+	@Override
 	public IFileHistoryProvider getFileHistoryProvider() {
 		return new SemanticFileHistoryProvider(getFileSystem());
 	}

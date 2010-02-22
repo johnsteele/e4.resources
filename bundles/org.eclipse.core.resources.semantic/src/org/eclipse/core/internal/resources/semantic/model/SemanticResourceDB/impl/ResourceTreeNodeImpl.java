@@ -11,7 +11,7 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/impl/ResourceTreeNodeImpl.java#3 $
+ * $Id: ResourceTreeNodeImpl.java,v 1.1 2010/02/10 20:56:40 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -219,6 +219,7 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	protected EClass eStaticClass() {
 		return SemanticResourceDBPackage.Literals.RESOURCE_TREE_NODE;
 	}
@@ -287,19 +288,22 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * @generated
 	 */
 	public void setParent(ResourceTreeNode newParent) {
-		if (newParent != eInternalContainer() || (eContainerFeatureID() != SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT && newParent != null)) {
+		if (newParent != eInternalContainer()
+				|| (eContainerFeatureID() != SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT && newParent != null)) {
 			if (EcoreUtil.isAncestor(this, newParent))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
 			if (newParent != null)
-				msgs = ((InternalEObject) newParent).eInverseAdd(this, SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN, ResourceTreeNode.class, msgs);
+				msgs = ((InternalEObject) newParent).eInverseAdd(this, SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN,
+						ResourceTreeNode.class, msgs);
 			msgs = basicSetParent(newParent, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT, newParent, newParent));
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT, newParent,
+					newParent));
 	}
 
 	/**
@@ -341,7 +345,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		String oldTemplateID = templateID;
 		templateID = newTemplateID;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID, oldTemplateID, templateID));
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID, oldTemplateID,
+					templateID));
 	}
 
 	/**
@@ -362,8 +367,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		HashMap<String, String> oldPersistentProperties = persistentProperties;
 		persistentProperties = newPersistentProperties;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES, oldPersistentProperties,
-					persistentProperties));
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES,
+					oldPersistentProperties, persistentProperties));
 	}
 
 	/**
@@ -384,7 +389,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		boolean oldLocalOnly = localOnly;
 		localOnly = newLocalOnly;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY, oldLocalOnly, localOnly));
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY, oldLocalOnly,
+					localOnly));
 	}
 
 	/**
@@ -426,8 +432,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		HashMap<QualifiedName, Object> oldSessionProperties = sessionProperties;
 		sessionProperties = newSessionProperties;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES, oldSessionProperties,
-					sessionProperties));
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES,
+					oldSessionProperties, sessionProperties));
 	}
 
 	/**
@@ -435,15 +441,16 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getChildren()).basicAdd(otherEnd, msgs);
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			if (eInternalContainer() != null)
-				msgs = eBasicRemoveFromContainer(msgs);
-			return basicSetParent((ResourceTreeNode) otherEnd, msgs);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				return ((InternalEList<InternalEObject>) (InternalEList<?>) getChildren()).basicAdd(otherEnd, msgs);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetParent((ResourceTreeNode) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -453,12 +460,13 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			return ((InternalEList<?>) getChildren()).basicRemove(otherEnd, msgs);
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			return basicSetParent(null, msgs);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				return ((InternalEList<?>) getChildren()).basicRemove(otherEnd, msgs);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				return basicSetParent(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -468,10 +476,12 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
 		switch (eContainerFeatureID()) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			return eInternalContainer().eInverseRemove(this, SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN, ResourceTreeNode.class, msgs);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				return eInternalContainer().eInverseRemove(this, SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN,
+						ResourceTreeNode.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -481,26 +491,27 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME:
-			return getName();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			return getChildren();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			return getParent();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS:
-			return isExists();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID:
-			return getTemplateID();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES:
-			return getPersistentProperties();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY:
-			return isLocalOnly();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE:
-			return getType();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES:
-			return getSessionProperties();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME :
+				return getName();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				return getChildren();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				return getParent();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS :
+				return isExists();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID :
+				return getTemplateID();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES :
+				return getPersistentProperties();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY :
+				return isLocalOnly();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE :
+				return getType();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
+				return getSessionProperties();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -510,37 +521,38 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME:
-			setName((String) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			getChildren().clear();
-			getChildren().addAll((Collection<? extends ResourceTreeNode>) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			setParent((ResourceTreeNode) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS:
-			setExists((Boolean) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID:
-			setTemplateID((String) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES:
-			setPersistentProperties((HashMap<String, String>) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY:
-			setLocalOnly((Boolean) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE:
-			setType((TreeNodeType) newValue);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES:
-			setSessionProperties((HashMap<QualifiedName, Object>) newValue);
-			return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME :
+				setName((String) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				getChildren().clear();
+				getChildren().addAll((Collection<? extends ResourceTreeNode>) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				setParent((ResourceTreeNode) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS :
+				setExists((Boolean) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID :
+				setTemplateID((String) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES :
+				setPersistentProperties((HashMap<String, String>) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY :
+				setLocalOnly((Boolean) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE :
+				setType((TreeNodeType) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
+				setSessionProperties((HashMap<QualifiedName, Object>) newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -550,35 +562,36 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME:
-			setName(NAME_EDEFAULT);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			getChildren().clear();
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			setParent((ResourceTreeNode) null);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS:
-			setExists(EXISTS_EDEFAULT);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID:
-			setTemplateID(TEMPLATE_ID_EDEFAULT);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES:
-			setPersistentProperties((HashMap<String, String>) null);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY:
-			setLocalOnly(LOCAL_ONLY_EDEFAULT);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE:
-			setType(TYPE_EDEFAULT);
-			return;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES:
-			setSessionProperties((HashMap<QualifiedName, Object>) null);
-			return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME :
+				setName(NAME_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				getChildren().clear();
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				setParent((ResourceTreeNode) null);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS :
+				setExists(EXISTS_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID :
+				setTemplateID(TEMPLATE_ID_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES :
+				setPersistentProperties((HashMap<String, String>) null);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY :
+				setLocalOnly(LOCAL_ONLY_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE :
+				setType(TYPE_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
+				setSessionProperties((HashMap<QualifiedName, Object>) null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -588,26 +601,27 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN:
-			return children != null && !children.isEmpty();
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT:
-			return getParent() != null;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS:
-			return exists != EXISTS_EDEFAULT;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID:
-			return TEMPLATE_ID_EDEFAULT == null ? templateID != null : !TEMPLATE_ID_EDEFAULT.equals(templateID);
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES:
-			return persistentProperties != null;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY:
-			return localOnly != LOCAL_ONLY_EDEFAULT;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE:
-			return type != TYPE_EDEFAULT;
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES:
-			return sessionProperties != null;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__NAME :
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__CHILDREN :
+				return children != null && !children.isEmpty();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PARENT :
+				return getParent() != null;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__EXISTS :
+				return exists != EXISTS_EDEFAULT;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TEMPLATE_ID :
+				return TEMPLATE_ID_EDEFAULT == null ? templateID != null : !TEMPLATE_ID_EDEFAULT.equals(templateID);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES :
+				return persistentProperties != null;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__LOCAL_ONLY :
+				return localOnly != LOCAL_ONLY_EDEFAULT;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__TYPE :
+				return type != TYPE_EDEFAULT;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
+				return sessionProperties != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -617,6 +631,7 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

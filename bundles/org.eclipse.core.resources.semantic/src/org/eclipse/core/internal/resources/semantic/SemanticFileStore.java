@@ -76,6 +76,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	//
 	// IFileStore/FileStore
 	//
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException {
 
 		try {
@@ -94,6 +98,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	@Override
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
 		FileInfo info;
 
@@ -161,6 +166,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return info;
 	}
 
+	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -249,6 +255,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	}
 
+	@Override
 	public File toLocalFile(int options, IProgressMonitor monitor) throws CoreException {
 		// some tools are operating directly on the file system; this enables
 		// these tools
@@ -269,6 +276,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	}
 
+	@Override
 	public IFileStore getChild(String name) {
 
 		IFileStore store = findChild(name);
@@ -343,6 +351,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	}
 
+	@Override
 	public String getName() {
 		try {
 			this.fs.lockForRead();
@@ -352,6 +361,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	@Override
 	public IFileStore getParent() {
 		try {
 			this.fs.lockForRead();
@@ -365,6 +375,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -386,10 +397,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 
-			SfsTraceLocation.getTrace().trace(
-					SfsTraceLocation.CONTENTPROVIDER.getLocation(),
-					NLS
-							.bind(Messages.SemanticFileStore_OpeningInputInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
+			SfsTraceLocation.getTrace()
+					.trace(
+							SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+							NLS.bind(Messages.SemanticFileStore_OpeningInputInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
 									.toString()));
 
 		}
@@ -397,6 +408,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return effectiveProvider.openInputStream(this, monitor);
 	}
 
+	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
 		// TODO 0.1: concurrency/race condition with IFile.getContent()
 
@@ -466,6 +478,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return os;
 	}
 
+	@Override
 	public URI toURI() {
 		try {
 			this.fs.lockForRead();
@@ -479,10 +492,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	@Override
 	public SemanticFileSystem getFileSystem() {
 		return this.fs;
 	}
 
+	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -751,6 +766,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	}
 
+	@Override
 	public void delete(int options, IProgressMonitor monitor) throws CoreException {
 		// this will be called instead of delete hook if no team provider is
 		// found
@@ -1373,7 +1389,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 				}
 
-				return effectiveProvider.validateEdit(new ISemanticFileStore[] { this }, shell);
+				return effectiveProvider.validateEdit(new ISemanticFileStore[] {this}, shell);
 			}
 			// already checked out
 			return new Status(IStatus.OK, SemanticResourcesPlugin.PLUGIN_ID, null);
@@ -1481,7 +1497,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 				try {
 					this.fs.lockForWrite();
-					// keep the last path so that getPath returns something meaningful after remove
+					// keep the last path so that getPath returns something
+					// meaningful after remove
 					this.previousPath = getPath();
 
 				} finally {
@@ -1542,6 +1559,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		this.provider = contentProvider;
 	}
 
+	/**
+	 * @throws CoreException
+	 */
+	@Override
 	protected void notifyPersistentPropertySet(String keyString, String oldValue, String newValue) throws CoreException {
 		// TODO tracing
 

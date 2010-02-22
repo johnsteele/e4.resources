@@ -40,6 +40,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class SemanticResourcePropertyPage extends PropertyPage {
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		Tree propsTree = new Tree(parent, SWT.NONE);

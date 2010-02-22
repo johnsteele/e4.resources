@@ -17,7 +17,6 @@ import java.io.OutputStream;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.internal.resources.semantic.SemanticResourcesPlugin;
-import org.eclipse.core.internal.resources.semantic.cacheservice.ICacheUpdateCallback;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;

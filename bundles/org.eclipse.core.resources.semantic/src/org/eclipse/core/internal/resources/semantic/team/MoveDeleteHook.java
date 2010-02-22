@@ -46,8 +46,7 @@ public class MoveDeleteHook implements IMoveDeleteHook {
 		this.sfs = actSfs;
 	}
 
-	private boolean deleteResource(IResourceTree tree, IResource resource, @SuppressWarnings("unused") int updateFlags,
-			final IProgressMonitor monitor) {
+	private boolean deleteResource(IResourceTree tree, IResource resource, int updateFlags, final IProgressMonitor monitor) {
 
 		ISemanticResource sresource = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
 		if (sresource != null) {

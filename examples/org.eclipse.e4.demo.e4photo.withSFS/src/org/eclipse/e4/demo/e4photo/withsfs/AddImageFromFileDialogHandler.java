@@ -48,10 +48,12 @@ public class AddImageFromFileDialogHandler {
 			this.myFolder = folder;
 		}
 
+		@Override
 		public void addPages() {
 			addPage(new AddFileOrFolderFromRemotePage(this.myFolder));
 		}
 
+		@Override
 		public boolean performFinish() {
 			AddFileOrFolderFromRemotePage page = (AddFileOrFolderFromRemotePage) getPage(AddFileOrFolderFromRemotePage.PAGE_NAME);
 			try {

@@ -73,6 +73,7 @@ final class SemanticResourceStatus extends Status implements ISemanticResourceSt
 	}
 
 	// for debug only
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("[type: "); //$NON-NLS-1$
