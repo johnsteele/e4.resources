@@ -37,8 +37,6 @@ import org.eclipse.swt.widgets.Shell;
 public class AddImageFromFileDialogHandler {
 
 	private final static class AddImageFromFileWizard extends Wizard {
-		private IEclipseContext dlgContext;
-
 		final ISemanticFolder myFolder;
 
 		/**
@@ -48,7 +46,6 @@ public class AddImageFromFileDialogHandler {
 		 */
 		AddImageFromFileWizard(IEclipseContext context, ISemanticFolder folder) {
 			this.myFolder = folder;
-			this.dlgContext = context;
 		}
 
 		public void addPages() {
@@ -69,147 +66,99 @@ public class AddImageFromFileDialogHandler {
 			return true;
 		}
 
-		void doIt(final ISemanticFolder parentFolder,
-				final AddFileOrFolderFromRemotePage page)
-				throws InterruptedException, InvocationTargetException {
+		void doIt(final ISemanticFolder parentFolder, final AddFileOrFolderFromRemotePage page) throws InterruptedException,
+				InvocationTargetException {
 
-			new ProgressMonitorDialog(this.getShell()).run(true, true,
-					new IRunnableWithProgress() {
+			new ProgressMonitorDialog(this.getShell()).run(true, true, new IRunnableWithProgress() {
 
-						public void run(IProgressMonitor monitor)
-								throws InvocationTargetException,
-								InterruptedException {
-							IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
-								public void run(IProgressMonitor actMonitor)
-										throws CoreException {
+						public void run(IProgressMonitor actMonitor) throws CoreException {
 
-									boolean folderMode = page.isFolderMode();
-									String childName = page.getChildName();
+							boolean folderMode = page.isFolderMode();
+							String childName = page.getChildName();
 
-									File rootFile = new File(page.getPath());
-									URI uri = rootFile.toURI();
+							File rootFile = new File(page.getPath());
+							URI uri = rootFile.toURI();
 
-									int childCount;
-									if (folderMode && page.isDeep()) {
-										childCount = countChildren(0, rootFile
-												.listFiles());
-									} else {
-										childCount = 1;
-									}
-
-									actMonitor.beginTask("", childCount * 2); //$NON-NLS-1$
-
-									actMonitor
-											.setTaskName(Messages.HandleAddFileFromRemote_Adding_XMSG
-													+ uri.toString());
-									if (folderMode) {
-										ISemanticFolder folder = parentFolder
-												.addFolder(
-														childName,
-														uri,
-														ISemanticFileSystem.SUPPRESS_REFRESH,
-														actMonitor);
-										if (page.isDeep()) {
-
-											addChildren(0, folder, rootFile
-													.listFiles(), actMonitor);
-										} else {
-											actMonitor.worked(1);
-										}
-									} else {
-										parentFolder
-												.addFile(
-														childName,
-														uri,
-														ISemanticFileSystem.SUPPRESS_REFRESH,
-														actMonitor);
-										actMonitor.worked(1);
-									}
-									actMonitor
-											.setTaskName(Messages.HandleAddFileFromRemote_Refreshing_XMSG);
-									parentFolder.getAdaptedContainer()
-											.refreshLocal(
-													IResource.DEPTH_INFINITE,
-													actMonitor);
-									actMonitor.done();
-
-								}
-
-								private int countChildren(int input,
-										File[] children) {
-									int result = input;
-									result += children.length;
-									for (File child : children) {
-										if (child.isDirectory()) {
-											result = countChildren(result,
-													child.listFiles());
-										}
-									}
-									return result;
-								}
-
-								private int addChildren(int actIndex,
-										ISemanticFolder folder,
-										File[] childFiles,
-										IProgressMonitor actMonitor)
-										throws CoreException {
-
-									int currentChildIndex = actIndex;
-
-									for (File childFile : childFiles) {
-										if (actMonitor.isCanceled()) {
-											throw new CoreException(
-													new Status(
-															IStatus.ERROR,
-															Activator.PLUGIN_ID,
-															null,
-															new InterruptedException()));
-										}
-										URI childUri = childFile.toURI();
-										actMonitor
-												.setTaskName(NLS
-														.bind(
-																Messages.HandleAddFileFromRemote_AddingResource_XMSG,
-																childUri.toString()));
-										currentChildIndex++;
-										if (childFile.isDirectory()) {
-											ISemanticFolder childFolder = folder
-													.addFolder(
-															childFile.getName(),
-															childUri,
-															ISemanticFileSystem.SUPPRESS_REFRESH,
-															actMonitor);
-											currentChildIndex = addChildren(
-													currentChildIndex,
-													childFolder, childFile
-															.listFiles(),
-													actMonitor);
-										} else {
-											folder.addFile(
-													childFile.getName(),
-													childUri,
-													ISemanticFileSystem.SUPPRESS_REFRESH,
-													actMonitor);
-										}
-										actMonitor.worked(1);
-									}
-									return currentChildIndex;
-								}
-							};
-
-							try {
-								ResourcesPlugin.getWorkspace().run(runnable,
-										monitor);
-							} catch (CoreException e) {
-								if (e.getCause() instanceof InterruptedException) {
-									throw (InterruptedException) e.getCause();
-								}
-								throw new InvocationTargetException(e);
+							int childCount;
+							if (folderMode && page.isDeep()) {
+								childCount = countChildren(0, rootFile.listFiles());
+							} else {
+								childCount = 1;
 							}
 
+							actMonitor.beginTask("", childCount * 2); //$NON-NLS-1$
+
+							actMonitor.setTaskName(Messages.HandleAddFileFromRemote_Adding_XMSG + uri.toString());
+							if (folderMode) {
+								ISemanticFolder folder = parentFolder.addFolder(childName, uri, ISemanticFileSystem.SUPPRESS_REFRESH,
+										actMonitor);
+								if (page.isDeep()) {
+
+									addChildren(0, folder, rootFile.listFiles(), actMonitor);
+								} else {
+									actMonitor.worked(1);
+								}
+							} else {
+								parentFolder.addFile(childName, uri, ISemanticFileSystem.SUPPRESS_REFRESH, actMonitor);
+								actMonitor.worked(1);
+							}
+							actMonitor.setTaskName(Messages.HandleAddFileFromRemote_Refreshing_XMSG);
+							parentFolder.getAdaptedContainer().refreshLocal(IResource.DEPTH_INFINITE, actMonitor);
+							actMonitor.done();
+
 						}
-					});
+
+						private int countChildren(int input, File[] children) {
+							int result = input;
+							result += children.length;
+							for (File child : children) {
+								if (child.isDirectory()) {
+									result = countChildren(result, child.listFiles());
+								}
+							}
+							return result;
+						}
+
+						private int addChildren(int actIndex, ISemanticFolder folder, File[] childFiles, IProgressMonitor actMonitor)
+								throws CoreException {
+
+							int currentChildIndex = actIndex;
+
+							for (File childFile : childFiles) {
+								if (actMonitor.isCanceled()) {
+									throw new CoreException(
+											new Status(IStatus.ERROR, Activator.PLUGIN_ID, null, new InterruptedException()));
+								}
+								URI childUri = childFile.toURI();
+								actMonitor.setTaskName(NLS.bind(Messages.HandleAddFileFromRemote_AddingResource_XMSG, childUri.toString()));
+								currentChildIndex++;
+								if (childFile.isDirectory()) {
+									ISemanticFolder childFolder = folder.addFolder(childFile.getName(), childUri,
+											ISemanticFileSystem.SUPPRESS_REFRESH, actMonitor);
+									currentChildIndex = addChildren(currentChildIndex, childFolder, childFile.listFiles(), actMonitor);
+								} else {
+									folder.addFile(childFile.getName(), childUri, ISemanticFileSystem.SUPPRESS_REFRESH, actMonitor);
+								}
+								actMonitor.worked(1);
+							}
+							return currentChildIndex;
+						}
+					};
+
+					try {
+						ResourcesPlugin.getWorkspace().run(runnable, monitor);
+					} catch (CoreException e) {
+						if (e.getCause() instanceof InterruptedException) {
+							throw (InterruptedException) e.getCause();
+						}
+						throw new InvocationTargetException(e);
+					}
+
+				}
+			});
 		}
 	}
 
@@ -221,8 +170,7 @@ public class AddImageFromFileDialogHandler {
 			res = (IResource) sel;
 		} else {
 			// get the first project of nothing is selected
-			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-					.getProjects();
+			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 
 			if (projects.length > 0) {
 				res = projects[0];
@@ -234,12 +182,10 @@ public class AddImageFromFileDialogHandler {
 				res = res.getParent();
 			}
 
-			ISemanticFolder sfolder = (ISemanticFolder) res
-					.getAdapter(ISemanticFolder.class);
+			ISemanticFolder sfolder = (ISemanticFolder) res.getAdapter(ISemanticFolder.class);
 
 			if (sfolder != null) {
-				AddImageFromFileWizard wizard = new AddImageFromFileWizard(
-						context, sfolder);
+				AddImageFromFileWizard wizard = new AddImageFromFileWizard(context, sfolder);
 
 				new WizardDialog(shell, wizard).open();
 			}

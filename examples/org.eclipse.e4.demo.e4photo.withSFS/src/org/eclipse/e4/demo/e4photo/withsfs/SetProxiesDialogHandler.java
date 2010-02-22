@@ -19,15 +19,12 @@ import org.eclipse.swt.widgets.Shell;
 public class SetProxiesDialogHandler {
 
 	private final static class SetProxiesWizard extends Wizard {
-		private IEclipseContext dlgContext;
-
 		/**
 		 * 
 		 * @param folder
 		 *            the folder
 		 */
 		SetProxiesWizard(IEclipseContext context) {
-			this.dlgContext = context;
 		}
 
 		public void addPages() {
