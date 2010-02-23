@@ -215,7 +215,7 @@
             class="org.eclipse.core.internal.resources.semantic.ui.team.RepositoryConfigurationWizard"
             icon="icons/sample.gif"
             id="org.eclipse.core.resources.semantic.team.SharingWizard"
-            name="%wizard.name.Sharing">
+            name="%configwizard.name_XGRP">
       </wizard>
    </extension>
    <extension
@@ -224,7 +224,7 @@
             class="org.eclipse.core.internal.resources.semantic.ui.sync.SemanticSubscriberParticipant"
             icon="icons/sample.gif"
             id="org.eclipse.core.resources.semantic.participant1"
-            name="%participant.name"
+            name="%synchparticipant.name_XGRP"
             persistent="false">
       </participant>
    </extension>
@@ -232,10 +232,10 @@
          point="org.eclipse.team.ui.synchronizeWizards">
       <wizard
             class="org.eclipse.core.internal.resources.semantic.ui.sync.ConfigurationWizard"
-            description="%wizard.description.SyncConfig"
+            description="%synchwizard.description_XMSG"
             icon="icons/sample.gif"
             id="SemanticFolders.wizard1"
-            name="%wizard.name.SyncConfig">
+            name="%synchwizard.name_XGRP">
       </wizard>
    </extension>
    <extension
