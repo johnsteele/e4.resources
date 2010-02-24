@@ -295,7 +295,7 @@ public class TestsRestContentProvider {
 
 					try {
 						// make sure we get another file timestamp
-						Thread.sleep(2000);
+						Thread.sleep(100);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -324,7 +324,7 @@ public class TestsRestContentProvider {
 
 					try {
 						// make sure we get another file timestamp
-						Thread.sleep(2000);
+						Thread.sleep(100);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

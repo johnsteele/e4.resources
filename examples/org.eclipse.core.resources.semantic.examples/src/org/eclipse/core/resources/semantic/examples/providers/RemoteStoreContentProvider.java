@@ -294,13 +294,13 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 				long localTime = -1l;
 				ICacheService srv = getCacheService();
 				if (srv.hasContent(semanticFileStore.getPath())) {
-					localTime = srv.getContentTimestamp(semanticFileStore.getPath());
+					localTime = getResourceTimestamp(semanticFileStore, monitor);
 				}
 				if (direction == SyncDirection.OUTGOING || localTime > remoteTime) {
 					// outgoing
 					OutputStream os = file.getOutputStream(false);
 					Util.transferStreams(srv.getContent(semanticFileStore.getPath()), os, monitor);
-					file.setTimestamp(srv.getContentTimestamp(semanticFileStore.getPath()));
+					file.setTimestamp(localTime);
 					store.serialize(monitor);
 				} else if (direction == SyncDirection.INCOMING || remoteTime > localTime) {
 					// incoming
@@ -417,8 +417,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 		RemoteFile file = ((RemoteFile) item);
 
-		getCacheService().addContentWithTimestamp(semanticFileStore.getPath(), new ByteArrayInputStream(file.getContent()),
-				file.getTimestamp(), ISemanticFileSystem.NONE, monitor);
+		getCacheService().addContent(semanticFileStore.getPath(), new ByteArrayInputStream(file.getContent()), ISemanticFileSystem.NONE,
+				monitor);
+		setResourceTimestamp(semanticFileStore, file.getTimestamp(), monitor);
 		setReadOnly(semanticFileStore, true, monitor);
 
 	}

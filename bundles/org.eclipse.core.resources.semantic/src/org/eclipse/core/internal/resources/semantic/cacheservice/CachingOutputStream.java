@@ -42,13 +42,13 @@ class CachingOutputStream extends OutputStream {
 	public void close() throws IOException {
 		InputStream stream = null;
 		try {
+			long timestamp = System.currentTimeMillis();
 
-			this.cacheService.addFromTempHandle(this.fileHandle, System.currentTimeMillis());
+			this.cacheService.addFromTempHandle(this.fileHandle);
 
 			IPath path = this.fileHandle.getKey();
 
 			stream = this.cacheService.getContent(path);
-			long cacheTimestamp = this.cacheService.getContentTimestamp(path);
 			long appendPosition = this.fileHandle.getAppendPosition();
 			long skipped = 0l;
 
@@ -60,7 +60,7 @@ class CachingOutputStream extends OutputStream {
 				throw new IOException(MessageFormat.format(Messages.CachingOutputStream_CouldNotSkip_XMSG, appendPosition, skipped));
 			}
 
-			this.callback.cacheUpdated(stream, cacheTimestamp, this.appendMode);
+			this.callback.cacheUpdated(stream, timestamp, this.appendMode);
 
 		} catch (CoreException e) {
 			// $JL-EXC$ ignore

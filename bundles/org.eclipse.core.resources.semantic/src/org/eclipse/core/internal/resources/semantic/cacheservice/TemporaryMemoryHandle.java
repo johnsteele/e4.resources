@@ -35,15 +35,13 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 	/**
 	 * @throws CoreException
 	 */
-	public void commit(long timestamp) throws CoreException {
+	public void commit() throws CoreException {
 		CachedMemoryHandle handle = MemoryCache.getInstance().getOrCreateMemoryStore(this.path.toString());
 		byte[] content;
 
 		Util.safeClose(this.bos);
 		content = this.bos.toByteArray();
 		handle.setContents(content, this.appendMode);
-
-		handle.setLastModified(timestamp);
 	}
 
 	public IPath getKey() {

@@ -29,21 +29,6 @@ public interface ICachedContentHandle {
 	public boolean exists();
 
 	/**
-	 * 
-	 * @return the content timestamp
-	 */
-	public long lastModified();
-
-	/**
-	 * 
-	 * @param timestamp
-	 *            the timestamp
-	 * @throws CoreException
-	 *             upon failure
-	 */
-	public void setLastModified(long timestamp) throws CoreException;
-
-	/**
 	 */
 	public void delete();
 

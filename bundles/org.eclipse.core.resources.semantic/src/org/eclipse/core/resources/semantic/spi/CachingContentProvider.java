@@ -30,8 +30,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.osgi.util.NLS;
 
-
-
 /**
  * This will delegate calls to openInputStream and openOutputStream to local
  * copies of the semantic files.
@@ -61,7 +59,7 @@ import org.eclipse.osgi.util.NLS;
  * 
  */
 public abstract class CachingContentProvider extends ContentProvider {
-	
+
 	private static final QualifiedName RESOURCE_TIMESTAMP = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID, "ResourceTimestamp"); //$NON-NLS-1$
 	// TODO 0.1: add convenience/helper methods to cleanup cache along with
 	// file/folder removal
@@ -151,7 +149,9 @@ public abstract class CachingContentProvider extends ContentProvider {
 			try {
 				is = openInputStreamInternal(childStore, monitor, setter);
 
-				cacheService.addContentWithTimestamp(path, is, setter.getTimestamp(), EFS.NONE, monitor);
+				cacheService.addContent(path, is, EFS.NONE, monitor);
+
+				setResourceTimestamp(childStore, setter.getTimestamp(), monitor);
 			} finally {
 				Util.safeClose(is);
 			}
@@ -169,9 +169,10 @@ public abstract class CachingContentProvider extends ContentProvider {
 
 		ICacheUpdateCallback callback = new ICacheUpdateCallback() {
 
-			public void cacheUpdated(InputStream newContent, long cacheTimestamp, boolean append) {
-				onCacheUpdate(childStore, newContent, cacheTimestamp, append, monitor);
+			public void cacheUpdated(InputStream newContent, long timestamp, boolean append) throws CoreException {
+				setResourceTimestamp(childStore, timestamp, monitor);
 
+				onCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 		};
 		return cacheService.wrapOutputStream(path, appendMode, callback, monitor);
@@ -343,8 +344,8 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * To be implemented by concrete subclasses.
 	 * <p>
 	 * This method is called both from
-	 * {@link #openInputStream(ISemanticFileStore, IProgressMonitor)} and from
-	 * the default implementation of
+	 * {@link #openInputStream(ISemanticFileStore, IProgressMonitor)} and
+	 * (indirectly) from the default implementation of
 	 * {@link #getResourceTimestamp(ISemanticFileStore, IProgressMonitor)}. This
 	 * method allows retrieval of content and content timestamp with one
 	 * roundtrip (e.g. via plain HTTP GET). But this approach has a drawback
@@ -352,14 +353,9 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * update of the resource tree.
 	 * <p>
 	 * Important: The timestamp that is obtained via {@code timeStampSetter}
-	 * parameter is only used to set timestamp on cache service entry.
+	 * parameter is then passed to
 	 * {@link #setResourceTimestamp(ISemanticFileStore, long, IProgressMonitor)}
-	 * method is not called by
-	 * {@link #openInputStream(ISemanticFileStore, IProgressMonitor)}. This is
-	 * done because the standard implementation of
-	 * {@link #getResourceTimestamp(ISemanticFileStore, IProgressMonitor)} uses
-	 * cache service to consistently store both content and timestamps in one
-	 * place.
+	 * method.
 	 * <p>
 	 * Content providers that are able to retrieve the resource timestamp
 	 * independently from content, should override the methods
@@ -367,9 +363,7 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * {@link #setResourceTimestamp(ISemanticFileStore, long, IProgressMonitor)}
 	 * and
 	 * {@link #onCacheUpdate(ISemanticFileStore, InputStream, long, boolean, IProgressMonitor)}
-	 * and provide an own timestamp handling that is independent from the cache
-	 * service and allows lazy content retrieval. In this case, the value
-	 * returned via timeStampSetter parameter is irrelevant and may be 0.
+	 * and provide an own timestamp handling that allows lazy content retrieval.
 	 * <p>
 	 * When implementing own timestamp handling, it is important to take into
 	 * account that the method
@@ -415,8 +409,8 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 *            the semantic file store
 	 * @param newContent
 	 *            the new cache content
-	 * @param cacheTimestamp
-	 *            the timestamp as read from the cache
+	 * @param timestamp
+	 *            the timestamp of the change
 	 * @param append
 	 *            <code>true</code> to indicate that the cache was updated in
 	 *            append mode; in this case, only the appended data will be
@@ -424,30 +418,25 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * @param monitor
 	 *            may be null
 	 */
-	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long cacheTimestamp, boolean append,
+	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long timestamp, boolean append,
 			IProgressMonitor monitor) {
 		// by default, we do nothing
 	}
 
 	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
-		
+
+		if (!semanticFileStore.isExists()) {
+			return EFS.NONE;
+		}
 
 		String stampString = semanticFileStore.getPersistentProperty(RESOURCE_TIMESTAMP);
-		if (stampString != null){
+		if (stampString != null) {
 			return Long.parseLong(stampString);
 		}
-		// the cache service can also give some information, but depending on the
-		// underlying file system, precision may be seconds, not milliseconds
-		ICacheService cacheService = this.getCacheService();
-		IPath path = semanticFileStore.getPath();
-		long timestamp = cacheService.getContentTimestamp(path);
 
-		if (timestamp >= 0) {			
-			return timestamp;
-		}
+		// no property set, fill cache that will retrieve the content that will
+		// set the timestamp
 
-		// timestamp == -1 means that the content is not in the cache, so we try
-		// to get it
 		MultiStatus stat = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
 				Messages.CachingContentProvider_FillCache_XGRP, semanticFileStore.getPath().toString()), null);
 
@@ -458,9 +447,10 @@ public abstract class CachingContentProvider extends ContentProvider {
 			throw new CoreException(stat);
 		}
 
-		timestamp = cacheService.getContentTimestamp(path);
-		if (timestamp >= 0) {
-			return timestamp;
+		// try to read the property again
+		stampString = semanticFileStore.getPersistentProperty(RESOURCE_TIMESTAMP);
+		if (stampString != null) {
+			return Long.parseLong(stampString);
 		}
 
 		throw new SemanticResourceException(SemanticResourceStatusCode.CACHED_CONTENT_NOT_FOUND, semanticFileStore.getPath(),
@@ -468,24 +458,9 @@ public abstract class CachingContentProvider extends ContentProvider {
 	}
 
 	public void setResourceTimestamp(ISemanticFileStore semanticFileStore, long timestamp, IProgressMonitor monitor) throws CoreException {
-		
-		semanticFileStore.setPersistentProperty(RESOURCE_TIMESTAMP, Long.toString(timestamp));
-		
-		// we also update the cache information, but this is additional information only
-		ICacheService cacheService = this.getCacheService();
-		IPath path = semanticFileStore.getPath();
 
-		if (cacheService.hasContent(path)) {
-			cacheService.setContentTimestamp(path, timestamp);
-		}
-		// TODO we probably don't want to get a cache update, do we?
-//		else {
-//			// ugly as it is, this will set the timestamp on the cache file
-//			// properly
-//			InputStream is = openInputStream(semanticFileStore, monitor);
-//			Util.safeClose(is);
-//			cacheService.setContentTimestamp(path, timestamp);
-//		}
+		semanticFileStore.setPersistentProperty(RESOURCE_TIMESTAMP, Long.toString(timestamp));
+
 	}
 
 }

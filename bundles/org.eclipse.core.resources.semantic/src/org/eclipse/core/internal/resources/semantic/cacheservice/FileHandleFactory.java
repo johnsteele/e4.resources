@@ -260,39 +260,6 @@ public class FileHandleFactory implements IContentHandleFactory {
 	/**
 	 * 
 	 * @param cacheFile
-	 * @return last modified
-	 */
-	public long getLastModified(File cacheFile) {
-		try {
-			lockForWrite();
-			return getActiveFileHandle(cacheFile).lastModified();
-		} finally {
-			unlockForWrite();
-		}
-	}
-
-	/**
-	 * 
-	 * @param cacheFile
-	 * @param timestamp
-	 * @throws CoreException
-	 */
-	public void setLastModified(File cacheFile, long timestamp) throws CoreException {
-		try {
-			lockForWrite();
-			if (!getActiveFileHandle(cacheFile).setLastModified(timestamp)) {
-				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_SETTING_TIMESTAMP, new Path(cacheFile
-						.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_TimstampSetOnCommit_XMSG, cacheFile
-						.getAbsolutePath()));
-			}
-		} finally {
-			unlockForWrite();
-		}
-	}
-
-	/**
-	 * 
-	 * @param cacheFile
 	 * @return input stream
 	 * @throws FileNotFoundException
 	 */

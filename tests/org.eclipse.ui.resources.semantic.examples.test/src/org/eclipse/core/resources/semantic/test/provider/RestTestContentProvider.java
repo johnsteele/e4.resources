@@ -48,29 +48,23 @@ import org.eclipse.osgi.util.NLS;
 public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 
 	@Override
-	public ISemanticSpiResourceInfo fetchResourceInfo(
-			ISemanticFileStore semanticFileStore, int options,
-			IProgressMonitor monitor) throws CoreException {
+	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
+			throws CoreException {
 		String uriString;
-		if (SemanticSpiResourceInfo.isOptionRequested(
-				ISemanticFileSystem.RESOURCE_INFO_URI_STRING, options)) {
+		if (SemanticSpiResourceInfo.isOptionRequested(ISemanticFileSystem.RESOURCE_INFO_URI_STRING, options)) {
 			uriString = this.getURIStringInternal(semanticFileStore);
 		} else {
 			uriString = null;
 		}
 
 		boolean existsRemotely = false;
-		if (SemanticSpiResourceInfo.isOptionRequested(
-				ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, options)) {
+		if (SemanticSpiResourceInfo.isOptionRequested(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, options)) {
 
 			String remoteURI = getURIString(semanticFileStore);
 
 			if (remoteURI == null) {
-				throw new SemanticResourceException(
-						SemanticResourceStatusCode.REMOTE_URI_NOT_FOUND,
-						semanticFileStore.getPath(), NLS.bind(
-								"Remote URI is not set for file {0}",
-								semanticFileStore.getPath().toString()));
+				throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_URI_NOT_FOUND, semanticFileStore.getPath(), NLS.bind(
+						"Remote URI is not set for file {0}", semanticFileStore.getPath().toString()));
 			}
 
 			try {
@@ -84,18 +78,15 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 		}
 
 		boolean isReadOnly = isReadOnlyInternal(semanticFileStore);
-		return new SemanticSpiResourceInfo(options, false, false, isReadOnly,
-				existsRemotely, uriString, this
-						.getContentTypeInternal(semanticFileStore));
+		return new SemanticSpiResourceInfo(options, false, false, isReadOnly, existsRemotely, uriString, this
+				.getContentTypeInternal(semanticFileStore));
 	}
 
 	@Override
-	public void revertChanges(ISemanticFileStore semanticFileStore,
-			IProgressMonitor monitor) throws CoreException {
+	public void revertChanges(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
 
-		MultiStatus status = new MultiStatus(TestPlugin.PLUGIN_ID, IStatus.OK,
-				NLS.bind("Revert Change Result for {0}", semanticFileStore
-						.getPath().toString()), null);
+		MultiStatus status = new MultiStatus(TestPlugin.PLUGIN_ID, IStatus.OK, NLS.bind("Revert Change Result for {0}", semanticFileStore
+				.getPath().toString()), null);
 		dropCache(semanticFileStore, monitor, new IDropCacheVisitor() {
 
 			public boolean shouldDrop(ISemanticFileStore store) {
@@ -108,19 +99,19 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 			throw new CoreException(status);
 		}
 
+		// this can only happen on files, no recursion
+		this.setReadOnly(semanticFileStore, true, monitor);
+
 		fillCache(semanticFileStore, monitor, status);
 
 		if (!status.isOK()) {
 			throw new CoreException(status);
 		}
-		// this can only happen on files, no recursion
-		this.setReadOnly(semanticFileStore, true, monitor);
 	}
 
 	@Override
-	public void synchronizeContentWithRemote(
-			ISemanticFileStore semanticFileStore, SyncDirection direction,
-			IProgressMonitor monitor, MultiStatus status) {
+	public void synchronizeContentWithRemote(ISemanticFileStore semanticFileStore, SyncDirection direction, IProgressMonitor monitor,
+			MultiStatus status) {
 
 		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
 			if (semanticFileStore.isLocalOnly()) {
@@ -132,9 +123,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 				uri = new URI(getURIString(semanticFileStore));
 			} catch (URISyntaxException e) {
 				// $JL-EXC$ ignore
-				status.add(new Status(IStatus.ERROR,
-						SemanticResourcesPluginExamples.PLUGIN_ID, e
-								.getMessage()));
+				status.add(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage()));
 				return;
 			} catch (CoreException e) {
 				status.add(e.getStatus());
@@ -147,25 +136,19 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 
 				long remoteTimestamp;
 				try {
-					remoteTimestamp = uri.toURL().openConnection()
-							.getLastModified();
+					remoteTimestamp = uri.toURL().openConnection().getLastModified();
 				} catch (MalformedURLException e) {
 					// $JL-EXC$ ignore
-					status.add(new Status(IStatus.ERROR,
-							SemanticResourcesPluginExamples.PLUGIN_ID, e
-									.getMessage()));
+					status.add(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage()));
 					return;
 				} catch (IOException e) {
 					// $JL-EXC$ ignore
-					status.add(new Status(IStatus.ERROR,
-							SemanticResourcesPluginExamples.PLUGIN_ID, e
-									.getMessage()));
+					status.add(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage()));
 					return;
 				}
 				long localTimestamp;
 				try {
-					localTimestamp = getCacheService().getContentTimestamp(
-							semanticFileStore.getPath());
+					localTimestamp = getResourceTimestamp(semanticFileStore, monitor);
 				} catch (CoreException e) {
 					status.add(e.getStatus());
 					return;
@@ -175,25 +158,19 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 			}
 
 			if (direction == SyncDirection.INCOMING || syncIn) {
-				this.dropCache(semanticFileStore, monitor,
-						this.deleteAllVisitor, status);
+				this.dropCache(semanticFileStore, monitor, this.deleteAllVisitor, status);
 				this.fillCache(semanticFileStore, monitor, status);
 			}
 			if (direction == SyncDirection.OUTGOING || syncOut) {
 				try {
 					File file = new File(uri);
-					Util.transferStreams(getCacheService().getContent(
-							semanticFileStore.getPath()), new FileOutputStream(
-							file), monitor);
-					file.setLastModified(getCacheService().getContentTimestamp(
-							semanticFileStore.getPath()));
+					Util.transferStreams(getCacheService().getContent(semanticFileStore.getPath()), new FileOutputStream(file), monitor);
+					file.setLastModified(getResourceTimestamp(semanticFileStore, monitor));
 				} catch (CoreException e) {
 					status.add(e.getStatus());
 				} catch (IOException e) {
 					// $JL-EXC$ ignore
-					status.add(new Status(IStatus.ERROR,
-							SemanticResourcesPluginExamples.PLUGIN_ID, e
-									.getMessage()));
+					status.add(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID, e.getMessage()));
 					return;
 				}
 			}
@@ -208,8 +185,7 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 			}
 			for (IFileStore store : childStores) {
 				if (store instanceof ISemanticFileStore) {
-					synchronizeContentWithRemote((ISemanticFileStore) store,
-							direction, monitor, status);
+					synchronizeContentWithRemote((ISemanticFileStore) store, direction, monitor, status);
 				}
 			}
 		}
@@ -220,20 +196,17 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 	//
 
 	@Override
-	public void addResource(ISemanticFileStore childStore, String name,
-			ResourceType resourceType, IProgressMonitor monitor)
+	public void addResource(ISemanticFileStore childStore, String name, ResourceType resourceType, IProgressMonitor monitor)
 			throws CoreException {
 		switch (resourceType) {
-		case FOLDER_TYPE:
-			// create internal data
-			childStore.addChildFolder(name);
+			case FOLDER_TYPE :
+				// create internal data
+				childStore.addChildFolder(name);
 
-			break;
+				break;
 
-		default:
-			throw new SemanticResourceException(
-					SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, childStore
-							.getPath(), "Not supported");
+			default :
+				throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, childStore.getPath(), "Not supported");
 		}
 	}
 
@@ -246,14 +219,12 @@ public class RestTestContentProvider extends SampleRESTReadonlyContentProvider {
 				return e.getStatus();
 			}
 		}
-		return new Status(IStatus.OK,
-				SemanticResourcesPluginExamples.PLUGIN_ID, null);
+		return new Status(IStatus.OK, SemanticResourcesPluginExamples.PLUGIN_ID, null);
 	}
 
 	@Override
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
-		return validateEdit(new ISemanticFileStore[] { semanticFileStore },
-				null);
+		return validateEdit(new ISemanticFileStore[] {semanticFileStore}, null);
 	}
 
 }

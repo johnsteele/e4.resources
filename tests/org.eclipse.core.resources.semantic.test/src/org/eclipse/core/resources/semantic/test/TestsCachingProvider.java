@@ -28,6 +28,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
+import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderBase;
@@ -299,6 +300,121 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", false, file.exists());
+
+	}
+
+	/**
+	 * TODO move this to the base class to test all content provider after
+	 * refactoring of tests wrt obtaining the remote file
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testParallelReadAndWrite() throws Exception {
+
+		final IFolder root = this.testProject.getFolder("root");
+		final IFolder parent = root.getFolder("Folder1");
+
+		final IFile file = parent.getFile("File1");
+		Assert.assertFalse("File should not exist", file.exists());
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sfr = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
+				sfr.addFile("File1", ISemanticFileSystem.NONE, monitor);
+				try {
+					Util.transferStreams(new ByteArrayInputStream("New Remote".getBytes("UTF-8")), file1.getOutputStream(false), monitor);
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+		runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				InputStream is = null;
+				try {
+					is = file.getContents();
+					assertContentsEqual(file, "Hello");
+
+					ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+					sFile.synchronizeContentWithRemote(SyncDirection.INCOMING, ISemanticFileSystem.NONE, monitor);
+					// we are still holding the file input stream, so we are
+					// seeing the out dated content
+					assertContentsEqual(file, "New Remote");
+					// drop the input stream
+					Util.safeClose(is);
+
+					// TODO now we need a refresh!
+					file.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+					assertContentsEqual(file, "New Remote");
+
+				} finally {
+					Util.safeClose(is);
+				}
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+	}
+
+	/**
+	 * 
+	 * TODO move this to the base class to test all content provider after
+	 * refactoring of tests wrt obtaining the remote file
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAppendContentsToOpenFile() throws Exception {
+
+		final IFolder root = this.testProject.getFolder("root");
+		final IFolder parent = root.getFolder("Folder1");
+
+		final IFile file = parent.getFile("File1");
+
+		final ISemanticFile sfile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder folder = (ISemanticFolder) file.getParent().getAdapter(ISemanticFolder.class);
+				folder.addFile(file.getName(), ISemanticFileSystem.NONE, monitor);
+				assertContentsEqual(file, "Hello");
+				sfile.validateEdit(null);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// $JL-EXC$
+				}
+				file.appendContents(new ByteArrayInputStream(" appended".getBytes()), EFS.NONE, monitor);
+				// TODO does not work with plain provider; fix after integration
+				// of other tests
+				assertContentsEqual(file, "Hello appended");
+				InputStream is = null;
+				try {
+					is = file.getContents();
+					assertContentsEqual(file, "Hello appended");
+					file.appendContents(new ByteArrayInputStream(" again".getBytes()), EFS.NONE, monitor);
+					assertContentsEqual(file, "Hello appended again");
+
+					// TODO this should also work with an opened file
+					sfile.synchronizeContentWithRemote(SyncDirection.OUTGOING, ISemanticFileSystem.NONE, monitor);
+					Assert.assertEquals("Wrong remote content", new String(file1.getContent()), "Hello appended again");
+				} finally {
+					Util.safeClose(is);
+				}
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
 	}
 }

@@ -54,7 +54,7 @@ import org.eclipse.osgi.util.NLS;
  * 
  */
 public abstract class CachingTestContentProviderBase extends CachingContentProvider implements ISemanticContentProviderRemote,
-ISemanticContentProviderLocking {
+		ISemanticContentProviderLocking {
 	/**
 	 * If set to any value, this indicates that write-through should be
 	 * performed
@@ -90,20 +90,20 @@ ISemanticContentProviderLocking {
 	}
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		switch (resourceType) {
-		case FILE_TYPE:
-			this.addFileFromRemote(parentStore, name, monitor);
-			break;
-		case FOLDER_TYPE:
-			this.addFolderFromRemote(parentStore, name, monitor);
-			break;
-		case UNKNOWN_TYPE:
-			addResourceFromRemote(parentStore, name, monitor);
-			break;
-		default:
-			throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "Can not create resource of type "
-					+ resourceType.name()));
+			case FILE_TYPE :
+				this.addFileFromRemote(parentStore, name, monitor);
+				break;
+			case FOLDER_TYPE :
+				this.addFolderFromRemote(parentStore, name, monitor);
+				break;
+			case UNKNOWN_TYPE :
+				addResourceFromRemote(parentStore, name, monitor);
+				break;
+			default :
+				throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "Can not create resource of type "
+						+ resourceType.name()));
 		}
 	}
 
@@ -115,7 +115,7 @@ ISemanticContentProviderLocking {
 		RemoteItem item = ((RemoteFolder) parentItem).getChild(name);
 		if (item == null) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_RESOURCE_NOT_FOUND, childStore.getPath(),
-			"No such resource");
+					"No such resource");
 		}
 		if (item.getType() != RemoteItem.Type.FILE) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, item.getPath(), "");
@@ -133,7 +133,7 @@ ISemanticContentProviderLocking {
 		RemoteItem item = ((RemoteFolder) parentItem).getChild(name);
 		if (item == null) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_RESOURCE_NOT_FOUND, childStore.getPath(),
-			"No such resource");
+					"No such resource");
 		}
 		if (item.getType() != RemoteItem.Type.FOLDER) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, item.getPath(), "");
@@ -152,7 +152,7 @@ ISemanticContentProviderLocking {
 		RemoteItem item = ((RemoteFolder) parentItem).getChild(name);
 		if (item == null) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_RESOURCE_NOT_FOUND, childStore.getPath(),
-			"No such resource");
+					"No such resource");
 		}
 		if (item.getType() == Type.FILE) {
 			addFileFromRemote(childStore, name, monitor);
@@ -165,7 +165,7 @@ ISemanticContentProviderLocking {
 	}
 
 	public void createFileRemotely(ISemanticFileStore childStore, String name, InputStream source, Object context, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 
 		byte[] buffer;
 		if (source != null) {
@@ -196,7 +196,7 @@ ISemanticContentProviderLocking {
 	}
 
 	public void createResourceRemotely(ISemanticFileStore childStore, String name, Object context, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 
 		createFileRemotely(childStore, name, null, context, monitor);
 
@@ -229,17 +229,15 @@ ISemanticContentProviderLocking {
 	}
 
 	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
-	throws CoreException {
-		return new SemanticSpiResourceInfo(options, semanticFileStore
-				.getSessionProperty(LOCKHANDLE) != null, true, semanticFileStore
+			throws CoreException {
+		return new SemanticSpiResourceInfo(options, semanticFileStore.getSessionProperty(LOCKHANDLE) != null, true, semanticFileStore
 				.getPersistentProperty(READONLY) != null,
-				getStore().getItemByPath(semanticFileStore.getPath().removeFirstSegments(2)) != null,
-				null, null);
+				getStore().getItemByPath(semanticFileStore.getPath().removeFirstSegments(2)) != null, null, null);
 	}
 
 	@Override
-	public InputStream openInputStreamInternal(ISemanticFileStore store, IProgressMonitor monitor,
-			ICacheTimestampSetter timeStampSetter) throws CoreException {
+	public InputStream openInputStreamInternal(ISemanticFileStore store, IProgressMonitor monitor, ICacheTimestampSetter timeStampSetter)
+			throws CoreException {
 		RemoteItem item = getStore().getItemByPath(store.getPath().removeFirstSegments(2));
 		if (item.getType() != Type.FILE) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, item.getPath(), "");
@@ -281,12 +279,11 @@ ISemanticContentProviderLocking {
 		}
 	}
 
-	public void synchronizeContentWithRemote(ISemanticFileStore store, SyncDirection direction, IProgressMonitor monitor,
-			MultiStatus status) {
+	public void synchronizeContentWithRemote(ISemanticFileStore store, SyncDirection direction, IProgressMonitor monitor, MultiStatus status) {
 		RemoteItem item = getStore().getItemByPath(store.getPath().removeFirstSegments(2));
 		if (item.getType() != Type.FILE) {
 			status.add(new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, item.getPath(), "")
-			.getStatus());
+					.getStatus());
 			return;
 		}
 		try {
@@ -305,7 +302,7 @@ ISemanticContentProviderLocking {
 			ICacheService srv = getCacheService();
 			IPath storePath = store.getPath();
 
-			long localStamp = srv.getContentTimestamp(storePath);
+			long localStamp = getResourceTimestamp(store, monitor);
 			long remoteStamp = file.getTimestamp();
 
 			// we need more elaborate checks here (read-only...)
@@ -331,9 +328,9 @@ ISemanticContentProviderLocking {
 
 			if (syncIn) {
 
-				srv.addContentWithTimestamp(storePath, new ByteArrayInputStream(file.getContent()), file.getTimestamp(),
-						ISemanticFileSystem.NONE, monitor);
+				srv.addContent(storePath, new ByteArrayInputStream(file.getContent()), ISemanticFileSystem.NONE, monitor);
 
+				setResourceTimestamp(store, file.getTimestamp(), monitor);
 			}
 		} catch (CoreException ce) {
 			status.add(ce.getStatus());

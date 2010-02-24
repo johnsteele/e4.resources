@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * <p>
  * This is instantiated when content is to be written to the cache. The
  * {@link OutputStream}-like write methods below are used to store the content
- * temporarily. Eventually, the cache service will call the
- * {@link #commit(long)} method which must (logically) copy the content into a
+ * temporarily. Eventually, the cache service will call the {@link #commit()}
+ * method which must (logically) copy the content into a
  * {@link ICachedContentHandle}.
  * 
  */
@@ -38,14 +38,12 @@ public interface ITemporaryContentHandle {
 	public IPath getKey();
 
 	/**
-	 * Commits temporary content into cache and sets the timestamp
+	 * Commits temporary content into cache
 	 * 
-	 * @param timestamp
-	 *            the timestamp to set
 	 * @throws CoreException
 	 * 
 	 */
-	public void commit(long timestamp) throws CoreException;
+	public void commit() throws CoreException;
 
 	/**
 	 * 

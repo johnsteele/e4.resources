@@ -76,7 +76,7 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 		return this.file;
 	}
 
-	public void commit(long timestamp) throws CoreException {
+	public void commit() throws CoreException {
 
 		try {
 			this.outputStream.flush();
@@ -99,8 +99,6 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 		if (!this.appendMode) {
 			this.factory.doRename(this.getFile(), this.cacheFile);
 		}
-
-		this.factory.setLastModified(cacheFile, timestamp);
 	}
 
 	public IPath getKey() {

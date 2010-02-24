@@ -45,14 +45,6 @@ class CachedFileHandle implements ICachedContentHandle {
 		return this.factory.checkFileExists(this.cacheFile);
 	}
 
-	public long lastModified() {
-		return this.factory.getLastModified(this.cacheFile);
-	}
-
-	public void setLastModified(long timestamp) throws CoreException {
-		this.factory.setLastModified(this.cacheFile, timestamp);
-	}
-
 	public void delete() {
 		this.factory.tryDelete(this.cacheFile);
 	}

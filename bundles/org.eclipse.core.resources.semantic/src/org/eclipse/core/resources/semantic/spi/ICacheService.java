@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,25 +47,6 @@ public interface ICacheService {
 	public void addContent(IPath path, InputStream input, int options, IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Adds the given content to the cache with timestamp
-	 * 
-	 * @param path
-	 *            the path
-	 * @param input
-	 *            the content
-	 * @param timestamp
-	 *            the timestamp
-	 * @param options
-	 *            only {@link ISemanticFileSystem#CONTENT_APPEND} is supported
-	 * @param monitor
-	 *            may be null
-	 * @throws CoreException
-	 *             upon failure
-	 */
-	public void addContentWithTimestamp(IPath path, InputStream input, long timestamp, int options, IProgressMonitor monitor)
-			throws CoreException;
-
-	/**
 	 * @param path
 	 *            the path
 	 * @return the content the content
@@ -84,27 +64,6 @@ public interface ICacheService {
 	 *             upon failure
 	 */
 	public boolean hasContent(IPath path) throws CoreException;
-
-	/**
-	 * 
-	 * @param path
-	 *            the path
-	 * @return timestamp or -1 if content doesn't exist
-	 * @throws CoreException
-	 *             upon failure
-	 */
-	public long getContentTimestamp(IPath path) throws CoreException;
-
-	/**
-	 * 
-	 * @param path
-	 *            the path
-	 * @param timestamp
-	 *            the timestamp
-	 * @throws CoreException
-	 *             upon failure
-	 */
-	public void setContentTimestamp(IPath path, long timestamp) throws CoreException;
 
 	/**
 	 * 

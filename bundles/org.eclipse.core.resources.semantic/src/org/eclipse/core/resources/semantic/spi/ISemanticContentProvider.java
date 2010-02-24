@@ -16,6 +16,7 @@ import java.io.OutputStream;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
+import org.eclipse.core.resources.semantic.ISemanticResource;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.team.FileModificationValidator;
 import org.eclipse.core.runtime.CoreException;
@@ -55,8 +56,7 @@ import org.eclipse.core.runtime.MultiStatus;
  * <p>
  * If some data/state must be preserved between Eclipse restarts,
  * {@link ISemanticFileStore#setPersistentProperty(org.eclipse.core.runtime.QualifiedName, String)}
- * should be used.
- * </li>
+ * should be used.</li>
  * </ul>
  * The Semantic File System will initialize content providers via extension
  * point <code>org.eclipse.core.resources.semantic.spi.contentProvider</code>
@@ -427,6 +427,7 @@ public interface ISemanticContentProvider extends ISemanticContentProviderBase, 
 	/**
 	 * This may be called by
 	 * {@link IFileStore#putInfo(org.eclipse.core.filesystem.IFileInfo, int, IProgressMonitor)}
+	 * or other methods.
 	 * <p>
 	 * 
 	 * @param semanticFileStore

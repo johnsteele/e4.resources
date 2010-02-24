@@ -13,6 +13,8 @@ package org.eclipse.core.resources.semantic.spi;
 
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * Called after successful cache updates
  * 
@@ -28,6 +30,7 @@ public interface ICacheUpdateCallback {
 	 * @param append
 	 *            if <code>true</code>, the content only represents the appended
 	 *            portion of the cache
+	 * @throws CoreException
 	 */
-	public void cacheUpdated(InputStream newContent, long cacheTimestamp, boolean append);
+	public void cacheUpdated(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException;
 }

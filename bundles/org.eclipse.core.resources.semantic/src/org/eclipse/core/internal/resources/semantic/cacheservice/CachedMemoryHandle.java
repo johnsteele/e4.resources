@@ -28,7 +28,6 @@ class CachedMemoryHandle implements ICachedContentHandle {
 	private byte[] myContent = new byte[0];
 
 	boolean exists = false;
-	long time = 0l;
 
 	/**
 	 * @param path
@@ -43,14 +42,6 @@ class CachedMemoryHandle implements ICachedContentHandle {
 
 	public boolean exists() {
 		return this.exists;
-	}
-
-	public long lastModified() {
-		return this.time;
-	}
-
-	public void setLastModified(long timestamp) {
-		this.time = timestamp;
 	}
 
 	public void delete() {

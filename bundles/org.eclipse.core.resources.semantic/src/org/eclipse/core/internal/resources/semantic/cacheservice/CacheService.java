@@ -14,9 +14,6 @@ package org.eclipse.core.internal.resources.semantic.cacheservice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -39,7 +36,6 @@ public class CacheService implements ICacheService {
 	private final Lock readLock = this.rwl.readLock();
 	private final Lock writeLock = this.rwl.writeLock();
 	private IContentHandleFactory handleFactory;
-	private static final DateFormat DFFORTRACE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss::SSS"); //$NON-NLS-1$
 
 	/**
 	 * @param handleFactory
@@ -82,43 +78,11 @@ public class CacheService implements ICacheService {
 
 			tempHandle.setContents(input, monitor);
 
-			// os = tempHandle.openOutputStream(append, monitor);
 		} finally {
 			unlockForWrite();
 		}
 
-		// Util.transferStreams(input, os, monitor);
-
-		this.addFromTempHandle(tempHandle, System.currentTimeMillis());
-	}
-
-	public void addContentWithTimestamp(IPath path, InputStream input, long timestamp, int options, IProgressMonitor monitor)
-			throws CoreException {
-
-		boolean append = (options & ISemanticFileSystem.CONTENT_APPEND) > 0;
-
-		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
-			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] {path.toString(), DFFORTRACE.format(new Date(timestamp)), new Boolean(append)});
-		}
-
-		ITemporaryContentHandle tempHandle;
-
-		try {
-			lockForWrite();
-
-			tempHandle = this.handleFactory.createTemporaryHandle(this, path, append);
-
-			tempHandle.setContents(input, monitor);
-
-			// os = tempHandle.openOutputStream(append, monitor);
-		} finally {
-			unlockForWrite();
-		}
-
-		// Util.transferStreams(input, os, monitor);
-
-		this.addFromTempHandle(tempHandle, timestamp);
+		this.addFromTempHandle(tempHandle);
 	}
 
 	public InputStream getContent(IPath path) throws CoreException {
@@ -181,60 +145,6 @@ public class CacheService implements ICacheService {
 		}
 	}
 
-	public long getContentTimestamp(IPath path) throws CoreException {
-
-		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
-			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
-		}
-
-		try {
-			lockForRead();
-
-			ICachedContentHandle cacheFile = createCacheContentHandle(path);
-
-			long result;
-			if (cacheFile.exists()) {
-				result = cacheFile.lastModified();
-			} else {
-				result = -1;
-			}
-
-			if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
-				if (result >= 0) {
-					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-							DFFORTRACE.format(new Date(result)));
-				} else {
-					SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(), new Long(result));
-				}
-			}
-
-			return result;
-		} finally {
-			unlockForRead();
-		}
-	}
-
-	public void setContentTimestamp(IPath path, long timestamp) throws CoreException {
-
-		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
-			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] {path.toString(), DFFORTRACE.format(new Date(timestamp))});
-		}
-
-		try {
-			lockForWrite();
-
-			ICachedContentHandle cacheFile = createCacheContentHandle(path);
-
-			if (cacheFile.exists()) {
-				cacheFile.setLastModified(timestamp);
-			}
-			// TODO 0.1: if the entry doesn't exist
-		} finally {
-			unlockForWrite();
-		}
-	}
-
 	public void removeContent(IPath path, IProgressMonitor monitor) throws CoreException {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
@@ -276,15 +186,14 @@ public class CacheService implements ICacheService {
 	 * used from {@link CachingOutputStream#close()}
 	 * 
 	 * @param tempHandle
-	 * @param timestamp
 	 * @throws CoreException
 	 */
-	void addFromTempHandle(ITemporaryContentHandle tempHandle, long timestamp) throws CoreException {
+	void addFromTempHandle(ITemporaryContentHandle tempHandle) throws CoreException {
 
 		try {
 			lockForWrite();
 
-			tempHandle.commit(timestamp);
+			tempHandle.commit();
 
 		} finally {
 			unlockForWrite();
