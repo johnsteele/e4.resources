@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Unit Tests for the Semantic File System Examples
+Bundle-Name: Unit Tests for the Semantic File System Examples (Incubation)
 Bundle-SymbolicName: org.eclipse.ui.resources.semantic.examples.test;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-ClassPath: .
