@@ -119,7 +119,7 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 						}
 
 						public String getContentIdentifier() {
-							return null;
+							return "RemoteVersion";
 						}
 
 						public String getComment() {

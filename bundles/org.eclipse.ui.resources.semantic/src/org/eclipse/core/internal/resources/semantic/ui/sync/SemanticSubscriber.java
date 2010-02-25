@@ -72,6 +72,11 @@ public class SemanticSubscriber extends Subscriber {
 	public synchronized SyncInfo getSyncInfo(IResource resource) throws TeamException {
 
 		SyncInfo syncinfo;
+
+		if (!resource.exists()) {
+			return null;
+		}
+		
 		try {
 			IFileStore store = EFS.getStore(resource.getLocationURI());
 			if (store instanceof ISemanticFileStore) {
