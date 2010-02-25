@@ -76,7 +76,7 @@ public class SemanticSubscriber extends Subscriber {
 		if (!resource.exists()) {
 			return null;
 		}
-		
+
 		try {
 			IFileStore store = EFS.getStore(resource.getLocationURI());
 			if (store instanceof ISemanticFileStore) {
