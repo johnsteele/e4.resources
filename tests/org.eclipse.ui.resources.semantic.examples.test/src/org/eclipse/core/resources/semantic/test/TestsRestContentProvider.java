@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
@@ -389,8 +390,7 @@ public class TestsRestContentProvider {
 
 				assertContentsEqual(uriFile.getAdaptedFile(), "I'm remote");
 
-				// long firstTime =
-				// uriFile.getAdaptedFile().getLocalTimeStamp();
+				long firstTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
 				try {
 					uriFile.validateEdit(null);
@@ -403,24 +403,27 @@ public class TestsRestContentProvider {
 				assertContentsEqual(file, "I'm remote");
 				assertContentsEqual(uriFile.getAdaptedFile(), "New content");
 
-				// TODO only if millisecond accuracy
-				// long filestamp = file.lastModified();
-				//
-				// Assert.assertEquals("Timestamp should be the same",
-				// filestamp,
-				// firstTime);
+				long filestamp = file.lastModified();
+
+				Assert.assertEquals("Timestamp should be the same", filestamp, firstTime);
+
 				// folder sync
 				sf.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsRestContentProvider.this.options, monitor);
 				sf.getAdaptedResource().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 				assertContentsEqual(file, "New content");
 
-				long thirdTime = uriFile.getAdaptedFile().getLocalTimeStamp();
+				long secondTime = uriFile.getAdaptedFile().getLocalTimeStamp();
 
-				// TODO above Assert.assertTrue("Timstamps should differ",
-				// thirdTime > filestamp);
-				Assert.assertEquals("Timestamp should be the same", file.lastModified(), thirdTime);
+				Assert.assertTrue("Timstamps should differ", secondTime > filestamp);
 
+				if (Platform.OS_WIN32.equals(Platform.getOS())) {
+					Assert.assertEquals("Timestamp should be the same", file.lastModified(), secondTime);
+				} else {
+					// non-millisecond accuracy on UNIXes
+					long millis = secondTime % 1000;
+					Assert.assertEquals("Timestamp should be the same", file.lastModified(), secondTime - millis);
+				}
 			}
 		};
 
