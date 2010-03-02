@@ -365,7 +365,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		return this.log;
 	}
 
-	class SemanticURILocatorService implements ISemanticURILocatorService {
+	static final class SemanticURILocatorService implements ISemanticURILocatorService {
 		private HashMap<String, ArrayList<IPath>> uri2pathMapping = new HashMap<String, ArrayList<IPath>>();
 		final SemanticFileSystem fs;
 		boolean needsRebuild;

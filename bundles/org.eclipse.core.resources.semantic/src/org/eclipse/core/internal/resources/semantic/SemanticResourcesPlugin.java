@@ -62,18 +62,17 @@ public class SemanticResourcesPlugin extends Plugin implements DebugOptionsListe
 		// behavior)
 		try {
 			if (context != null) {
-				if (context != null) {
-					ServiceReference[] refs = context.getServiceReferences(Location.class.getName(), Location.INSTANCE_FILTER);
-					if (refs != null && refs.length == 1) {
-						Location location = (Location) context.getService(refs[0]);
-						if (location != null) {
-							IPath instancePath = new Path(new File(location.getURL().getFile()).toString());
-							context.ungetService(refs[0]);
-							return instancePath.append(".metadata/.plugins").append(PLUGIN_ID); //$NON-NLS-1$
-						}
+				ServiceReference[] refs = context.getServiceReferences(Location.class.getName(), Location.INSTANCE_FILTER);
+				if (refs != null && refs.length == 1) {
+					Location location = (Location) context.getService(refs[0]);
+					if (location != null) {
+						IPath instancePath = new Path(new File(location.getURL().getFile()).toString());
+						context.ungetService(refs[0]);
+						return instancePath.append(".metadata/.plugins").append(PLUGIN_ID); //$NON-NLS-1$
 					}
 				}
 			}
+
 		} catch (InvalidSyntaxException e) {
 			// $JL-EXC$ ignore and use user.home below
 		}

@@ -96,10 +96,10 @@ public class SemanticResourcesView extends ViewPart {
 	// the properties (session and persistent)
 	TreeViewer propsTable;
 
-	// date format with millisecond resolution
-	static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss::SSS"); //$NON-NLS-1$
 	// refresh rate for auto-refresh
 	static final int REFRESH_RATE = 5000;
+	// date format with millisecond resolution
+	final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss::SSS"); //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -302,8 +302,7 @@ public class SemanticResourcesView extends ViewPart {
 					path.setText(SemanticResourcesView.this.selectedPath);
 					propsMain.setText(MessageFormat.format(Messages.SemanticResourcesView_PropertiesOf_XGRP, selected.getInfo().getName()));
 					SemanticResourcesView.this.existsBox.setSelection(selected.getInfo().exists());
-					SemanticResourcesView.this.timestampText.setText(SemanticResourcesView.df.format(new Date(selected.getInfo()
-							.getLastModified())));
+					SemanticResourcesView.this.timestampText.setText(df.format(new Date(selected.getInfo().getLastModified())));
 					SemanticResourcesView.this.propsTable.setInput(selected);
 					SemanticResourcesView.this.propsTable.expandAll();
 					sf.setMaximizedControl(null);
@@ -372,8 +371,7 @@ public class SemanticResourcesView extends ViewPart {
 					SemanticResourcesView.this.propsTable.expandAll();
 					if (selected != null) {
 						SemanticResourcesView.this.existsBox.setSelection(selected.getInfo().exists());
-						SemanticResourcesView.this.timestampText.setText(SemanticResourcesView.df.format(new Date(selected.getInfo()
-								.getLastModified())));
+						SemanticResourcesView.this.timestampText.setText(df.format(new Date(selected.getInfo().getLastModified())));
 					}
 				} else {
 					SemanticResourcesView.this.propsTable.setInput(null);

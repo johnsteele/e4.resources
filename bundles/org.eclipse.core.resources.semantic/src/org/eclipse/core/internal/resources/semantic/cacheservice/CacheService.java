@@ -66,7 +66,7 @@ public class CacheService implements ICacheService {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
 			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
-					new Object[] {path.toString(), new Boolean(append)});
+					new Object[] {path.toString(), Boolean.valueOf(append)});
 		}
 
 		ITemporaryContentHandle tempHandle;
@@ -136,7 +136,8 @@ public class CacheService implements ICacheService {
 			ICachedContentHandle cacheFile = createCacheContentHandle(path);
 
 			if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
-				SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(), new Boolean(cacheFile.exists()));
+				SfsSpiTraceLocation.getTrace().traceExit(SfsSpiTraceLocation.CACHESERVICE.getLocation(),
+						Boolean.valueOf(cacheFile.exists()));
 			}
 
 			return cacheFile.exists();

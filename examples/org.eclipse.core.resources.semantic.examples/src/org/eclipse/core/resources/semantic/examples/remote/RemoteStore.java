@@ -65,7 +65,7 @@ public class RemoteStore extends RemoteStoreTransient {
 	private final static String XML_ATT_TIMESTAMP = "Timestamp"; //$NON-NLS-1$
 	private final static String XML_ATT_VAL_EMPTY = ""; //$NON-NLS-1$
 
-	private class XmlContentHandler extends DefaultHandler {
+	private static final class XmlContentHandler extends DefaultHandler {
 
 		private RemoteFolder currentFolder;
 		private RemoteFile currentFile;

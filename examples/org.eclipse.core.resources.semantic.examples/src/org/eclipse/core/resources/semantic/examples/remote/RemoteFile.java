@@ -92,7 +92,7 @@ public class RemoteFile extends RemoteItem {
 			}
 		}
 
-		public void setAppend(boolean append) {
+		public synchronized void setAppend(boolean append) {
 			if (!append) {
 				super.reset();
 				this.isOpen = true;

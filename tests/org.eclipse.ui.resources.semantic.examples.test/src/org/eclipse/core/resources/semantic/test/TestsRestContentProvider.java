@@ -62,7 +62,7 @@ public class TestsRestContentProvider {
 	final String projectName;
 	final String providerName;
 	private IProject testProject;
-	final int options = ISemanticFileSystem.NONE;
+	final static int options = ISemanticFileSystem.NONE;
 
 	/**
 	 * Initializes the trace locations

@@ -57,7 +57,7 @@ public class TestsFederatingProvider {
 	private static final String projectName = "TestSFSFederationProject";
 
 	static IProject testProject;
-	final int options = ISemanticFileSystem.SUPPRESS_REFRESH;
+	static final int options = ISemanticFileSystem.SUPPRESS_REFRESH;
 
 	/**
 	 * Initialization
@@ -155,18 +155,17 @@ public class TestsFederatingProvider {
 				ISemanticFolder restSFolder = (ISemanticFolder) restFolder.getAdapter(ISemanticFolder.class);
 				ISemanticFile restSFile;
 				try {
-					restSFile = restSFolder.addFile("Hi.all", new URI("file:someUri/which/is/long"),
-							TestsFederatingProvider.this.options, monitor);
+					restSFile = restSFolder.addFile("Hi.all", new URI("file:someUri/which/is/long"), TestsFederatingProvider.this.options,
+							monitor);
 					sstore = (ISemanticFileStore) EFS.getStore(restSFile.getAdaptedResource().getLocationURI());
 					cp = sstore.getEffectiveContentProvider();
 					// TODO fix this when using another content provider
-					Assert
-					.assertEquals("Wrong content provider", DefaultContentProvider.class.getName(), cp.getClass()
-							.getName());
+					Assert.assertEquals("Wrong content provider", DefaultContentProvider.class.getName(), cp.getClass().getName());
 
-					Assert.assertFalse("Resource should not exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource().exists());
-					Assert.assertFalse("Resource should not exist " + restSFile.getAdaptedResource().getLocationURI(), restSFile.getAdaptedResource()
-							.exists());
+					Assert.assertFalse("Resource should not exist " + sfile.getAdaptedResource().getLocationURI(), sfile
+							.getAdaptedResource().exists());
+					Assert.assertFalse("Resource should not exist " + restSFile.getAdaptedResource().getLocationURI(), restSFile
+							.getAdaptedResource().exists());
 
 				} catch (URISyntaxException e) {
 					// $JL-EXC$
@@ -182,34 +181,47 @@ public class TestsFederatingProvider {
 				ISemanticResourceInfo info = parent.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCAL_ONLY, monitor);
 				Assert.assertTrue("Should be local-only", info.isLocalOnly());
 
-				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource().exists());
-//				Assert.assertTrue("Resource should exist " + restSFile.getResource().getLocationURI(), restSFile.getResource().exists());
+				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
+						.exists());
+				// Assert.assertTrue("Resource should exist " +
+				// restSFile.getResource().getLocationURI(),
+				// restSFile.getResource().exists());
 
-//				Assert.assertFalse("Resource should not exist " + sfile.getResource().getLocationURI(), sfile.getResource().exists());
-//				Assert.assertFalse("Resource should not exist " + restSFile.getResource().getLocationURI(), restSFile.getResource()
-//						.exists());
+				// Assert.assertFalse("Resource should not exist " +
+				// sfile.getResource().getLocationURI(),
+				// sfile.getResource().exists());
+				// Assert.assertFalse("Resource should not exist " +
+				// restSFile.getResource().getLocationURI(),
+				// restSFile.getResource()
+				// .exists());
 
 				sfile.getAdaptedFile().getContents();
-//				restSFile.getFile().getContents();
+				// restSFile.getFile().getContents();
 
-				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource().exists());
-//				Assert.assertTrue("Resource should exist " + restSFile.getResource().getLocationURI(), restSFile.getResource().exists());
+				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
+						.exists());
+				// Assert.assertTrue("Resource should exist " +
+				// restSFile.getResource().getLocationURI(),
+				// restSFile.getResource().exists());
 
 				IFile file = (IFile) sfile.getAdaptedResource();
-				IStatus result = ResourcesPlugin.getWorkspace().validateEdit(new IFile[] { file }, Display.getCurrent());
+				IStatus result = ResourcesPlugin.getWorkspace().validateEdit(new IFile[] {file}, Display.getCurrent());
 
 				Assert.assertTrue("Validate Edit should return ok", result.isOK());
 
 				file.setContents(new ByteArrayInputStream(new byte[0]), true, true, monitor);
 
-//				file = (IFile) restSFile.getResource();
-//				result = ResourcesPlugin.getWorkspace().validateEdit(new IFile[] { file }, Display.getCurrent());
-//				file.setContents(new ByteArrayInputStream(new byte[0]), true, true, monitor);
+				// file = (IFile) restSFile.getResource();
+				// result = ResourcesPlugin.getWorkspace().validateEdit(new
+				// IFile[] { file }, Display.getCurrent());
+				// file.setContents(new ByteArrayInputStream(new byte[0]), true,
+				// true, monitor);
 
-				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource().exists());
-//				Assert.assertTrue("Resource should exist " + restSFile.getResource().getLocationURI(), restSFile.getResource().exists());
-
-
+				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
+						.exists());
+				// Assert.assertTrue("Resource should exist " +
+				// restSFile.getResource().getLocationURI(),
+				// restSFile.getResource().exists());
 
 			}
 		};
