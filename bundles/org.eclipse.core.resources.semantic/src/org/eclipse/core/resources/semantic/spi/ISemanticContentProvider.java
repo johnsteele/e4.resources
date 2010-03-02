@@ -365,9 +365,20 @@ public interface ISemanticContentProvider extends ISemanticContentProviderBase, 
 	 * @param semanticFileStore
 	 *            the resource handle
 	 * @param options
-	 *            see the constants in {@link ISemanticFileSystem} for possible
-	 *            values; multiple values can be specified using bitwise OR
-	 *            (i.e. the <code>int</code> "|" operator);
+	 *            possible value are:
+	 *            <ul>
+	 *            <li>{@link ISemanticFileSystem#RESOURCE_INFO_CONTENT_TYPE}
+	 *            </li> <li>
+	 *            {@link ISemanticFileSystem#RESOURCE_INFO_EXISTS_REMOTELY}</li>
+	 *            <li>{@link ISemanticFileSystem#RESOURCE_INFO_LOCAL_ONLY}</li>
+	 *            <li>{@link ISemanticFileSystem#RESOURCE_INFO_LOCKED}</li> <li>
+	 *            {@link ISemanticFileSystem#RESOURCE_INFO_LOCKING_SUPPORTED}
+	 *            </li> <li>{@link ISemanticFileSystem#RESOURCE_INFO_READ_ONLY}
+	 *            </li> <li>{@link ISemanticFileSystem#RESOURCE_INFO_URI_STRING}
+	 *            </li>
+	 *            </ul>
+	 *            Multiple values can be specified using bitwise OR (i.e. the
+	 *            <code>int</code> "|" operator);
 	 *            {@link ISemanticFileSystem#NONE} corresponds to <em>all</em>
 	 *            attributes
 	 * @param monitor

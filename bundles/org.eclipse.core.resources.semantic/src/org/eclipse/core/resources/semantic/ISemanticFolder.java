@@ -109,7 +109,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            a progress monitor or <code>null</code> if progress reporting
 	 *            is not desired
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @return the new resource
 	 * @throws CoreException
 	 *             in case of failure, e.g. when a resource with the same name
@@ -143,7 +143,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            an arbitrary context object to be passed to content provider,
 	 *            may be <code>null</code>
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor or <code>null</code> if progress reporting
 	 *            is not desired
@@ -177,7 +177,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            the name of the member; note that this does not perform the
 	 *            checks referred to in this interface javadoc
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor or <code>null</code> if progress reporting
 	 *            is not desired
@@ -206,7 +206,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            the name of the member file; please refer to this interface
 	 *            javadoc about restrictions for names
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -235,7 +235,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            the name of the member folder; please refer to this interface
 	 *            javadoc about restrictions for names
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor or <code>null</code> if progress reporting
 	 *            is not desired
@@ -281,7 +281,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            under which resource content can be accessed
 	 *            (retrieved/persisted)
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            may be null
 	 * @return the member file
@@ -322,7 +322,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            under which resource content can be accessed
 	 *            (retrieved/persisted)
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            may be null
 	 * @return the member folder
@@ -360,7 +360,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            provider registered under contentProviderID; may be
 	 *            <code>null</code> if no such properties are required
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            may be <code>null</code>
 	 * @return the member folder
@@ -397,7 +397,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *            provider registered under contentProviderID; may be
 	 *            <code>null</code> if no such properties are required
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            may be <code>null</code>
 	 * @return the member folder

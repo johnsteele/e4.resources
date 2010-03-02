@@ -123,7 +123,7 @@ public interface ISemanticFile extends ISemanticResource {
 	 * options, this resource will be refreshed locally.
 	 * 
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * 
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting

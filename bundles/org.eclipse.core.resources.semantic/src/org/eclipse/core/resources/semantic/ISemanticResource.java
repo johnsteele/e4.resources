@@ -137,8 +137,8 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * not direct or indirect children of this resource. In addition, the checks
 	 * for data loss described above should be performed.
 	 * <p>
-	 * {@link ISemanticFileSystem#VALIDATE_REMOVE_IGNORE_RESOURCE_STATE}
-	 * should only be specified together with
+	 * {@link ISemanticFileSystem#VALIDATE_REMOVE_IGNORE_RESOURCE_STATE} should
+	 * only be specified together with
 	 * {@link ISemanticFileSystem#VALIDATE_REMOVE_RAISE_ERROR_ON_SCOPE_EXTENSION}
 	 * . In this case, the checks for data loss should be skipped.
 	 * 
@@ -174,7 +174,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * options, the parent of this resource will be refreshed locally.
 	 * 
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -201,7 +201,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * read only flag, lock state...).
 	 * 
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -251,7 +251,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *            {@link SyncDirection#BOTH}, {@link SyncDirection#INCOMING},
 	 *            {@link SyncDirection#OUTGOING}
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -319,7 +319,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * returns an {@link IStatus#OK} status.
 	 * 
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -355,7 +355,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * returns an {@link IStatus#OK} status.
 	 * 
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
@@ -384,7 +384,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * @param uri
 	 *            new URI or <code>null</code> if the URI should be unset
 	 * @param options
-	 *            the options as specified in {@link ISemanticResource}
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired
