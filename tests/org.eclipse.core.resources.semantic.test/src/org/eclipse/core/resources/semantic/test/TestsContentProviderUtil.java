@@ -50,8 +50,6 @@ import org.junit.BeforeClass;
  */
 public abstract class TestsContentProviderUtil {
 
-	// TODO the following are public currently because of test failures
-
 	public static final QualifiedName TEMPLATE_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Hello");
 	public static final QualifiedName DUMMY_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy1");
 	public static final QualifiedName DUMMY_PROP2 = new QualifiedName(TestPlugin.PLUGIN_ID, "Dummy2");
@@ -218,7 +216,7 @@ public abstract class TestsContentProviderUtil {
 
 	}
 
-	protected void assertContentsEqual(IFile file, String test) {
+	public void assertContentsEqual(IFile file, String test) {
 		InputStream is = null;
 		try {
 			is = file.getContents();
@@ -235,7 +233,7 @@ public abstract class TestsContentProviderUtil {
 		}
 	}
 
-	protected void assertContentsNotEqual(IFile file, String test) {
+	public void assertContentsNotEqual(IFile file, String test) {
 		InputStream is = null;
 		try {
 			is = file.getContents();

@@ -25,12 +25,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.resources.semantic.SyncDirection;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.test.provider.MemoryCachingTestContentProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
@@ -51,6 +54,12 @@ public class TestsMemoryCachingProvider extends TestsContentProviderBase {
 	 */
 	public TestsMemoryCachingProvider() {
 		super(true, "MemoryCachingTests", MemoryCachingTestContentProvider.class.getName());
+	}
+
+	@Override
+	public RemoteFile getRemoteFile() {
+		RemoteStoreTransient store = (RemoteStoreTransient) testProject.getAdapter(RemoteStoreTransient.class);
+		return (RemoteFile) store.getItemByPath(new Path("Folder1/File1"));
 	}
 
 	/**
@@ -75,8 +84,8 @@ public class TestsMemoryCachingProvider extends TestsContentProviderBase {
 
 				public void run(IProgressMonitor monitor) throws CoreException {
 
-					IViewPart histView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-							IHistoryView.VIEW_ID);
+					IViewPart histView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+							.showView(IHistoryView.VIEW_ID);
 
 					((IHistoryView) histView).showHistoryFor(file);
 
@@ -94,8 +103,7 @@ public class TestsMemoryCachingProvider extends TestsContentProviderBase {
 						// $JL-EXC$
 						throw new RuntimeException(e.getMessage());
 					}
-					sfile.synchronizeContentWithRemote(SyncDirection.OUTGOING,
-							TestsMemoryCachingProvider.this.options, monitor);
+					sfile.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsMemoryCachingProvider.this.options, monitor);
 					file.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 					hist = provider.getHistoryFor(sfs, EFS.NONE, monitor);
@@ -116,8 +124,7 @@ public class TestsMemoryCachingProvider extends TestsContentProviderBase {
 
 					Assert.assertTrue("Should be able to show history view", canShow);
 
-					IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-							IHistoryView.VIEW_ID);
+					IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IHistoryView.VIEW_ID);
 
 					Assert.assertNotNull("History page part should not be null", part);
 

@@ -121,8 +121,11 @@ public class TestCacheService {
 			removeFromCache(service, path);
 		} catch (CoreException e) {
 			// $JL-EXC$ ignore exception
-			Assert.fail("Removal should not fail even if file open");
 
+			// the cache file must still be there but hasContent must report
+			// false
+			Assert.assertTrue(!service.hasContent(path));
+			Assert.assertTrue(cacheFile.exists());
 		} finally {
 			// this will close the stream so that a file can be deleted
 			Util.safeClose(is);

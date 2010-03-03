@@ -11,7 +11,10 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.test;
 
+import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.test.provider.PlainTestContentProvider;
+import org.eclipse.core.runtime.Path;
 
 /**
  * Tests a non-caching content provider
@@ -25,12 +28,19 @@ public class TestsPlainProvider extends TestsContentProviderBase {
 		super(true, "TestPlainProvider", PlainTestContentProvider.class.getName());
 	}
 
+	@Override
+	public RemoteFile getRemoteFile() {
+		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject.getAdapter(RemoteStoreTransient.class);
+		return (RemoteFile) store.getItemByPath(new Path("Folder1/File1"));
+	}
+
 	/**
 	 * Overwritten since it doesn't work in non-caching providers
 	 */
 	@Override
 	public void testChangeFileContentLocalAndRevert() throws Exception {
-		// TODO this doesn't work in a non-caching provider; change the RemoteFile implementation
+		// TODO this doesn't work in a non-caching provider; change the
+		// RemoteFile implementation
 		// so that it implements revert
 	}
 

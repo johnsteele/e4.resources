@@ -43,6 +43,7 @@ import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStore;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.spi.Util;
@@ -68,8 +69,6 @@ import org.junit.Test;
  */
 public abstract class TestsContentProviderBase extends TestsContentProviderUtil {
 
-	protected RemoteFile file1;
-
 	/**
 	 * The constructor
 	 * 
@@ -86,12 +85,14 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		TestsContentProviderUtil.initTrace();
+		TestsContentProviderUtil.beforeClass();
 	}
 
 	public static void afterClass() throws Exception {
-		TestsContentProviderUtil.resetTrace();
+		TestsContentProviderUtil.afterClass();
 	}
+
+	public abstract RemoteFile getRemoteFile();
 
 	@Override
 	@Before
@@ -128,7 +129,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				f1.addFolder("Folder11");
 
 				try {
-					TestsContentProviderBase.this.file1 = f1.addFile("File1", "Hello".getBytes("UTF-8"), store.newTime());
+					f1.addFile("File1", "Hello".getBytes("UTF-8"), store.newTime());
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -171,7 +172,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		this.testProject = null;
-		this.file1 = null;
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -539,7 +539,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
 		long stamp = store.fetchInfo().getLastModified();
 
-		Assert.assertEquals("Wrong date", this.file1.getTimestamp(), stamp);
+		Assert.assertEquals("Wrong date", getRemoteFile().getTimestamp(), stamp);
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -671,10 +671,18 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
+
+				ISemanticResourceInfo info = sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKING_SUPPORTED, monitor);
+				if (!info.isLockingSupported()) {
+					return;
+				}
+
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
 				sfile.lockResource(TestsContentProviderBase.this.options, monitor);
-				Assert.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor).isLocked());
+				Assert
+						.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
+								.isLocked());
 				sfile.unlockResource(TestsContentProviderBase.this.options, monitor);
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
@@ -949,7 +957,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		assertContentsEqual(file, "Hello");
 
-		Assert.assertEquals("Wrong remote content", "Hello", new String(this.file1.getContent(), "UTF-8"));
+		Assert.assertEquals("Wrong remote content", "Hello", new String(getRemoteFile().getContent(), "UTF-8"));
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -963,6 +971,10 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 					file.setContents(new ByteArrayInputStream("NewString".getBytes("UTF-8")), IResource.KEEP_HISTORY,
 							new NullProgressMonitor());
 					sf.synchronizeContentWithRemote(SyncDirection.OUTGOING, TestsContentProviderBase.this.options, monitor);
+					if (getRemoteFile().getStore() instanceof RemoteStore) {
+						((RemoteStore) getRemoteFile().getStore()).serialize(monitor);
+					}
+
 					if (!TestsContentProviderBase.this.autoRefresh) {
 						file.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 					}
@@ -979,7 +991,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		assertContentsEqual(file, "NewString");
 
-		Assert.assertEquals("Wrong remote content", "NewString", new String(this.file1.getContent(), "UTF-8"));
+		Assert.assertEquals("Wrong remote content", "NewString", new String(getRemoteFile().getContent(), "UTF-8"));
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -1009,6 +1021,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 	}
 
 	/**
+	 * TODO should this call synchronizeStateWithRemoate?
 	 * 
 	 * @throws Exception
 	 */
@@ -1038,9 +1051,13 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		ISemanticFile sfile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
 
+		if (!sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKING_SUPPORTED, null).isLockingSupported()) {
+			return;
+		}
+
 		Assert.assertEquals("Wrong lock state", false, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
-		this.file1.setLocked(true);
+		getRemoteFile().setLocked(true);
 
 		Assert.assertEquals("Wrong lock state", false, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
@@ -1058,7 +1075,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		Assert.assertEquals("Wrong lock state", true, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
-		this.file1.setLocked(false);
+		getRemoteFile().setLocked(false);
 
 		Assert.assertEquals("Wrong lock state", true, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
@@ -1269,29 +1286,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		ISemanticFile sfile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
 		stat = sfile.validateSave();
-		Assert.assertFalse("ValidateSave should not be ok", stat.getSeverity() == IStatus.OK);
-
-	}
-
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testValidateRemoteCreate() throws Exception {
-
-		final IFolder root = this.testProject.getFolder("root");
-		final IFolder parent = root.getFolder("Folder1");
-		IFile file = parent.getFile("File1");
-
-		ISemanticFolder sf = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
-		IStatus stat = sf.validateRemoteCreate(file.getName(), null);
-
-		Assert.assertFalse("ValidateRemoteCreate should not be ok", stat.getSeverity() == IStatus.OK);
-
-		file = parent.getFile("File2");
-		stat = sf.validateRemoteCreate(file.getName(), null);
-
 		Assert.assertFalse("ValidateSave should not be ok", stat.getSeverity() == IStatus.OK);
 
 	}

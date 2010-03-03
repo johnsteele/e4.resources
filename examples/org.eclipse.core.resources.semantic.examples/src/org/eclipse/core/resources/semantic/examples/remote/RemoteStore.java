@@ -63,6 +63,7 @@ public class RemoteStore extends RemoteStoreTransient {
 	private final static String XML_ATT_VERSION = "Version"; //$NON-NLS-1$
 	private final static String XML_ATT_TYPE = "Type"; //$NON-NLS-1$
 	private final static String XML_ATT_TIMESTAMP = "Timestamp"; //$NON-NLS-1$
+	private final static String XML_ATT_LOCKED = "Locked"; //$NON-NLS-1$
 	private final static String XML_ATT_VAL_EMPTY = ""; //$NON-NLS-1$
 
 	private static final class XmlContentHandler extends DefaultHandler {
@@ -100,7 +101,13 @@ public class RemoteStore extends RemoteStoreTransient {
 			} else if (type.equals(Type.FILE.toString())) {
 				String name = nameValuePairs.get(RemoteStore.XML_ATT_NAME);
 				long timestamp = Long.parseLong(nameValuePairs.get(RemoteStore.XML_ATT_TIMESTAMP));
+				String lockString = nameValuePairs.get(RemoteStore.XML_ATT_TIMESTAMP);
+				boolean locked = false;
+				if (lockString != null) {
+					locked = Boolean.parseBoolean(nameValuePairs.get(RemoteStore.XML_ATT_LOCKED));
+				}
 				this.currentFile = this.currentFolder.addFile(name, new byte[0], timestamp);
+				this.currentFile.setLocked(locked);
 			} else if (type.equals(XML_ELEMENT_VERSION)) {
 				String version = nameValuePairs.get(XML_ATT_VERSION);
 				this.currentVersion = version;
@@ -211,8 +218,7 @@ public class RemoteStore extends RemoteStoreTransient {
 			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes(file.getCharset(true)));
 		} catch (UnsupportedEncodingException e) {
 			// $JL-EXC$ ignore here
-			// $JL-I18N$
-			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes());
+			is = new ByteArrayInputStream(writer.getBuffer().toString().getBytes()); // $JL-I18N$
 		}
 
 		if (!file.exists()) {
@@ -274,6 +280,7 @@ public class RemoteStore extends RemoteStoreTransient {
 		} else {
 			RemoteFile file = (RemoteFile) actItem;
 			child.setAttribute(RemoteStore.XML_ATT_TIMESTAMP, Long.toString(file.getTimestamp()));
+			child.setAttribute(RemoteStore.XML_ATT_LOCKED, Boolean.toString(file.isLocked()));
 
 			CDATASection section = doc.createCDATASection(bytesToString(file.myContent));
 			child.appendChild(section);

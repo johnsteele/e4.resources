@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -49,7 +48,6 @@ import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -57,32 +55,7 @@ import org.junit.Test;
  * Test the REST content provider
  * 
  */
-public class TestsRestContentProvider {
-
-	final String projectName;
-	final String providerName;
-	private IProject testProject;
-	final static int options = ISemanticFileSystem.NONE;
-
-	/**
-	 * Initializes the trace locations
-	 * 
-	 * @throws Exception
-	 */
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		TestsContentProviderUtil.initTrace();
-	}
-
-	/**
-	 * Resets the trace locations
-	 * 
-	 * @throws Exception
-	 */
-	public static void afterClass() throws Exception {
-		// reset traces
-		TestsContentProviderUtil.resetTrace();
-	}
+public class TestsRestContentProvider extends TestsContentProviderUtil {
 
 	/**
 	 * Setup
@@ -165,8 +138,7 @@ public class TestsRestContentProvider {
 	 * Constructor
 	 */
 	public TestsRestContentProvider() {
-		this.projectName = "TestRestContentProvider";
-		this.providerName = RestTestContentProvider.class.getName();
+		super(true, "TestsRestContentProvider", RestTestContentProvider.class.getName());
 	}
 
 	/**
@@ -476,21 +448,21 @@ public class TestsRestContentProvider {
 
 	}
 
-	void assertContentsEqual(IFile file, String test) {
-		InputStream is = null;
-		try {
-			is = file.getContents();
-			int size = is.available();
-			byte[] buffer = new byte[size];
-			is.read(buffer);
-			Util.safeClose(is);
-			Assert.assertEquals("Wrong content", test, new String(buffer, "UTF-8"));
-
-		} catch (Exception e) {
-			// $JL-EXC$
-			Assert.fail("Exception getting file content: " + e.getMessage());
-		}
-	}
+	// void assertContentsEqual(IFile file, String test) {
+	// InputStream is = null;
+	// try {
+	// is = file.getContents();
+	// int size = is.available();
+	// byte[] buffer = new byte[size];
+	// is.read(buffer);
+	// Util.safeClose(is);
+	// Assert.assertEquals("Wrong content", test, new String(buffer, "UTF-8"));
+	//
+	// } catch (Exception e) {
+	// // $JL-EXC$
+	// Assert.fail("Exception getting file content: " + e.getMessage());
+	// }
+	// }
 
 	void assertContentsEqual(File file, String test) {
 		InputStream is = null;

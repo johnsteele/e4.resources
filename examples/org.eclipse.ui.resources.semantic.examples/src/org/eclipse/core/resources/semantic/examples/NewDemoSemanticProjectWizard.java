@@ -30,7 +30,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticProject;
 import org.eclipse.core.resources.semantic.examples.SelectScenarioPage.Scenario;
-import org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStore;
 import org.eclipse.core.resources.semantic.spi.Util;
@@ -92,7 +91,6 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 		final Set<Scenario> scenarios = scenPage.getScenarios();
 		final String projectName = projPage.getProjectName();
 		final String directoryName = projPage.getDirectoryName();
-		final boolean useOwn = !projPage.isUseOtherProject();
 
 		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
 
@@ -139,18 +137,6 @@ public class NewDemoSemanticProjectWizard extends Wizard implements INewWizard {
 				sproject.setPersistentProperty(TEMP_DIR_NAME, directoryName);
 
 				if (scenarios.contains(Scenario.REMOTESTORECONTENTPROVIDER)) {
-
-					if (!useOwn) {
-						String remoteName = projectName + "_Remote"; //$NON-NLS-1$
-						IProject remote = workspace.getRoot().getProject(remoteName);
-						if (!remote.exists()) {
-							remote.create(monitor);
-						}
-						remote.open(monitor);
-						sproject.setPersistentProperty(RemoteStoreContentProvider.USE_PROJECT, remoteName);
-					} else {
-						sproject.setPersistentProperty(RemoteStoreContentProvider.USE_PROJECT, null);
-					}
 
 					RemoteStore store = (RemoteStore) project.getAdapter(RemoteStore.class);
 					RemoteFolder first = store.getRootFolder().addFolder("First"); //$NON-NLS-1$

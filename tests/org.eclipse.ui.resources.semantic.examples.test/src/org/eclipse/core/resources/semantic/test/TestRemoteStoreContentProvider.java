@@ -29,11 +29,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticProject;
 import org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
@@ -49,6 +51,12 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 	 */
 	public TestRemoteStoreContentProvider() {
 		super(false, "TestRemoteStoreContentProvider", RemoteStoreContentProvider.class.getName());
+	}
+
+	@Override
+	public RemoteFile getRemoteFile() {
+		RemoteStore store = (RemoteStore) testProject.getAdapter(RemoteStore.class);
+		return (RemoteFile) store.getItemByPath(new Path("Folder1/File1"));
 	}
 
 	@Override
@@ -87,7 +95,7 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 				f1.addFolder("Folder11");
 
 				try {
-					TestRemoteStoreContentProvider.this.file1 = f1.addFile("File1", "Hello".getBytes("UTF-8"), store.newTime());
+					f1.addFile("File1", "Hello".getBytes("UTF-8"), store.newTime());
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -133,7 +141,6 @@ public class TestRemoteStoreContentProvider extends TestsContentProviderBase {
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		this.testProject = null;
-		this.file1 = null;
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 

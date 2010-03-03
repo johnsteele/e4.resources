@@ -367,14 +367,12 @@ public class RemoteStoreEditor extends EditorPart {
 							label.getParent().layout(true);
 						} catch (CoreException e) {
 							// $JL-EXC$ ignore here
-							// $JL-I18N$
-							content.setText(new String(file.getContent()));
+							content.setText(new String(file.getContent())); // $JL-I18N$
 						}
 
 					} catch (UnsupportedEncodingException e) {
 						// $JL-EXC$ ignore here
-						// $JL-I18N$
-						content.setText(new String(file.getContent()));
+						content.setText(new String(file.getContent())); // $JL-I18N$
 					}
 				} else {
 					sash.setMaximizedControl(RemoteStoreEditor.this.tv.getControl());

@@ -18,12 +18,13 @@ import org.junit.runners.Suite;
  * All SFS tests
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { TestsRestContentProvider.class, //
+@Suite.SuiteClasses( {TestsRestContentProvider.class, //
 		TestsSampleCompositeResourceProvider.class,//
 		TestsSynchronization.class,//
 		TestsRepositoryProvider.class,//
 		TestsMemoryCachingProvider.class,//
-		TestsSFSUi.class })
+		TestRemoteStoreContentProvider.class,//
+		TestsSFSUi.class})
 public class SfsExamplesTestSuite {
 	// the suite
 }

@@ -38,7 +38,6 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderRemote;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
-import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticRevisionStorage;
@@ -63,65 +62,13 @@ import org.eclipse.team.core.history.ITag;
  * 
  */
 public class RemoteStoreContentProvider extends CachingContentProvider implements ISemanticContentProviderRemote {
-	/** If set, this should use the own project for remote storage */
-	public static final QualifiedName USE_PROJECT = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "UseOwnProject"); //$NON-NLS-1$
 
 	private static final IStatus OKSTATUS = new Status(IStatus.OK, SemanticResourcesPluginExamplesCore.PLUGIN_ID, ""); //$NON-NLS-1$
-	// private static final IStatus CANCELSTATUS = new Status(IStatus.CANCEL,
-	// SemanticResourcesPluginExamplesCore.PLUGIN_ID,
-	// Messages.RemoteStoreContentProvider_Canceld_XMSG);
 
 	private static final QualifiedName ATTR_READONLY = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "ReadOnly"); //$NON-NLS-1$
 
-	private final static class RuleFactory implements ISemanticResourceRuleFactory {
-
-		// since we may work across projects, we always return the workspace
-		// root
-
-		RuleFactory() {
-			// nothing
-		}
-
-		public ISemanticFileStore charsetRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore copyRule(ISemanticFileStore source, ISemanticFileStore destination) {
-			return null;
-		}
-
-		public ISemanticFileStore createRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore deleteRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore markerRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore modifyRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore moveRule(ISemanticFileStore source, ISemanticFileStore destination) {
-			return null;
-		}
-
-		public ISemanticFileStore refreshRule(ISemanticFileStore store) {
-			return null;
-		}
-
-		public ISemanticFileStore validateEditRule(ISemanticFileStore[] stores) {
-			return null;
-		}
-
-	}
-
 	@Override
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	public Object getAdapter(Class adapter) {
 
 		if (adapter == ISemanticFileHistoryProvider.class) {
@@ -291,11 +238,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 			try {
 				RemoteFile file = (RemoteFile) item;
 				long remoteTime = file.getTimestamp();
-				long localTime = -1l;
+				long localTime = getResourceTimestamp(semanticFileStore, monitor);
 				ICacheService srv = getCacheService();
-				if (srv.hasContent(semanticFileStore.getPath())) {
-					localTime = getResourceTimestamp(semanticFileStore, monitor);
-				}
+
 				if (direction == SyncDirection.OUTGOING || localTime > remoteTime) {
 					// outgoing
 					OutputStream os = file.getOutputStream(false);
@@ -314,11 +259,6 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 			}
 		}
 
-	}
-
-	@Override
-	public ISemanticResourceRuleFactory getRuleFactory() {
-		return new RuleFactory();
 	}
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)
@@ -502,6 +442,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_RESOURCE_NOT_FOUND, store.getPath(),
 					Messages.RemoteStoreContentProvider_RemoteItemNotFound_XMSG);
 		}
+		timeStampSetter.setTimestamp(file.getTimestamp());
 		return new ByteArrayInputStream(file.getContent());
 	}
 

@@ -39,7 +39,6 @@ public class CreateDemoProjectPage extends WizardPage {
 
 	String projectName;
 	String directoryName = ""; //$NON-NLS-1$
-	boolean useOtherProject = false;
 
 	private Set<Scenario> scenarios = new HashSet<Scenario>();
 
@@ -107,21 +106,6 @@ public class CreateDemoProjectPage extends WizardPage {
 			}
 		});
 
-		final Button separateProject = new Button(main, SWT.CHECK);
-		separateProject.setText(Messages.CreateDemoProjectPage_UseSeparateProject_XRBL);
-		GridDataFactory.fillDefaults().span(2, 1).applyTo(separateProject);
-
-		separateProject.addSelectionListener(new SelectionListener() {
-
-			public void widgetSelected(SelectionEvent e) {
-				CreateDemoProjectPage.this.useOtherProject = separateProject.getSelection();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// nothing
-			}
-		});
-
 		name.addModifyListener(new ModifyListener() {
 
 			public void modifyText(ModifyEvent e) {
@@ -151,7 +135,7 @@ public class CreateDemoProjectPage extends WizardPage {
 	 * @return set of scenarios
 	 */
 	public Set<Scenario> getScenarios() {
-		return scenarios;
+		return this.scenarios;
 	}
 
 	/**
@@ -176,10 +160,4 @@ public class CreateDemoProjectPage extends WizardPage {
 		return this.directoryName.replace('\\', '/');
 	}
 
-	/**
-	 * @return the flag
-	 */
-	public boolean isUseOtherProject() {
-		return this.useOtherProject;
-	}
 }

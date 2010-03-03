@@ -12,11 +12,6 @@
 package org.eclipse.core.resources.semantic.examples.remote;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.semantic.ISemanticFolder;
-import org.eclipse.core.resources.semantic.ISemanticProject;
-import org.eclipse.core.resources.semantic.examples.providers.RemoteStoreContentProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.QualifiedName;
@@ -33,32 +28,6 @@ public class RemoteStoreAdapter implements IAdapterFactory {
 
 		if (adaptableObject != null && adaptableObject instanceof IContainer && adapterType.equals(RemoteStore.class)) {
 			IContainer resource = ((IContainer) adaptableObject);
-
-			ISemanticFolder sfolder = (ISemanticFolder) resource.getAdapter(ISemanticFolder.class);
-			if (sfolder != null) {
-
-				try {
-
-					ISemanticProject sProject = (ISemanticProject) resource.getProject().getAdapter(ISemanticProject.class);
-					String remoteProjectName = sProject.getPersistentProperty(RemoteStoreContentProvider.USE_PROJECT);
-					if (remoteProjectName != null) {
-						IProject remoteProject = ResourcesPlugin.getWorkspace().getRoot().getProject(remoteProjectName);
-						if (remoteProject.isAccessible()) {
-							RemoteStore store = new RemoteStore(remoteProject);
-							try {
-								store.deserialize();
-								return store;
-							} catch (CoreException e) {
-								// $JL-EXC$
-								SemanticResourcesPluginExamplesCore.getDefault().getLog().log(e.getStatus());
-							}
-						}
-						return null;
-					}
-				} catch (CoreException e) {
-					// $JL-EXC$ ignore
-				}
-			}
 
 			RemoteStore newStore = new RemoteStore(resource);
 

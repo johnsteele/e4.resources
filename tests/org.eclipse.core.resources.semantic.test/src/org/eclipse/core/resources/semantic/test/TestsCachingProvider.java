@@ -29,6 +29,8 @@ import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.resources.semantic.SyncDirection;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderBase;
@@ -36,6 +38,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 /**
@@ -43,6 +46,28 @@ import org.junit.Test;
  * 
  */
 public class TestsCachingProvider extends TestsContentProviderBase {
+
+	private RemoteFile file1;
+
+	@Override
+	public void afterMethod() throws Exception {
+		super.afterMethod();
+		this.file1 = null;
+	}
+
+	@Override
+	public void beforeMethod() throws Exception {
+		super.beforeMethod();
+		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject.getAdapter(RemoteStoreTransient.class);
+		this.file1 = (RemoteFile) store.getItemByPath(new Path("Folder1/File1"));
+
+	}
+
+	@Override
+	public RemoteFile getRemoteFile() {
+		return this.file1;
+	}
+
 	/**
 	 * No-argument construcator
 	 */
