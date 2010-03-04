@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.compare.CompareEditorInput;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.IEvaluationContext;
@@ -55,10 +56,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.ui.history.IHistoryView;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -567,6 +572,43 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
 		runCommandByAction("DiffCommand", sFile);
+
+		boolean finished = false;
+		int counter = 0;
+
+		while (!finished) {
+			for (int i = 0; i < 10; i++) {
+				Thread.sleep(100);
+				while (Display.getCurrent().readAndDispatch()) {
+					// do nothing
+				}
+			}
+
+			IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+			for (IWorkbenchWindow iWorkbenchWindow : windows) {
+				IWorkbenchPage[] pages = iWorkbenchWindow.getPages();
+
+				for (IWorkbenchPage iWorkbenchPage : pages) {
+					IEditorReference[] eRefs = iWorkbenchPage.findEditors(null, "org.eclipse.compare.CompareEditor",
+							IWorkbenchPage.MATCH_ID);
+					for (IEditorReference iEditorReference : eRefs) {
+						IEditorInput eInput = iEditorReference.getEditorInput();
+
+						if (eInput instanceof CompareEditorInput) {
+							if (((CompareEditorInput) eInput).getCompareResult() != null) {
+								finished = true;
+							}
+						}
+					}
+				}
+			}
+			counter++;
+
+			if (counter > 10) {
+				Assert.assertTrue("DiffEditor still not ready", false);
+				break;
+			}
+		}
 
 		Assert.assertEquals("File existence", true, sFile.getAdaptedFile().exists());
 
