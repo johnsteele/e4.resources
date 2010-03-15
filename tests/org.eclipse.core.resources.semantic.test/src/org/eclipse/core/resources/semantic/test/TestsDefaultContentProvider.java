@@ -619,10 +619,13 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
 		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+		ISemanticFileStore store2 = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
 		IPath beforePath = store.getPath();
 		store.remove(null);
 		IPath afterPath = store.getPath();
+		IPath afterPath2 = store2.getPath();
 		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath);
+		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath2);
 
 	}
 

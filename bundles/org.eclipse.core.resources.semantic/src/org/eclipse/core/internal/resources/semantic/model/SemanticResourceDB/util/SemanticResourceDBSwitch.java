@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/util/SemanticResourceDBSwitch.java#3 $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.util;
 
@@ -31,8 +30,6 @@ import org.eclipse.emf.ecore.EObject;
  * starting with the actual class of the object and proceeding up the
  * inheritance hierarchy until a non-null result is returned, which is the
  * result of the switch. <!-- end-user-doc -->
- * 
- * @param <T>
  * 
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage
  * @generated
@@ -61,8 +58,6 @@ public class SemanticResourceDBSwitch<T> {
 	 * Calls <code>caseXXX</code> for each class of the model until one returns
 	 * a non null result; it yields that result. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param theEObject
 	 * 
 	 * @return the first non-null result returned by a <code>caseXXX</code>
 	 *         call.
@@ -101,31 +96,31 @@ public class SemanticResourceDBSwitch<T> {
 	 */
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-		case SemanticResourceDBPackage.RESOURCE_TREE_NODE: {
-			ResourceTreeNode resourceTreeNode = (ResourceTreeNode) theEObject;
-			T result = caseResourceTreeNode(resourceTreeNode);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case SemanticResourceDBPackage.SEMANTIC_DB: {
-			SemanticDB semanticDB = (SemanticDB) theEObject;
-			T result = caseSemanticDB(semanticDB);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		case SemanticResourceDBPackage.TREE_ROOT: {
-			TreeRoot treeRoot = (TreeRoot) theEObject;
-			T result = caseTreeRoot(treeRoot);
-			if (result == null)
-				result = caseResourceTreeNode(treeRoot);
-			if (result == null)
-				result = defaultCase(theEObject);
-			return result;
-		}
-		default:
-			return defaultCase(theEObject);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE : {
+				ResourceTreeNode resourceTreeNode = (ResourceTreeNode) theEObject;
+				T result = caseResourceTreeNode(resourceTreeNode);
+				if (result == null)
+					result = defaultCase(theEObject);
+				return result;
+			}
+			case SemanticResourceDBPackage.SEMANTIC_DB : {
+				SemanticDB semanticDB = (SemanticDB) theEObject;
+				T result = caseSemanticDB(semanticDB);
+				if (result == null)
+					result = defaultCase(theEObject);
+				return result;
+			}
+			case SemanticResourceDBPackage.TREE_ROOT : {
+				TreeRoot treeRoot = (TreeRoot) theEObject;
+				T result = caseTreeRoot(treeRoot);
+				if (result == null)
+					result = caseResourceTreeNode(treeRoot);
+				if (result == null)
+					result = defaultCase(theEObject);
+				return result;
+			}
+			default :
+				return defaultCase(theEObject);
 		}
 	}
 

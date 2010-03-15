@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/SemanticResourceDBPackage.java#2 $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 
@@ -155,12 +154,21 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int RESOURCE_TREE_NODE__SESSION_PROPERTIES = 8;
 
 	/**
+	 * The feature id for the '<em><b>Path</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_TREE_NODE__PATH = 9;
+
+	/**
 	 * The number of structural features of the '<em>Resource Tree Node</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE_TREE_NODE_FEATURE_COUNT = 9;
+	int RESOURCE_TREE_NODE_FEATURE_COUNT = 10;
 
 	/**
 	 * The meta object id for the '
@@ -276,6 +284,15 @@ public interface SemanticResourceDBPackage extends EPackage {
 	 * @ordered
 	 */
 	int TREE_ROOT__SESSION_PROPERTIES = RESOURCE_TREE_NODE__SESSION_PROPERTIES;
+
+	/**
+	 * The feature id for the '<em><b>Path</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int TREE_ROOT__PATH = RESOURCE_TREE_NODE__PATH;
 
 	/**
 	 * The feature id for the '<em><b>Parent DB</b></em>' container reference.
@@ -439,6 +456,16 @@ public interface SemanticResourceDBPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getResourceTreeNode_SessionProperties();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Path</em>'.
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath()
+	 * @see #getResourceTreeNode()
+	 * @generated
+	 */
+	EAttribute getResourceTreeNode_Path();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB <em>Semantic DB</em>}'.
@@ -619,6 +646,13 @@ public interface SemanticResourceDBPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__SESSION_PROPERTIES = eINSTANCE.getResourceTreeNode_SessionProperties();
+
+		/**
+		 * The meta object literal for the '<em><b>Path</b></em>' attribute feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute RESOURCE_TREE_NODE__PATH = eINSTANCE.getResourceTreeNode_Path();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl <em>Semantic DB</em>}' class.

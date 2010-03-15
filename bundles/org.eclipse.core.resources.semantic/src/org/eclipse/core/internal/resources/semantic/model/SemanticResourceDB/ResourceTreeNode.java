@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/ResourceTreeNode.java#2 $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 
@@ -37,6 +36,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly <em>Local Only</em>}</li>
  *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType <em>Type</em>}</li>
  *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getSessionProperties <em>Session Properties</em>}</li>
+ *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}</li>
  * </ul>
  * </p>
  *
@@ -281,5 +281,31 @@ public interface ResourceTreeNode extends EObject {
 	 * @generated
 	 */
 	void setSessionProperties(HashMap<QualifiedName, Object> value);
+
+	/**
+	 * Returns the value of the '<em><b>Path</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Path</em>' attribute isn't clear, there really
+	 * should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Path</em>' attribute.
+	 * @see #setPath(String)
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_Path()
+	 * @model transient="true"
+	 * @generated
+	 */
+	String getPath();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Path</em>' attribute.
+	 * @see #getPath()
+	 * @generated
+	 */
+	void setPath(String value);
 
 } // ResourceTreeNode

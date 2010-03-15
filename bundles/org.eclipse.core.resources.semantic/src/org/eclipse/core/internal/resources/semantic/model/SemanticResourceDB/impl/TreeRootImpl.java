@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: TreeRootImpl.java,v 1.1 2010/02/10 20:56:39 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -97,9 +96,6 @@ public class TreeRootImpl extends ResourceTreeNodeImpl implements TreeRoot {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @param newParentDB
-	 * @param msgs
-	 * @return object
 	 * @generated
 	 */
 	public NotificationChain basicSetParentDB(SemanticDB newParentDB, NotificationChain msgs) {

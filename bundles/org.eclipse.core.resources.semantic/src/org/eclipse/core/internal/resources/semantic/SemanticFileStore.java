@@ -66,8 +66,6 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	private final ISemanticFileSystemLog log;
 	private ISemanticContentProvider provider;
 
-	private IPath previousPath;
-
 	SemanticFileStore(SemanticFileSystem fs, ResourceTreeNode node) {
 		super(fs, node);
 		this.log = fs.getLog();
@@ -1453,8 +1451,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForRead();
 
-			if (this.previousPath != null) {
-				return this.previousPath;
+			if (this.node.getPath() != null) {
+				return new Path(this.node.getPath());
 			}
 
 			StringBuilder sb = new StringBuilder(50);
@@ -1499,7 +1497,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					this.fs.lockForWrite();
 					// keep the last path so that getPath returns something
 					// meaningful after remove
-					this.previousPath = getPath();
+					this.node.setPath(getPath().toString());
 
 				} finally {
 					this.fs.unlockForWrite();

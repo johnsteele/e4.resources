@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: TreeNodeType.java,v 1.1 2010/02/10 20:56:41 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 
@@ -25,7 +24,6 @@ import org.eclipse.emf.common.util.Enumerator;
  * <!-- begin-user-doc --> A representation of the literals of the enumeration '
  * <em><b>Tree Node Type</b></em>', and utility methods for working with them.
  * <!-- end-user-doc -->
- * 
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getTreeNodeType()
  * @model
  * @generated
@@ -33,9 +31,9 @@ import org.eclipse.emf.common.util.Enumerator;
 @SuppressWarnings("unqualified-field-access")
 public enum TreeNodeType implements Enumerator {
 	/**
-	 * The '<em><b>FOLDER</b></em>' literal object. <!-- begin-user-doc --> <!--
+	 * The '<em><b>FOLDER</b></em>' literal object.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #FOLDER_VALUE
 	 * @generated
 	 * @ordered
@@ -43,9 +41,9 @@ public enum TreeNodeType implements Enumerator {
 	FOLDER(2, "FOLDER", "FOLDER"), //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
-	 * The '<em><b>FILE</b></em>' literal object. <!-- begin-user-doc --> <!--
+	 * The '<em><b>FILE</b></em>' literal object.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @see #FILE_VALUE
 	 * @generated
 	 * @ordered
@@ -53,9 +51,9 @@ public enum TreeNodeType implements Enumerator {
 	FILE(1, "FILE", "FILE"), //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
-	 * The '<em><b>PROJECT</b></em>' literal object. <!-- begin-user-doc -->
+	 * The '<em><b>PROJECT</b></em>' literal object.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #PROJECT_VALUE
 	 * @generated
 	 * @ordered
@@ -63,9 +61,9 @@ public enum TreeNodeType implements Enumerator {
 	PROJECT(3, "PROJECT", "PROJECT"), //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
-	 * The '<em><b>UNKNOWN</b></em>' literal object. <!-- begin-user-doc -->
+	 * The '<em><b>UNKNOWN</b></em>' literal object.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #UNKNOWN_VALUE
 	 * @generated
 	 * @ordered
@@ -73,13 +71,13 @@ public enum TreeNodeType implements Enumerator {
 	UNKNOWN(0, "UNKNOWN", "UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
-	 * The '<em><b>FOLDER</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>FOLDER</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>FOLDER</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #FOLDER
 	 * @model
 	 * @generated
@@ -88,13 +86,13 @@ public enum TreeNodeType implements Enumerator {
 	public static final int FOLDER_VALUE = 2;
 
 	/**
-	 * The '<em><b>FILE</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>FILE</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>FILE</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #FILE
 	 * @model
 	 * @generated
@@ -103,13 +101,13 @@ public enum TreeNodeType implements Enumerator {
 	public static final int FILE_VALUE = 1;
 
 	/**
-	 * The '<em><b>PROJECT</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>PROJECT</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>PROJECT</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #PROJECT
 	 * @model
 	 * @generated
@@ -118,13 +116,13 @@ public enum TreeNodeType implements Enumerator {
 	public static final int PROJECT_VALUE = 3;
 
 	/**
-	 * The '<em><b>UNKNOWN</b></em>' literal value. <!-- begin-user-doc -->
+	 * The '<em><b>UNKNOWN</b></em>' literal value.
+	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of '<em><b>UNKNOWN</b></em>' literal object isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @see #UNKNOWN
 	 * @model
 	 * @generated
@@ -138,22 +136,23 @@ public enum TreeNodeType implements Enumerator {
 	 * 
 	 * @generated
 	 */
-	private static final TreeNodeType[] VALUES_ARRAY = new TreeNodeType[] { FOLDER, FILE, PROJECT, UNKNOWN, };
+	private static final TreeNodeType[] VALUES_ARRAY = new TreeNodeType[] {
+			FOLDER,
+			FILE,
+			PROJECT,
+			UNKNOWN,
+		};
 
 	/**
-	 * A public read-only list of all the '<em><b>Tree Node Type</b></em>'
-	 * enumerators. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * A public read-only list of all the '<em><b>Tree Node Type</b></em>' enumerators.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static final List<TreeNodeType> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
-	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified
-	 * literal value. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param literal
-	 * @return object
+	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified literal value.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static TreeNodeType get(String literal) {
@@ -167,12 +166,8 @@ public enum TreeNodeType implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified
-	 * name. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param name
-	 * @return object
-	 * 
+	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified name.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static TreeNodeType getByName(String name) {
@@ -186,53 +181,42 @@ public enum TreeNodeType implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified
-	 * integer value. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 * @return object
-	 * 
+	 * Returns the '<em><b>Tree Node Type</b></em>' literal with the specified integer value.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static TreeNodeType get(int value) {
 		switch (value) {
-		case FOLDER_VALUE:
-			return FOLDER;
-		case FILE_VALUE:
-			return FILE;
-		case PROJECT_VALUE:
-			return PROJECT;
-		case UNKNOWN_VALUE:
-			return UNKNOWN;
+			case FOLDER_VALUE: return FOLDER;
+			case FILE_VALUE: return FILE;
+			case PROJECT_VALUE: return PROJECT;
+			case UNKNOWN_VALUE: return UNKNOWN;
 		}
 		return null;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final int value;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final String name;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private final String literal;
 
 	/**
-	 * Only this class can construct instances. <!-- begin-user-doc --> <!--
+	 * Only this class can construct instances.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private TreeNodeType(int value, String name, String literal) {
@@ -243,35 +227,31 @@ public enum TreeNodeType implements Enumerator {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public int getValue() {
-		return value;
+	  return value;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getName() {
-		return name;
+	  return name;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getLiteral() {
-		return literal;
+	  return literal;
 	}
 
 	/**
-	 * Returns the literal value of the enumerator, which is its string
-	 * representation. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the literal value of the enumerator, which is its string representation.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override

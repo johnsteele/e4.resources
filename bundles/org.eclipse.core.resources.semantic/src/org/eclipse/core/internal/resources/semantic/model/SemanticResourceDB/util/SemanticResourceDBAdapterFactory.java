@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: SemanticResourceDBAdapterFactory.java,v 1.1 2010/02/10 20:56:40 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.util;
 

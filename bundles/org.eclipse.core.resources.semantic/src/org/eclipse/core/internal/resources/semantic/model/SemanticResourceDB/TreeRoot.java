@@ -11,22 +11,25 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/TreeRoot.java#2 $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Tree Root</b></em>'. <!-- end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB <em>Parent DB</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getRootURI <em>Root URI</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB
+ * <em>Parent DB</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getRootURI
+ * <em>Root URI</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getTreeRoot()
  * @model
  * @generated
@@ -34,13 +37,15 @@ package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB;
 public interface TreeRoot extends ResourceTreeNode {
 	/**
 	 * Returns the value of the '<em><b>Parent DB</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB#getRoots <em>Roots</em>}'.
-	 * <!-- begin-user-doc -->
+	 * It is bidirectional and its opposite is '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB#getRoots
+	 * <em>Roots</em>}'. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Parent DB</em>' container reference isn't
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Parent DB</em>' container reference.
 	 * @see #setParentDB(SemanticDB)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getTreeRoot_ParentDB()
@@ -51,10 +56,13 @@ public interface TreeRoot extends ResourceTreeNode {
 	SemanticDB getParentDB();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB <em>Parent DB</em>}' container reference.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB
+	 * <em>Parent DB</em>}' container reference. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Parent DB</em>' container reference.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Parent DB</em>' container reference.
 	 * @see #getParentDB()
 	 * @generated
 	 */

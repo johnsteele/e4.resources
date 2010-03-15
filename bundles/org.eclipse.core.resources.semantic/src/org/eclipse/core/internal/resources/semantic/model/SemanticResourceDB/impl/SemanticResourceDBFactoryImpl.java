@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: SemanticResourceDBFactoryImpl.java,v 1.1 2010/02/10 20:56:39 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -40,8 +39,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	/**
 	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @return object
 	 * 
 	 * @generated
 	 */
@@ -158,9 +155,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @param eDataType
-	 * @param initialValue
-	 * @return object
 	 * @generated
 	 */
 	public TreeNodeType createTreeNodeTypeFromString(EDataType eDataType, String initialValue) {
@@ -174,9 +168,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @param eDataType
-	 * @param instanceValue
-	 * @return object
 	 * @generated
 	 */
 	public String convertTreeNodeTypeToString(EDataType eDataType, Object instanceValue) {
@@ -185,10 +176,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param eDataType
-	 * @param initialValue
-	 * @return object
 	 * 
 	 * @generated
 	 */
@@ -200,10 +187,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @param eDataType
-	 * @param instanceValue
-	 * @return object
-	 * 
 	 * @generated
 	 */
 	public String convertPersistentPropertiesToString(EDataType eDataType, Object instanceValue) {
@@ -212,10 +195,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param eDataType
-	 * @param initialValue
-	 * @return object
 	 * 
 	 * @generated
 	 */
@@ -226,10 +205,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param eDataType
-	 * @param instanceValue
-	 * @return object
 	 * 
 	 * @generated
 	 */
@@ -248,8 +223,6 @@ public class SemanticResourceDBFactoryImpl extends EFactoryImpl implements Seman
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return object
 	 * 
 	 * @deprecated
 	 * @generated

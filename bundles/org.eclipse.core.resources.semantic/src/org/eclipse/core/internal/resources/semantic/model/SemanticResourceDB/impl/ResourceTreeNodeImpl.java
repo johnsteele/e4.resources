@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: ResourceTreeNodeImpl.java,v 1.1 2010/02/10 20:56:40 ebartsch Exp $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -66,6 +65,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <li>
  * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getSessionProperties
  * <em>Session Properties</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getPath
+ * <em>Path</em>}</li>
  * </ul>
  * </p>
  * 
@@ -206,6 +208,26 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	protected HashMap<QualifiedName, Object> sessionProperties;
 
 	/**
+	 * The default value of the '{@link #getPath() <em>Path</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getPath()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String PATH_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getPath() <em>Path</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getPath()
+	 * @generated
+	 * @ordered
+	 */
+	protected String path = PATH_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
@@ -272,9 +294,6 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @param newParent
-	 * @param msgs
-	 * @return object
 	 * @generated
 	 */
 	public NotificationChain basicSetParent(ResourceTreeNode newParent, NotificationChain msgs) {
@@ -441,6 +460,27 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setPath(String newPath) {
+		String oldPath = path;
+		path = newPath;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH, oldPath, path));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
@@ -512,6 +552,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return getType();
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
 				return getSessionProperties();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
+				return getPath();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -553,6 +595,9 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
 				setSessionProperties((HashMap<QualifiedName, Object>) newValue);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
+				setPath((String) newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -592,6 +637,9 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
 				setSessionProperties((HashMap<QualifiedName, Object>) null);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
+				setPath(PATH_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -622,6 +670,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return type != TYPE_EDEFAULT;
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__SESSION_PROPERTIES :
 				return sessionProperties != null;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
+				return PATH_EDEFAULT == null ? path != null : !PATH_EDEFAULT.equals(path);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -651,6 +701,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		result.append(type);
 		result.append(", sessionProperties: "); //$NON-NLS-1$
 		result.append(sessionProperties);
+		result.append(", path: "); //$NON-NLS-1$
+		result.append(path);
 		result.append(')');
 		return result.toString();
 	}

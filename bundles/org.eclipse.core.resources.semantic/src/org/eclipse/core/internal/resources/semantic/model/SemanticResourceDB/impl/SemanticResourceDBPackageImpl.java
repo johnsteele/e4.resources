@@ -11,7 +11,6 @@
  *    Mathias Kinzler (SAP AG) - initial API and implementation
  * </copyright>
  *
- * $Id: //til/til.sfs/dev/src/_org.eclipse.core.resources.semantic/ecp/api/org/eclipse/core/internal/resources/semantic/model/SemanticResourceDB/impl/SemanticResourceDBPackageImpl.java#3 $
  */
 package org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl;
 
@@ -118,7 +117,6 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 	 * that field to obtain the package. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * 
-	 * @return object
 	 * @see #eNS_URI
 	 * @see #createPackageContents()
 	 * @see #initializePackageContents()
@@ -129,8 +127,8 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 			return (SemanticResourceDBPackage) EPackage.Registry.INSTANCE.getEPackage(SemanticResourceDBPackage.eNS_URI);
 
 		// Obtain or create and register package
-		SemanticResourceDBPackageImpl theSemanticResourceDBPackage = (SemanticResourceDBPackageImpl) (EPackage.Registry.INSTANCE.get(eNS_URI) instanceof SemanticResourceDBPackageImpl ? EPackage.Registry.INSTANCE
-				.get(eNS_URI)
+		SemanticResourceDBPackageImpl theSemanticResourceDBPackage = (SemanticResourceDBPackageImpl) (EPackage.Registry.INSTANCE
+				.get(eNS_URI) instanceof SemanticResourceDBPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI)
 				: new SemanticResourceDBPackageImpl());
 
 		isInited = true;
@@ -244,6 +242,15 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	public EAttribute getResourceTreeNode_Path() {
+		return (EAttribute) resourceTreeNodeEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public EClass getSemanticDB() {
 		return semanticDBEClass;
 	}
@@ -350,6 +357,7 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__LOCAL_ONLY);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__TYPE);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__SESSION_PROPERTIES);
+		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__PATH);
 
 		semanticDBEClass = createEClass(SEMANTIC_DB);
 		createEReference(semanticDBEClass, SEMANTIC_DB__ROOTS);
@@ -398,7 +406,8 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 		treeRootEClass.getESuperTypes().add(this.getResourceTreeNode());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(resourceTreeNodeEClass, ResourceTreeNode.class, "ResourceTreeNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEClass(resourceTreeNodeEClass, ResourceTreeNode.class,
+				"ResourceTreeNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(
 				getResourceTreeNode_Name(),
 				ecorePackage.getEString(),
@@ -437,6 +446,10 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 				getResourceTreeNode_SessionProperties(),
 				this.getSessionProperties(),
 				"sessionProperties", null, 0, 1, ResourceTreeNode.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(
+				getResourceTreeNode_Path(),
+				ecorePackage.getEString(),
+				"path", null, 0, 1, ResourceTreeNode.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(semanticDBEClass, SemanticDB.class, "SemanticDB", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(
@@ -451,7 +464,9 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 				this.getSemanticDB(),
 				this.getSemanticDB_Roots(),
 				"parentDB", null, 0, 1, TreeRoot.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getTreeRoot_RootURI(), ecorePackage.getEString(),
+		initEAttribute(
+				getTreeRoot_RootURI(),
+				ecorePackage.getEString(),
 				"rootURI", null, 0, 1, TreeRoot.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		// Initialize enums and add enum literals
@@ -462,7 +477,9 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 		addEEnumLiteral(treeNodeTypeEEnum, TreeNodeType.UNKNOWN);
 
 		// Initialize data types
-		initEDataType(persistentPropertiesEDataType, HashMap.class,
+		initEDataType(
+				persistentPropertiesEDataType,
+				HashMap.class,
 				"PersistentProperties", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS, "java.util.HashMap<java.lang.String, java.lang.String>"); //$NON-NLS-1$ //$NON-NLS-2$
 		initEDataType(
 				sessionPropertiesEDataType,

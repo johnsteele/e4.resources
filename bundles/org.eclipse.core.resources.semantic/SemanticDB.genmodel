@@ -2,7 +2,7 @@
 <genmodel:GenModel xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText=""
-    modelDirectory="/til.sfs__org.eclipse.core.resources.semantic_aie_dev/api" modelPluginID="org.eclipse.core.resources.semantic"
+    modelDirectory="org.eclipse.core.resources.semantic/src" modelPluginID="org.eclipse.core.resources.semantic"
     modelName="SemanticDB" nonNLSMarkers="true" importerID="org.eclipse.emf.importer.ecore"
     complianceLevel="6.0" copyrightFields="false" language="" classNamePattern="">
   <foreignModel>SemanticDB.ecore</foreignModel>
@@ -26,6 +26,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/localOnly"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/type"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/sessionProperties"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SemanticDB.ecore#//ResourceTreeNode/path"/>
     </genClasses>
     <genClasses ecoreClass="SemanticDB.ecore#//SemanticDB">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SemanticDB.ecore#//SemanticDB/roots"/>
