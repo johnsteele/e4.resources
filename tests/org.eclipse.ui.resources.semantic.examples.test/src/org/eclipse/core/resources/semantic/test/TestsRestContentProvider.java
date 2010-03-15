@@ -480,21 +480,4 @@ public class TestsRestContentProvider extends TestsContentProviderUtil {
 		}
 	}
 
-	private File createTestFile(String fileName) {
-		String tmpdir = System.getProperty("java.io.tmpdir");
-		final File file = new File(tmpdir, fileName);
-		return file;
-	}
-
-	URI createURI4File(File file) throws URISyntaxException {
-		String filepath = file.getAbsolutePath().replace('\\', '/');
-
-		// Handle differences between Windows and UNIX
-		if (!filepath.startsWith("/")) {
-			filepath = "/" + filepath;
-		}
-
-		return new URI("file", "", filepath, null);
-	}
-
 }

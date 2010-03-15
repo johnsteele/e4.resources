@@ -12,6 +12,9 @@
 package org.eclipse.core.resources.semantic.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -44,40 +47,40 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.core.RepositoryProvider;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests federation
  * 
  */
-public class TestsFederatingProvider {
+public class TestsFederatingProvider extends TestsContentProviderUtil {
 
-	private static final String projectName = "TestSFSFederationProject";
-
-	static IProject testProject;
-	static final int options = ISemanticFileSystem.SUPPRESS_REFRESH;
+	public TestsFederatingProvider() {
+		super(false, "TestSFSFederationProject", FederatingContentProvider.class.getName());
+	}
 
 	/**
 	 * Initialization
 	 * 
 	 * @throws Exception
 	 */
-	@BeforeClass
-	public static void beforeClass() throws Exception {
+	@Override
+	@Before
+	public void beforeMethod() throws Exception {
 
 		TestsContentProviderUtil.initTrace();
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(projectName);
+		final IProject project = workspace.getRoot().getProject(TestsFederatingProvider.this.projectName);
 
 		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				IProjectDescription description = workspace.newProjectDescription(projectName);
+				IProjectDescription description = workspace.newProjectDescription(TestsFederatingProvider.this.projectName);
 
 				try {
-					description.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + projectName));
+					description.setLocationURI(new URI(ISemanticFileSystem.SCHEME + ":/" + TestsFederatingProvider.this.projectName));
 				} catch (URISyntaxException e) {
 					// really not likely, though
 					throw new RuntimeException(e);
@@ -109,8 +112,9 @@ public class TestsFederatingProvider {
 	 * 
 	 * @throws Exception
 	 */
-	@AfterClass
-	public static void afterClass() throws Exception {
+	@Override
+	@After
+	public void afterMethod() throws Exception {
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
@@ -155,8 +159,13 @@ public class TestsFederatingProvider {
 				ISemanticFolder restSFolder = (ISemanticFolder) restFolder.getAdapter(ISemanticFolder.class);
 				ISemanticFile restSFile;
 				try {
-					restSFile = restSFolder.addFile("Hi.all", new URI("file:someUri/which/is/long"), TestsFederatingProvider.this.options,
-							monitor);
+					File testfile = createTestFile("test.txt");
+					boolean created = testfile.createNewFile();
+					if (!created) {
+						new FileOutputStream(testfile).close();
+					}
+
+					restSFile = restSFolder.addFile("Hi.all", createURI4File(testfile), TestsFederatingProvider.this.options, monitor);
 					sstore = (ISemanticFileStore) EFS.getStore(restSFile.getAdaptedResource().getLocationURI());
 					cp = sstore.getEffectiveContentProvider();
 					// TODO fix this when using another content provider
@@ -168,6 +177,10 @@ public class TestsFederatingProvider {
 							.getAdaptedResource().exists());
 
 				} catch (URISyntaxException e) {
+					// $JL-EXC$
+					Assert.fail(e.getMessage());
+					restSFile = null;
+				} catch (IOException e) {
 					// $JL-EXC$
 					Assert.fail(e.getMessage());
 					restSFile = null;

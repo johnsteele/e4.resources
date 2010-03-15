@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -33,12 +34,12 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticTreeWalker;
 import org.eclipse.core.resources.semantic.spi.Util;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,6 +58,12 @@ import org.eclipse.osgi.util.NLS;
 public class DefaultContentProvider extends CachingContentProvider implements ISemanticContentProviderFederation,
 		ISemanticContentProviderREST {
 
+	private static final String TRUE = "true"; //$NON-NLS-1$
+	private static final QualifiedName RESOURCE_NOT_ACCESSIBLE = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID,
+			"ResourceNotAccessible"); //$NON-NLS-1$
+	private static final QualifiedName RESOURCE_NOT_ACCESSIBLE_MESSAGE = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID,
+			"ResourceNotAccessibleMessage"); //$NON-NLS-1$
+
 	public String getFederatedProviderIDForPath(IPath path) {
 		IPath checkPath = path.removeFirstSegments(getRootStore().getPath().segmentCount());
 		return SemanticFileSystemSpiCore.getInstance().getFolderTemplateMapping(checkPath);
@@ -74,6 +81,18 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 		this.setURIStringInternal(newChild, uri.toString());
 		setReadOnly(newChild, true, monitor);
+
+		MultiStatus stat = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
+				Messages.DefaultContentProvider_CacheFillError_XMSG, newChild.getPath().toString()), null);
+
+		// ok since getResourceTimestamp is called only for files
+		fillCache(newChild, monitor, stat);
+
+		if (!stat.isOK()) {
+			newChild.remove(monitor);
+			throw new CoreException(stat);
+		}
+
 	}
 
 	public void addFolderFromRemoteByURI(ISemanticFileStore childStore, String name, URI uri, IProgressMonitor monitor)
@@ -170,17 +189,21 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 		String remoteURI = this.getURIString(childStore);
 
+		if (childStore.getPersistentProperty(RESOURCE_NOT_ACCESSIBLE) != null) {
+			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), childStore
+					.getPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE));
+		}
+
 		if (remoteURI == null) {
 			// TODO 0.1: this will happen upon folder move in the default
-			// content
-			// provider
+			// content provider
 
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_URI_NOT_FOUND, childStore.getPath(), NLS.bind(
 					Messages.DefaultContentProvider_RemotURINotSet_XMSG, childStore.getPath().toString()));
 		}
 
 		try {
-			final URI uri = URI.create(remoteURI);
+			final URI uri = new URI(remoteURI);
 
 			URL url = uri.toURL();
 
@@ -191,9 +214,17 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 				setter.setTimestamp(conn.getDate());
 			}
 
-			return conn.getInputStream();
+			InputStream is = conn.getInputStream();
+			clearStateResourceNotAccessible(childStore);
+			return is;
 		} catch (IOException e) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), null, e);
+			setStateResourceNotAccessible(childStore, e);
+			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), e.getMessage(),
+					e);
+		} catch (URISyntaxException e) {
+			setStateResourceNotAccessible(childStore, e);
+			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), e.getMessage(),
+					e);
 		}
 	}
 
@@ -252,6 +283,12 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 			// no outgoing sync
 			if (direction == SyncDirection.INCOMING || direction == SyncDirection.BOTH) {
 				this.dropCache(semanticFileStore, monitor, this.deleteAllVisitor, status);
+				try {
+					clearStateResourceNotAccessible(semanticFileStore);
+				} catch (CoreException e) {
+					status.add(e.getStatus());
+					return;
+				}
 				this.fillCache(semanticFileStore, monitor, status);
 			}
 		} else {
@@ -328,6 +365,16 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 				// TODO 0.1 error handling
 				break;
 		}
+	}
+
+	private void setStateResourceNotAccessible(ISemanticFileStore childStore, Exception e) throws CoreException {
+		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE, TRUE);
+		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, e.getMessage());
+	}
+
+	private void clearStateResourceNotAccessible(ISemanticFileStore semanticFileStore) throws CoreException {
+		semanticFileStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE, null);
+		semanticFileStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, null);
 	}
 
 }

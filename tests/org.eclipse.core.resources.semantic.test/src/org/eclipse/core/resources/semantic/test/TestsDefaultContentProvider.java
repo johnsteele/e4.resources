@@ -12,6 +12,9 @@
 package org.eclipse.core.resources.semantic.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -31,6 +34,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
+import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
@@ -38,10 +42,11 @@ import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -53,14 +58,11 @@ import org.junit.Test;
 /**
  * Tests the default content provider
  */
-public class TestsDefaultContentProvider {
+public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
-	static final QualifiedName TEMPLATE_PROP = new QualifiedName(TestPlugin.PLUGIN_ID, "Hello");
-
-	final String projectName;
-	IProject testProject;
-	final int options;
-	final boolean autoRefresh;
+	private static final String UTF_8_CHARSET = "utf-8";
+	private static final String TEST = "test";
+	private static final String TEST2 = "test2";
 
 	/**
 	 * The default constructor
@@ -75,14 +77,7 @@ public class TestsDefaultContentProvider {
 	 * @param withAutoRefresh
 	 */
 	TestsDefaultContentProvider(boolean withAutoRefresh) {
-		this.projectName = "TestDefaultContentProvider";
-		if (withAutoRefresh) {
-			this.options = ISemanticFileSystem.NONE;
-			this.autoRefresh = true;
-		} else {
-			this.options = ISemanticFileSystem.SUPPRESS_REFRESH;
-			this.autoRefresh = false;
-		}
+		super(withAutoRefresh, "TestDefaultContentProvider", null);
 	}
 
 	/**
@@ -111,9 +106,9 @@ public class TestsDefaultContentProvider {
 	 * 
 	 * @throws Exception
 	 */
+	@Override
 	@Before
 	public void beforeMethod() throws Exception {
-
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
@@ -159,6 +154,7 @@ public class TestsDefaultContentProvider {
 	 * 
 	 * @throws Exception
 	 */
+	@Override
 	@After
 	public void afterMethod() throws Exception {
 
@@ -416,7 +412,8 @@ public class TestsDefaultContentProvider {
 	 */
 	@Test
 	@Ignore
-	// TODO fails due to some problem in RESTContentProvider.openInputStreamInternal (called upon a folder)
+	// TODO fails due to some problem in
+	// RESTContentProvider.openInputStreamInternal (called upon a folder)
 	public void testAddFileAndMoveFolder() throws Exception {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -497,20 +494,20 @@ public class TestsDefaultContentProvider {
 					sf.addFile("testFile", TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 				try {
 					sf.addFolder("testFolder", TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 				try {
 					sf.addResource("testResource", TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 				try {
@@ -518,14 +515,14 @@ public class TestsDefaultContentProvider {
 							TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 				try {
 					sf.createResourceRemotely("newRemoteResource", null, TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 				final ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
@@ -534,14 +531,14 @@ public class TestsDefaultContentProvider {
 					sFile.deleteRemotely(TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 				try {
 					sFile.revertChanges(TestsDefaultContentProvider.this.options, monitor);
 					Assert.fail("Should have failed");
 				} catch (CoreException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 			}
 		};
@@ -564,7 +561,7 @@ public class TestsDefaultContentProvider {
 					TestsDefaultContentProvider.this.testProject.move(new Path("SomeTarget"), false, monitor);
 					Assert.fail("Should have failed");
 				} catch (OperationCanceledException e) {
-					//$JL-EXC$ expected
+					// $JL-EXC$ expected
 				}
 
 			}
@@ -580,7 +577,8 @@ public class TestsDefaultContentProvider {
 	@Test
 	public void testTemplateMapping() throws Exception {
 
-		// we have a mapping to PlainTestContentProvider which does not allow to create local files
+		// we have a mapping to PlainTestContentProvider which does not allow to
+		// create local files
 		final IFolder pcpfolder = this.testProject.getFolder("PlainTestContentProvider");
 		pcpfolder.create(false, true, null);
 
@@ -628,4 +626,189 @@ public class TestsDefaultContentProvider {
 
 	}
 
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddFileWithURL() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+				try {
+					File testfile = createTestFile("test.txt");
+					boolean created = testfile.createNewFile();
+					if (!created) {
+						new FileOutputStream(testfile).close();
+					}
+
+					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+							monitor);
+					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
+						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					}
+
+					Util.safeClose(sfile.getAdaptedFile().getContents());
+
+					Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
+							.exists());
+
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddFileWithWrongURL() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+
+				if (sFolder.getAdaptedContainer().getFile(new Path("SomeFile")).exists()) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, "resource already exists"));
+				}
+
+				try {
+					sFolder.addFile("SomeFile", new URI("x:y"), TestsDefaultContentProvider.this.options, monitor);
+					Assert.assertTrue("addFile() should have failed", false);
+
+				} catch (CoreException e) {
+					// catch and continue
+					e.getMessage();
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddFileWithNonExistingURL() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+
+				if (sFolder.getAdaptedContainer().getFile(new Path("SomeFile")).exists()) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, "resource already exists"));
+				}
+
+				try {
+					File testfile = createTestFile("test.txt");
+					if (!testfile.delete()) {
+						throw new IOException("Cann't delete file " + testfile);
+					}
+
+					sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options, monitor);
+					Assert.assertTrue("addFile() should have failed", false);
+
+				} catch (CoreException e) {
+					// catch and continue
+					e.getMessage();
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSynchronize() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+				try {
+					File testfile = createTestFile("test.txt");
+
+					writeContentsToFile(testfile, TEST, UTF_8_CHARSET);
+
+					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+							monitor);
+					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
+						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					}
+
+					assertContentsEqual(sfile.getAdaptedFile(), TEST);
+
+					Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
+							.exists());
+
+					writeContentsToFile(testfile, TEST2, UTF_8_CHARSET);
+
+					sfile.synchronizeContentWithRemote(SyncDirection.INCOMING, TestsDefaultContentProvider.this.options, monitor);
+
+					assertContentsEqual(sfile.getAdaptedFile(), TEST2);
+
+					if (!testfile.delete()) {
+						throw new IOException("Cann't delete file " + testfile);
+					}
+
+					try {
+						sfile.synchronizeContentWithRemote(SyncDirection.INCOMING, TestsDefaultContentProvider.this.options, monitor);
+					} catch (CoreException e) {
+						// ignore and continue
+						e.getMessage();
+					}
+
+					try {
+						Util.safeClose(sfile.getAdaptedFile().getContents());
+					} catch (CoreException e) {
+						// ignore and continue
+						e.getMessage();
+					}
+
+					writeContentsToFile(testfile, TEST, UTF_8_CHARSET);
+
+					sfile.synchronizeContentWithRemote(SyncDirection.INCOMING, TestsDefaultContentProvider.this.options, monitor);
+
+					assertContentsEqual(sfile.getAdaptedFile(), TEST);
+
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+	}
 }

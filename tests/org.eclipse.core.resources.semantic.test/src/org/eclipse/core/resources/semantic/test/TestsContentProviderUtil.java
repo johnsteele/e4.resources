@@ -11,7 +11,12 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -252,4 +257,32 @@ public abstract class TestsContentProviderUtil {
 		}
 	}
 
+	public File createTestFile(String fileName) {
+		String tmpdir = System.getProperty("java.io.tmpdir");
+		File file = new File(tmpdir, fileName);
+		file.deleteOnExit();
+		return file;
+	}
+
+	public URI createURI4File(File file) throws URISyntaxException {
+		String filepath = file.getAbsolutePath().replace('\\', '/');
+
+		// Handle differences between Windows and UNIX
+		if (!filepath.startsWith("/")) {
+			filepath = "/" + filepath;
+		}
+
+		return new URI("file", "", filepath, null);
+	}
+
+	public void writeContentsToFile(File testfile, String contents, String encoding) throws FileNotFoundException, IOException,
+			UnsupportedEncodingException {
+		OutputStream os = new FileOutputStream(testfile);
+
+		try {
+			os.write(contents.getBytes(encoding));
+		} finally {
+			Util.safeClose(os);
+		}
+	}
 }
