@@ -170,8 +170,6 @@ public abstract class CachingContentProvider extends ContentProvider {
 		ICacheUpdateCallback callback = new ICacheUpdateCallback() {
 
 			public void cacheUpdated(InputStream newContent, long timestamp, boolean append) throws CoreException {
-				setResourceTimestamp(childStore, timestamp, monitor);
-
 				onCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 		};
@@ -405,7 +403,7 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * re-synchronize the cache content. In order to keep track of the cache
 	 * state, persistent properties could be used.
 	 * 
-	 * @param semanticFileStore
+	 * @param childStore
 	 *            the semantic file store
 	 * @param newContent
 	 *            the new cache content
@@ -418,9 +416,13 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * @param monitor
 	 *            may be null
 	 */
-	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long timestamp, boolean append,
+	public void onCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
 			IProgressMonitor monitor) {
-		// by default, we do nothing
+		try {
+			setResourceTimestamp(childStore, timestamp, monitor);
+		} catch (CoreException e) {
+			// TODO logging
+		}
 	}
 
 	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {
