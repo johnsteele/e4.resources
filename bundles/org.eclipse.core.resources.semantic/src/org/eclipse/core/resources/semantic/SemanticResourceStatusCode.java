@@ -193,7 +193,14 @@ public enum SemanticResourceStatusCode {
 	/**
 	 * Error creating cache file
 	 */
-	FILECACHE_CACHEFILE_CREATION_FAILED(98);
+	FILECACHE_CACHEFILE_CREATION_FAILED(98),
+
+	/**
+	 * Semantic File Store not accessible
+	 * 
+	 * @since 0.2
+	 */
+	NOT_ACCESSIBLE(99);
 
 	/**
 	 * The plug-in ID

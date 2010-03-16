@@ -666,11 +666,18 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 		final IFile file = parent.getFile("File1");
 
-		final ISemanticFile sfile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+		final ISemanticFolder sf = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
+
+				ISemanticFile sfile = sf.addFile("File1", TestsContentProviderBase.this.options, null);
+				if (!TestsContentProviderBase.this.autoRefresh) {
+					Assert.assertEquals("File existence", false, file.exists());
+					sf.getAdaptedContainer().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				}
+				Assert.assertEquals("File existence", true, file.exists());
 
 				ISemanticResourceInfo info = sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKING_SUPPORTED, monitor);
 				if (!info.isLockingSupported()) {
@@ -680,9 +687,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
 				sfile.lockResource(TestsContentProviderBase.this.options, monitor);
-				Assert
-						.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
-								.isLocked());
+				Assert.assertTrue("Should be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor).isLocked());
 				sfile.unlockResource(TestsContentProviderBase.this.options, monitor);
 				Assert.assertFalse("Should not be locked", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, monitor)
 						.isLocked());
@@ -1174,17 +1179,27 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		final IFolder root = this.testProject.getFolder("root");
 		final IFolder parent = root.getFolder("Folder1");
 		final IFile file = parent.getFile("File1");
-		ISemanticFile sf = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+		final ISemanticFolder sf = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
 
-		Assert.assertFalse("File should not be read-only", sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
-				.isReadOnly());
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
-		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
-		IFileInfo info = new FileInfo();
-		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, true);
-		store.putInfo(info, EFS.SET_ATTRIBUTES, null);
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFile sfile = sf.addFile("File1", TestsContentProviderBase.this.options, monitor);
 
-		Assert.assertTrue("File should be read-only", sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null).isReadOnly());
+				Assert.assertTrue("File should be read-only", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null)
+						.isReadOnly());
+
+				ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+				IFileInfo info = new FileInfo();
+				info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, false);
+				store.putInfo(info, EFS.SET_ATTRIBUTES, null);
+
+				Assert.assertFalse("File should not be read-only", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY,
+						null).isReadOnly());
+
+			}
+		};
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
 
 	}
 

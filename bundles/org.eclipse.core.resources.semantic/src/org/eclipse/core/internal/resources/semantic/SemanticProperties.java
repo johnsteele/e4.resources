@@ -17,6 +17,8 @@ import java.util.Map;
 import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode;
 import org.eclipse.core.resources.semantic.ISemanticProperties;
+import org.eclipse.core.resources.semantic.SemanticResourceException;
+import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -69,6 +71,8 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(), getPathForTrace().toString());
 		}
+
+		checkAccessible();
 
 		Map<QualifiedName, String> result = new HashMap<QualifiedName, String>();
 		try {
@@ -137,6 +141,8 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(), getPathForTrace().toString());
 		}
 
+		checkAccessible();
+
 		Util.assertQualifiedNameValid(key);
 
 		String keyString = Util.qualifiedNameToString(key);
@@ -178,6 +184,8 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(), getPathForTrace().toString());
 		}
 
+		checkAccessible();
+
 		Util.assertQualifiedNameValid(key);
 
 		try {
@@ -208,6 +216,8 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.CORE_VERBOSE.getLocation(), getPathForTrace().toString());
 		}
+
+		checkAccessible();
 
 		Map<QualifiedName, Object> result = new HashMap<QualifiedName, Object>();
 
@@ -258,4 +268,50 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 		}
 	}
 
+	/**
+	 * Similar to
+	 * <code>org.eclipse.core.internal.resources.Resource#checkAccessible(int)</code>
+	 * <p>
+	 * The corresponding Resource method is called on:
+	 * <ul>
+	 * <li>Container.memebers()</li>
+	 * <li>Container.setDefaultCharset()</li>
+	 * <li>File.appendContents()</li>
+	 * <li>File.create() (on the parent)</li>
+	 * <li>File.getContentDescription()</li>
+	 * <li>File.getContents()</li>
+	 * <li>File.getEncoding()</li>
+	 * <li>File.setCharset()</li>
+	 * <li>File.setContents()</li>
+	 * <li>Folder.create() (on the parent)</li>
+	 * <li>Project.checkAccessible()</li>
+	 * <li>Project.getDescription()</li>
+	 * <li>Project.getNature()</li>
+	 * <li>Project.getReferencedProjects()</li>
+	 * <li>Project.hasNature</li>
+	 * <li>Project.isNatureEnabled()</li>
+	 * <li>Project.setDescription()</li>
+	 * <li>Resource.accept()</li>
+	 * <li>Resource.createLink()</li>
+	 * <li>Resource.copy()</li>
+	 * <li>Resource.move()</li>
+	 * <li>Resource.createMarker()</li>
+	 * <li>Resource.deleteMarkers()</li>
+	 * <li>Resource.findMarkers()</li>
+	 * <li>Resource.findMaxProblemSeverity()</li>
+	 * <li>Resource.setDerived()</li>
+	 * <li>Resource.setHidden()</li>
+	 * <li>Resource.setTeamPrivateMember()</li>
+	 * </ul>
+	 * 
+	 * @throws CoreException
+	 */
+	protected void checkAccessible() throws CoreException {
+
+		if (!node.isExists()) {
+			throw new SemanticResourceException(SemanticResourceStatusCode.PROJECT_NOT_ACCESSIBLE, getPathForTrace(),
+					Messages.SemanticProperties_StoreNotAccessible_XMSG);
+		}
+
+	}
 }

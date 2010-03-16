@@ -176,6 +176,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_UpdateFileInfo_XMSG, getPath().toString()));
 		}
 
+		checkAccessible();
+
 		if ((options & EFS.SET_ATTRIBUTES) != 0) {
 			// we ignore Archive, Hidden, and Executable here
 			getEffectiveContentProvider().setReadOnly(this, info.getAttribute(EFS.ATTRIBUTE_READ_ONLY), monitor);
@@ -261,7 +263,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		// this cache
 		// non-caching content providers can not support this
 		// TODO 0.1: think of a more generic solution
-		if (options != EFS.CACHE) {
+
+		if (options != EFS.CACHE && this.node.isExists()) {
 			ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 			if (effectiveProvider instanceof ISemanticContentProviderLocal) {
 				return ((ISemanticContentProviderLocal) effectiveProvider).toLocalFile(this);
@@ -379,6 +382,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
+
+		checkAccessible();
 
 		try {
 			this.fs.lockForRead();
@@ -822,6 +827,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void synchronizeContentWithRemote(SyncDirection direction, IProgressMonitor monitor) throws CoreException {
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -833,6 +839,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_SynchContent_XMSG, effectiveProvider.getClass().getName(), getPath().toString()));
 
 		}
+
+		checkAccessible();
+
 		MultiStatus status = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
 				Messages.SemanticFileStore_SyncContent_XGRP, getPath().toString()), null);
 		effectiveProvider.synchronizeContentWithRemote(this, direction, monitor, status);
@@ -842,11 +851,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void setRemoteURI(URI uri, IProgressMonitor monitor) throws CoreException {
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
+
+		checkAccessible();
 
 		// delegate to content provider
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
@@ -869,6 +881,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void revertChanges(IProgressMonitor monitor) throws CoreException {
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
@@ -880,6 +893,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
 					NLS.bind(Messages.SemanticFileStore_Revert_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
+
+		checkAccessible();
 
 		effectiveProvider.revertChanges(this, monitor);
 	}
@@ -897,6 +912,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
 					NLS.bind(Messages.SemanticFileStore_Locking_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
+
+		checkAccessible();
 
 		if (effectiveProvider instanceof ISemanticContentProviderLocking) {
 			return ((ISemanticContentProviderLocking) effectiveProvider).lockResource(this, monitor);
@@ -921,6 +938,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_Unlocking_XMSG, getPath().toString(), effectiveProvider.getClass().getName()));
 		}
 
+		checkAccessible();
+
 		if (effectiveProvider instanceof ISemanticContentProviderLocking) {
 			return ((ISemanticContentProviderLocking) effectiveProvider).unlockResource(this, monitor);
 		}
@@ -938,6 +957,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		ISemanticContentProvider effectiveProvider;
 		try {
+			checkAccessible();
 			effectiveProvider = getEffectiveContentProvider();
 		} catch (CoreException ce) {
 			this.log.log(ce);
@@ -965,6 +985,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		try {
+			checkAccessible();
+		} catch (CoreException e) {
+			return e.getStatus();
 		}
 
 		boolean canBeDeleted;
@@ -1014,6 +1040,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		boolean canBeDeleted;
 		ISemanticContentProvider effectiveProvider;
 		try {
+
 			effectiveProvider = getEffectiveContentProvider();
 
 		} catch (CoreException e) {
@@ -1059,6 +1086,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddChildFolder_XMSG, name, getPath().toString()));
 		}
 
+		checkAccessible();
+
 		try {
 			this.fs.lockForWrite();
 			ResourceTreeNode child = checkChildExists(name);
@@ -1089,6 +1118,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), message);
 
 		}
+
+		checkAccessible();
 
 		try {
 			this.fs.lockForWrite();
@@ -1123,6 +1154,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddChildFile_XMSG, name, getPath().toString()));
 		}
 
+		checkAccessible();
+
 		try {
 			this.fs.lockForWrite();
 			ResourceTreeNode child = checkChildExists(name);
@@ -1147,6 +1180,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddLocalChild_XMSG, name, getPath().toString()));
 		}
 
+		checkAccessible();
+
 		try {
 			this.fs.lockForWrite();
 			ResourceTreeNode child = checkChildExists(name);
@@ -1160,6 +1195,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public boolean hasResource(String name) {
+
 		try {
 			this.fs.lockForRead();
 			EList<ResourceTreeNode> children = this.node.getChildren();
@@ -1184,6 +1220,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public String getRemoteURIString() throws CoreException {
+
+		checkAccessible();
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
@@ -1328,7 +1367,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				if (resourceTreeNode.getName().equals(name)) {
 					children.remove(resourceTreeNode);
 
-					resourceTreeNode.setExists(false);
+					cleanupNode(resourceTreeNode);
 
 					this.fs.requestURILocatorRebuild();
 					break;
@@ -1339,6 +1378,15 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		} finally {
 			this.fs.unlockForWrite();
 		}
+	}
+
+	private void cleanupNode(ResourceTreeNode resourceTreeNode) {
+		resourceTreeNode.setExists(false);
+
+		resourceTreeNode.setPersistentProperties(null);
+		resourceTreeNode.setSessionProperties(null);
+
+		// TODO cleanup children
 	}
 
 	public IStatus validateEdit(Object shell) {
@@ -1474,9 +1522,6 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	public void remove(IProgressMonitor monitor) throws CoreException {
 
-		// TODO how do we deal with "removed" stores wrt getPath and other
-		// methods?
-
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
@@ -1517,7 +1562,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 				this.node.getChildren().clear();
 
-				this.node.setExists(false);
+				this.cleanupNode(node);
 
 				this.fs.requestFlush(false);
 
@@ -1544,6 +1589,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticFileStoreInternal getChildResource(String name) {
+		// TODO checkAccessible()??
 		return findChild(name);
 	}
 

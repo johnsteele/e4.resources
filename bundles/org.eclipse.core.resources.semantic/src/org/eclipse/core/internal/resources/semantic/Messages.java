@@ -56,6 +56,7 @@ public class Messages extends NLS {
 	public static String SemanticFileSystem_SFSInitError_XMSG;
 	public static String SemanticFileSystem_SFSUpdateError_XMSG;
 	public static String SemanticFileSystemCore_TemplateIdNotFound_XMSG;
+	public static String SemanticProperties_StoreNotAccessible_XMSG;
 	public static String SemanticResourceAdapterImpl_CalledOutsideRule_XMSG;
 	public static String SemanticResourceAdapterImpl_JobNoRule_XMSG;
 	public static String SemanticResourceAdapterImpl_NoSemanticStore_XMSG;

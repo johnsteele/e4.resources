@@ -627,6 +627,12 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath);
 		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath2);
 
+		try {
+			store.getPersistentProperties();
+			Assert.assertTrue("GetPersistentProperties should have failed.", false);
+		} catch (CoreException e) {
+			// ignore
+		}
 	}
 
 	/**
