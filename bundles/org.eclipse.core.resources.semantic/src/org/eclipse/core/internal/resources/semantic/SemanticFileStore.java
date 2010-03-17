@@ -83,12 +83,22 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForRead();
 			EList<ResourceTreeNode> children = this.node.getChildren();
-			String[] names = new String[children.size()];
+			int counter = 0;
+
+			for (ResourceTreeNode resourceTreeNode : children) {
+				if (resourceTreeNode.isExists()) {
+					counter++;
+				}
+			}
+
+			String[] names = new String[counter];
 			int i = 0;
 
 			for (ResourceTreeNode resourceTreeNode : children) {
-				names[i] = resourceTreeNode.getName();
-				i++;
+				if (resourceTreeNode.isExists()) {
+					names[i] = resourceTreeNode.getName();
+					i++;
+				}
 			}
 			return names;
 		} finally {
@@ -1380,13 +1390,22 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
-	private void cleanupNode(ResourceTreeNode resourceTreeNode) {
+	private void cleanupNode(ResourceTreeNode resourceTreeNode) throws CoreException {
 		resourceTreeNode.setExists(false);
 
 		resourceTreeNode.setPersistentProperties(null);
 		resourceTreeNode.setSessionProperties(null);
 
-		// TODO cleanup children
+		// TODO cleanup children, run a check for now
+		boolean checkChildren = false;
+		if (checkChildren) {
+			EList<ResourceTreeNode> children = resourceTreeNode.getChildren();
+			for (ResourceTreeNode resourceTreeNode2 : children) {
+				if (resourceTreeNode2.isExists()) {
+					throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "children not empty")); //$NON-NLS-1$
+				}
+			}
+		}
 	}
 
 	public IStatus validateEdit(Object shell) {
