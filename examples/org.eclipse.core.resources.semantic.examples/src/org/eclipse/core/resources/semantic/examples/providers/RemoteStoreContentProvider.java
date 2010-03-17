@@ -38,6 +38,7 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderRemote;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticRevisionStorage;
@@ -528,6 +529,50 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 	public IStatus validateSave(ISemanticFileStore semanticFileStore) {
 		return validateEdit(new ISemanticFileStore[] {semanticFileStore}, null);
+	}
+
+	@Override
+	public ISemanticResourceRuleFactory getRuleFactory() {
+		// we always return the project, as the RemoteStore may need
+		// to update the xml file in the project
+		return new ISemanticResourceRuleFactory() {
+
+			public ISemanticFileStore validateEditRule(ISemanticFileStore[] stores) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore refreshRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore moveRule(ISemanticFileStore source, ISemanticFileStore destination) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore modifyRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore markerRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore deleteRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore createRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore copyRule(ISemanticFileStore source, ISemanticFileStore destination) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+
+			public ISemanticFileStore charsetRule(ISemanticFileStore store) {
+				return (ISemanticFileStore) getRootStore().getParent();
+			}
+		};
 	}
 
 }
