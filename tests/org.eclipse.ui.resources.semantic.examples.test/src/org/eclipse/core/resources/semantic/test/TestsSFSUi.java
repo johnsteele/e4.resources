@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.compare.CompareEditorInput;
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.Util;
 import org.eclipse.core.resources.IFile;
@@ -45,11 +42,16 @@ import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Display;
@@ -58,19 +60,18 @@ import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemConfiguration;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
+import org.eclipse.ui.texteditor.ConfigurationElementSorter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -675,31 +676,61 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	private void runCommandByAction(final String actionName, final ISemanticResource resource) throws Exception {
 
 		// make sure project explorer is selected
-		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-				"org.eclipse.ui.navigator.ProjectExplorer"); // Project
-		// Explorer
-		// view
-		// id is
-		// hard-coded
-		// for
-		// 3.4
-		// compatibility
+		// Project Explorer view id is hard-coded for 3.4 compatibility
+		final IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
+				"org.eclipse.ui.navigator.ProjectExplorer");
 
-		ICommandService csrv = (ICommandService) part.getSite().getService(ICommandService.class);
-		Command commandToRun = csrv.getCommand("org.eclipse.core.resources.semantic.ui." + actionName);
+		final String id = "org.eclipse.core.resources.semantic.ui." + actionName;
+		final IObjectActionDelegate delegate = findDelegate(id);
+		final IAction action = new Action() {
+			//
+		};
 
-		if (commandToRun == null || !commandToRun.isDefined()) {
-			throw new RuntimeException("Command not found for " + actionName);
+		delegate.setActivePart(action, part);
+		delegate.selectionChanged(action, new StructuredSelection(resource));
+		delegate.run(action);
+
+		return;
+	}
+
+	IObjectActionDelegate findDelegate(String delegateID) throws CoreException {
+		List<IConfigurationElement> configElements = new ArrayList<IConfigurationElement>();
+		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(PlatformUI.PLUGIN_ID, "popupMenus"); //$NON-NLS-1$ 
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
+			if ("objectContribution".equals(element.getName())) {
+				IConfigurationElement[] children = element.getChildren("action"); //$NON-NLS-1$ 
+				for (int j = 0; j < children.length; j++) {
+					IConfigurationElement child = children[j];
+					if (delegateID.equals(child.getAttribute("definitionId"))) {//$NON-NLS-1$ 
+						configElements.add(child);
+					}
+				}
+			}
 		}
 
-		IHandlerService srv = (IHandlerService) part.getSite().getService(IHandlerService.class);
-		IEvaluationContext ctx = srv.createContextSnapshot(true);
-		ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, new StructuredSelection(resource));
-		ctx.addVariable(ISources.ACTIVE_MENU_SELECTION_NAME, new StructuredSelection(resource));
+		int actionSize = configElements.size();
+		if (actionSize > 0) {
+			IConfigurationElement element;
+			if (actionSize > 1) {
+				IConfigurationElement[] actionArray = configElements.toArray(new IConfigurationElement[actionSize]);
+				ConfigurationElementSorter sorter = new ConfigurationElementSorter() {
 
-		ExecutionEvent event = new ExecutionEvent(commandToRun, new HashMap<String, String>(), resource, ctx);
-		commandToRun.executeWithChecks(event);
+					@Override
+					public IConfigurationElement getConfigurationElement(Object object) {
+						return (IConfigurationElement) object;
+					}
+				};
+				sorter.sort(actionArray);
+				element = actionArray[0];
+			} else {
+				element = configElements.get(0);
+			}
 
+			return (IObjectActionDelegate) element.createExecutableExtension("class");
+		}
+
+		throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, "No object contribution found for " + delegateID));
 	}
 
 }
