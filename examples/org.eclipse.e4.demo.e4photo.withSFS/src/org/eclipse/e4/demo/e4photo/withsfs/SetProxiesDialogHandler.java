@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.e4.demo.e4photo.withsfs;
 
-import org.eclipse.e4.core.services.context.IEclipseContext;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;

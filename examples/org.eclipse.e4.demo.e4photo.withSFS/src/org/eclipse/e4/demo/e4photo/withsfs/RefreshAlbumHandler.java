@@ -23,7 +23,7 @@ import org.eclipse.core.resources.semantic.ISemanticProject;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.e4.core.services.context.IEclipseContext;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
