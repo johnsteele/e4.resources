@@ -50,13 +50,15 @@ public class SemanticLightweightDecorator implements ILightweightLabelDecorator 
 				try {
 					int options = ISemanticFileSystem.RESOURCE_INFO_LOCAL_ONLY | ISemanticFileSystem.RESOURCE_INFO_LOCKED
 							| ISemanticFileSystem.RESOURCE_INFO_READ_ONLY;
-					ISemanticResourceInfo attrs = sresource.fetchResourceInfo(options, null);
-					if (attrs.isLocalOnly()) {
-						decoration.addOverlay(SemanticLightweightDecorator.LOCAL_IMAGE, IDecoration.BOTTOM_RIGHT);
-					} else if (attrs.isLocked()) {
-						decoration.addOverlay(SemanticLightweightDecorator.LOCKED_IMAGE, IDecoration.BOTTOM_RIGHT);
-					} else if (!attrs.isReadOnly()) {
-						decoration.addOverlay(SemanticLightweightDecorator.EDIT_IMAGE, IDecoration.BOTTOM_RIGHT);
+					if (sresource.getAdaptedResource().exists()) {
+						ISemanticResourceInfo attrs = sresource.fetchResourceInfo(options, null);
+						if (attrs.isLocalOnly()) {
+							decoration.addOverlay(SemanticLightweightDecorator.LOCAL_IMAGE, IDecoration.BOTTOM_RIGHT);
+						} else if (attrs.isLocked()) {
+							decoration.addOverlay(SemanticLightweightDecorator.LOCKED_IMAGE, IDecoration.BOTTOM_RIGHT);
+						} else if (!attrs.isReadOnly()) {
+							decoration.addOverlay(SemanticLightweightDecorator.EDIT_IMAGE, IDecoration.BOTTOM_RIGHT);
+						}
 					}
 				} catch (CoreException e) {
 					// $JL-EXC$ ignore

@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
@@ -27,6 +28,7 @@ import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBFactory;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType;
+import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot;
 import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemLog;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
@@ -82,14 +84,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		try {
 			this.fs.lockForRead();
-			EList<ResourceTreeNode> children = this.node.getChildren();
-			int counter = 0;
 
-			for (ResourceTreeNode resourceTreeNode : children) {
-				if (resourceTreeNode.isExists()) {
-					counter++;
-				}
-			}
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
+			EList<ResourceTreeNode> children = this.node.getChildren();
+			int counter = children.size();
 
 			String[] names = new String[counter];
 			int i = 0;
@@ -109,6 +108,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	@Override
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
 		FileInfo info;
+
+		this.checkAndJoinTreeIfAnotherEntryExists();
 
 		ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 		boolean askContentProviderForReadonly = false;
@@ -211,10 +212,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticContentProvider getEffectiveContentProvider() throws CoreException {
-
-		String contentProviderID;
 		ISemanticFileStore parentStore;
-		String parentContentProviderId = null;
+		String parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
+		ResourceTreeNode parent = null;
+		ResourceTreeNode cpRootParent;
 
 		try {
 			this.fs.lockForWrite();
@@ -223,42 +224,111 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				return this.provider;
 			}
 
-			contentProviderID = this.node.getTemplateID();
-			if (contentProviderID == null) {
-				// walk up to find a contentProviderID
-				ResourceTreeNode parent = this.node.getParent();
-				ResourceTreeNode oldParent = this.node;
+			this.checkAndJoinTreeIfAnotherEntryExists();
 
-				while (parent != null) {
-					parentContentProviderId = parent.getTemplateID();
-					if (parentContentProviderId != null) {
+			if (this.node.getTemplateID() != null) {
+				String contentProviderID = this.node.getTemplateID();
+				// TODO move outside of lock
+				initProvider(contentProviderID, this);
+
+				if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+					SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
+				}
+
+				return this.provider;
+			}
+
+			List<ResourceTreeNode> nodes;
+
+			if (!this.node.isExists()) {
+				nodes = this.fs.getNodesByPath(this.node.getPath());
+				// go down to find a contentProviderID
+				cpRootParent = nodes.get(0);
+				int counter = 0;
+
+				// scan the existing part where CP IDs are already assigned
+				for (ResourceTreeNode resourceTreeNode : nodes) {
+					if (resourceTreeNode.isExists()) {
+						if (resourceTreeNode.getTemplateID() != null) {
+							parentContentProviderId = resourceTreeNode.getTemplateID();
+							cpRootParent = resourceTreeNode;
+						}
+						counter++;
+					} else {
 						break;
 					}
-					oldParent = parent;
-
-					parent = parent.getParent();
 				}
-				if (parentContentProviderId == null) {
-					parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
-					parent = oldParent;
-				}
-				// construct the parent
-				parentStore = this.fs.getStore(parent);
 
-				// the first parent with a provider ID
+				// construct the root parent
+				parentStore = this.fs.getStore(cpRootParent);
+
+				// TODO move outside of lock?
 				ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, parentStore);
 
-				return parentProvider;
+				// scan through non existing part
+				for (int i = counter; i < nodes.size(); i++) {
+					ResourceTreeNode resourceTreeNode = nodes.get(i);
 
+					if (parentProvider instanceof ISemanticContentProviderFederation) {
+						String federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider)
+								.getFederatedProviderIDForPath(new Path(resourceTreeNode.getPath()));
+
+						if (federatedContentProviderId != null) {
+							parentContentProviderId = federatedContentProviderId;
+							cpRootParent = resourceTreeNode;
+							parentStore = this.fs.getStore(cpRootParent);
+							// TODO move outside of lock?
+							parentProvider = initProvider(parentContentProviderId, parentStore);
+						}
+					}
+				}
+
+				if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+					SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
+				}
+
+				return parentProvider;
 			}
-			initProvider(contentProviderID, this);
+
+			// walk up to find a contentProviderID
+			parent = this.node.getParent();
+
+			if (parent == null) {
+				// this is a root store with default content provider
+				ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, this);
+
+				return parentProvider;
+			}
+
+			ResourceTreeNode oldParent = this.node;
+
+			while (parent != null) {
+				parentContentProviderId = parent.getTemplateID();
+				if (parentContentProviderId != null) {
+					break;
+				}
+				oldParent = parent;
+
+				parent = parent.getParent();
+			}
+
+			if (parentContentProviderId == null) {
+				parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
+				parent = oldParent;
+			}
+
+			// construct the parent
+			parentStore = this.fs.getStore(parent);
+
+			// TODO move outside of lock?
+			// the first parent with a provider ID
+			ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, parentStore);
 
 			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
-				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
 			}
 
-			return this.provider;
-
+			return parentProvider;
 		} finally {
 			this.fs.unlockForWrite();
 		}
@@ -273,6 +343,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		// this cache
 		// non-caching content providers can not support this
 		// TODO 0.1: think of a more generic solution
+
+		this.checkAndJoinTreeIfAnotherEntryExists();
 
 		if (options != EFS.CACHE && this.node.isExists()) {
 			ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
@@ -320,18 +392,19 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					.append(name));
 		}
 
-		SemanticFileStore result;
+		ISemanticFileStore result;
 		try {
 			this.fs.lockForWrite();
 
-			ResourceTreeNode child = checkChildExists(name);
+			this.checkAndJoinTreeIfAnotherEntryExists();
 
-			ResourceTreeNode newnode = createLocalChildNode(name, child, federatedContentProviderId);
+			checkChildExists(name);
+
+			IPath childPath = this.getPath().append(name);
+
+			ResourceTreeNode newnode = createLocalChildNode(name, childPath, federatedContentProviderId);
 
 			result = this.fs.getStore(newnode);
-
-			this.fs.requestFlush(false);
-
 		} catch (CoreException e) {
 			if (SfsTraceLocation.CORE.isActive()) {
 				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
@@ -366,6 +439,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public String getName() {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			return this.node.getName();
 		} finally {
 			this.fs.unlockForRead();
@@ -376,8 +452,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public IFileStore getParent() {
 		try {
 			this.fs.lockForRead();
-			if (this.node.getParent() != null) {
-				return this.fs.getStore(this.node.getParent());
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
+			ResourceTreeNode parentNode = this.fs.getParentNode(this.node);
+			if (parentNode != null) {
+				return this.fs.getStore(parentNode);
 			}
 			return null;
 
@@ -429,6 +509,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
 
+		this.checkAndJoinTreeIfAnotherEntryExists();
+
 		try {
 			this.fs.lockForRead();
 			TreeNodeType type = this.node.getType();
@@ -470,12 +552,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		OutputStream os = effectiveProvider.openOutputStream(this, actOptions, monitor);
 
 		try {
-
 			this.fs.lockForWrite();
 
 			boolean changeRequired = !this.node.isExists() || this.node.getType() != TreeNodeType.FILE;
 			if (changeRequired) {
-				this.node.setExists(true);
+				this.fs.switchToExists(this.node, this.fs.getParentNode(this.node));
 				this.node.setType(TreeNodeType.FILE);
 				try {
 					this.fs.requestFlush(false);
@@ -521,57 +602,36 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForWrite();
 
-			ResourceTreeNode parent = this.node.getParent();
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
+			ResourceTreeNode parent = this.fs.getParentNode(this.node);
+			ISemanticContentProvider parentProvider = null;
 
 			if ((options & EFS.SHALLOW) != 0) {
 				if (parent != null && !parent.isExists()) {
 					throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_PARENT_DOESNT_EXIST, getPath(),
 							Messages.SemanticFileStore_ShallowMkDirFailed_XMSG);
+				} else if (parent != null) { // and exists
+					parentProvider = fs.getStore(parent).getEffectiveContentProvider();
+				} else { // parent == null
+					parentProvider = getEffectiveContentProvider();
 				}
 			} else {
 				if (parent != null && !parent.isExists()) {
-					mkdir(parent);
+					parentProvider = this.fs.mkdir(parent, this.fs.getParentNode(parent));
+				} else if (parent != null) { // and exists
+					parentProvider = fs.getStore(parent).getEffectiveContentProvider();
+				} else { // parent == null
+					parentProvider = getEffectiveContentProvider();
 				}
 			}
-			makeFolder(this.node);
+			this.fs.makeFolder(this.node, parent, parentProvider);
 
 		} finally {
 			this.fs.unlockForWrite();
 		}
 
 		return this;
-	}
-
-	private static void mkdir(ResourceTreeNode actNode) throws CoreException {
-
-		ResourceTreeNode parent = actNode.getParent();
-		if (parent != null && !parent.isExists()) {
-			mkdir(parent);
-		}
-
-		makeFolder(actNode);
-
-	}
-
-	private static void makeFolder(ResourceTreeNode actNode) throws CoreException {
-
-		if (actNode.getType() == TreeNodeType.FILE) {
-			// wrong type encountered
-			SemanticFileSystem fs = (SemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME);
-			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, fs.getStore(actNode).getPath(),
-					Messages.SemanticFileStore_MkDirOnFile_XMSG);
-		}
-		if (!actNode.isExists()) {
-			// TODO 0.1: this should be intercepted by the content provider to
-			// avoid unwanted folder creation
-
-			actNode.setExists(true);
-		}
-
-		if (actNode.getType() != TreeNodeType.PROJECT) {
-			// set type folder if it is not already a project
-			actNode.setType(TreeNodeType.FOLDER);
-		}
 	}
 
 	//
@@ -800,6 +860,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
 
+		this.checkAndJoinTreeIfAnotherEntryExists();
+
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
@@ -819,11 +881,11 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public void removeFromWorkspace(IProgressMonitor monitor) throws CoreException {
-		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
-
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
+
+		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 
@@ -833,16 +895,17 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 							.getName()));
 		}
 
+		checkAccessible();
+
 		effectiveProvider.removeResource(this, monitor);
 	}
 
 	public void synchronizeContentWithRemote(SyncDirection direction, IProgressMonitor monitor) throws CoreException {
-
-		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
-
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
+
+		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 			SfsTraceLocation.getTrace().trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
@@ -1047,6 +1110,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
 
+		try {
+			checkAccessible();
+		} catch (CoreException e) {
+			return e.getStatus();
+		}
+
 		boolean canBeDeleted;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -1096,13 +1165,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddChildFolder_XMSG, name, getPath().toString()));
 		}
 
-		checkAccessible();
-
 		try {
 			this.fs.lockForWrite();
-			ResourceTreeNode child = checkChildExists(name);
 
-			createChildNode(name, true, child, null);
+			checkAccessible();
+
+			checkChildExists(name);
+
+			createChildNode(name, true, null);
 
 			this.fs.requestFlush(false);
 		} finally {
@@ -1129,12 +1199,13 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		}
 
-		checkAccessible();
-
 		try {
 			this.fs.lockForWrite();
-			ResourceTreeNode oldchild = checkChildExists(name);
-			ResourceTreeNode child = createChildNode(name, asFolder, oldchild, contentProviderID);
+
+			checkAccessible();
+
+			checkChildExists(name);
+			ResourceTreeNode child = createChildNode(name, asFolder, contentProviderID);
 
 			HashMap<String, String> propsMap = new HashMap<String, String>();
 			if (properties != null && !properties.isEmpty()) {
@@ -1164,13 +1235,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddChildFile_XMSG, name, getPath().toString()));
 		}
 
-		checkAccessible();
-
 		try {
 			this.fs.lockForWrite();
-			ResourceTreeNode child = checkChildExists(name);
 
-			createChildNode(name, false, child, null);
+			checkAccessible();
+
+			checkChildExists(name);
+
+			createChildNode(name, false, null);
 
 			this.fs.requestFlush(false);
 		} finally {
@@ -1190,13 +1262,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_AddLocalChild_XMSG, name, getPath().toString()));
 		}
 
-		checkAccessible();
-
 		try {
 			this.fs.lockForWrite();
-			ResourceTreeNode child = checkChildExists(name);
 
-			createLocalChildNode(name, child, contentProviderID);
+			checkAccessible();
+
+			checkChildExists(name);
+
+			createLocalChildNode(name, this.getPath().append(name), contentProviderID);
 
 			this.fs.requestFlush(false);
 		} finally {
@@ -1208,6 +1281,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			EList<ResourceTreeNode> children = this.node.getChildren();
 			for (ResourceTreeNode resourceTreeNode : children) {
 				if (resourceTreeNode.getName().equals(name)) {
@@ -1223,6 +1299,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public String getContentProviderID() {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			return this.node.getTemplateID();
 		} finally {
 			this.fs.unlockForRead();
@@ -1247,6 +1326,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public boolean isExists() {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			return this.node.isExists();
 		} finally {
 			this.fs.unlockForRead();
@@ -1256,6 +1338,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public boolean isLocalOnly() {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			return this.node.isLocalOnly();
 		} finally {
 			this.fs.unlockForRead();
@@ -1271,11 +1356,14 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	private SemanticFileStore findChild(String name) {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			EList<ResourceTreeNode> children = this.node.getChildren();
 
 			for (ResourceTreeNode resourceTreeNode : children) {
 				if (resourceTreeNode.getName().equals(name)) {
-					return this.fs.getStore(resourceTreeNode);
+					return (SemanticFileStore) this.fs.getStore(resourceTreeNode);
 				}
 			}
 		} finally {
@@ -1284,15 +1372,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return null;
 	}
 
-	private ResourceTreeNode createChildNode(String name, boolean isFolder, ResourceTreeNode previous, String contentProviderID) {
+	private ResourceTreeNode createChildNode(String name, boolean isFolder, String contentProviderID) {
 		// all callers have a lock, so we don't lock here
-		ResourceTreeNode child;
-
-		if (previous != null) {
-			child = previous;
-		} else {
-			child = SemanticResourceDBFactory.eINSTANCE.createResourceTreeNode();
-		}
+		ResourceTreeNode child = SemanticResourceDBFactory.eINSTANCE.createResourceTreeNode();
 
 		child.setName(name);
 		child.setTemplateID(contentProviderID);
@@ -1312,22 +1394,16 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return child;
 	}
 
-	private ResourceTreeNode createLocalChildNode(String name, ResourceTreeNode previous, String contentProviderID) {
+	private ResourceTreeNode createLocalChildNode(String name, IPath childPath, String contentProviderID) {
 		// all callers have a lock, so we don't lock here
-		ResourceTreeNode child;
-
-		if (previous != null) {
-			child = previous;
-		} else {
-			child = SemanticResourceDBFactory.eINSTANCE.createResourceTreeNode();
-		}
+		ResourceTreeNode child = SemanticResourceDBFactory.eINSTANCE.createResourceTreeNode();
 
 		child.setName(name);
 		child.setTemplateID(contentProviderID);
 		child.setType(TreeNodeType.UNKNOWN);
 		child.setExists(false); // needed to comply with resource creation
 		// behavior
-		child.setParent(this.node);
+		child.setPath(childPath.toString());
 		child.setLocalOnly(true);
 
 		return child;
@@ -1346,10 +1422,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	 * }
 	 */
 	/**
-	 * throws exception if child exists returns child node if node present but
-	 * not exists
+	 * throws exception if child exists
 	 */
-	private ResourceTreeNode checkChildExists(String name) throws CoreException {
+	private void checkChildExists(String name) throws CoreException {
 		// all callers have obtained a lock, so we don't lock here
 		EList<ResourceTreeNode> children = this.node.getChildren();
 
@@ -1360,33 +1435,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_ALREADY_EXISTS, newPath, NLS.bind(
 							Messages.SemanticFileStore_ResourceWithPathExists_XMSG, newPath.toString()));
 				}
-				return resourceTreeNode;
-
 			}
-		}
-		return null;
-	}
-
-	private void removeChild(String name) throws CoreException {
-
-		try {
-			this.fs.lockForWrite();
-			EList<ResourceTreeNode> children = this.node.getChildren();
-
-			for (ResourceTreeNode resourceTreeNode : children) {
-				if (resourceTreeNode.getName().equals(name)) {
-					children.remove(resourceTreeNode);
-
-					cleanupNode(resourceTreeNode);
-
-					this.fs.requestURILocatorRebuild();
-					break;
-				}
-			}
-
-			this.fs.requestFlush(false);
-		} finally {
-			this.fs.unlockForWrite();
 		}
 	}
 
@@ -1412,6 +1461,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		try {
+			checkAccessible();
+		} catch (CoreException e) {
+			return e.getStatus();
 		}
 
 		boolean canBeEdited;
@@ -1470,6 +1525,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
 		}
 
+		try {
+			checkAccessible();
+		} catch (CoreException e) {
+			return e.getStatus();
+		}
+
 		boolean canBeSaved;
 		ISemanticContentProvider effectiveProvider;
 		try {
@@ -1518,21 +1579,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForRead();
 
-			if (this.node.getPath() != null) {
-				return new Path(this.node.getPath());
-			}
+			this.checkAndJoinTreeIfAnotherEntryExists();
 
-			StringBuilder sb = new StringBuilder(50);
-			sb.append('/');
-			sb.append(this.node.getName());
-			ResourceTreeNode parent = this.node.getParent();
-			while (parent != null) {
-				sb.insert(0, parent.getName());
-				sb.insert(0, '/');
-				parent = parent.getParent();
-			}
-			return new Path(sb.toString());
-
+			return this.fs.getPathForNode(this.node);
 		} finally {
 			this.fs.unlockForRead();
 		}
@@ -1551,6 +1600,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_RemovingResource_XMSG, getPath().toString()));
 		}
 
+		this.checkAccessible();
+
 		IFileStore parent = getParent();
 
 		if (parent != null) {
@@ -1563,12 +1614,16 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					// meaningful after remove
 					this.node.setPath(getPath().toString());
 
+					this.node.setParent(null);
+
+					cleanupNode(this.node);
+
+					this.fs.requestFlush(false);
+
+					this.fs.requestURILocatorRebuild();
 				} finally {
 					this.fs.unlockForWrite();
 				}
-
-				SemanticFileStore sparent = (SemanticFileStore) parent;
-				sparent.removeChild(getName());
 			} else {
 				// TODO 0.1: this needs to be handled if a resource is contained
 				// in a non-Semantic container or possibly if it is a symbolic
@@ -1579,9 +1634,17 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			try {
 				this.fs.lockForWrite();
 
+				// keep the last path so that getPath returns something
+				// meaningful after remove
+				this.node.setPath(getPath().toString());
+
 				this.node.getChildren().clear();
 
 				this.cleanupNode(node);
+
+				if (this.node instanceof TreeRoot) {
+					((TreeRoot) this.node).setParentDB(null);
+				}
 
 				this.fs.requestFlush(false);
 
@@ -1593,6 +1656,8 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticResourceInfo fetchResourceInfo(int options, IProgressMonitor monitor) throws CoreException {
+		// checkAccessible();
+
 		ISemanticSpiResourceInfo providerInfo = getEffectiveContentProvider().fetchResourceInfo(this, options, monitor);
 		return new SemanticResourceInfo(options, providerInfo, isLocalOnly());
 	}
@@ -1600,6 +1665,9 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public int getType() {
 		try {
 			this.fs.lockForRead();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
 			return this.node.getType().getValue();
 		} finally {
 			this.fs.unlockForRead();

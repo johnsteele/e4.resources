@@ -34,6 +34,9 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticURILocatorService;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
+import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
+import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,8 +46,8 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
@@ -60,7 +63,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 	protected static final QualifiedName ATTRIBUTE_URI = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID, "URIString"); //$NON-NLS-1$ 
 
 	private static final String METADATA_FILENAME = "metadata.xmi"; //$NON-NLS-1$
-	private final static IPath EMPTY = new Path(""); //$NON-NLS-1$
+	final static IPath EMPTY = new Path(""); //$NON-NLS-1$
 
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	private final Lock readLock = this.rwl.readLock();
@@ -130,9 +133,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		return EFS.getNullFileSystem().getStore(uri);
 	}
 
-	private IFileStore getFileStoreImplementation(URI uri) {
-
-		String pathString = uri.getPath();
+	IFileStore getFileStoreImplementation(String pathString) {
 		IPath path;
 
 		if (pathString != null) {
@@ -188,6 +189,11 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		return EFS.getNullFileSystem().getStore(path);
 	}
 
+	private IFileStore getFileStoreImplementation(URI uri) {
+		String pathString = uri.getPath();
+		return getFileStoreImplementation(pathString);
+	}
+
 	private IFileStore getFileStoreRecursive(IPath path, ResourceTreeNode rootNode) {
 		String[] segments = path.segments();
 		ResourceTreeNode currentNode = rootNode;
@@ -213,10 +219,261 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		if (ready) {
 			return getStore(currentNode);
 		}
-		return EFS.getNullFileSystem().getStore(path);
+		return getStore(createNonExistingNode(path));
 	}
 
-	protected SemanticFileStore getStore(ResourceTreeNode node) {
+	ResourceTreeNode getParentNode(ResourceTreeNode childNode) {
+		try {
+			this.lockForRead();
+
+			if (childNode.isExists()) {
+				return childNode.getParent();
+			}
+
+			if (childNode.getPath() != null) {
+				int idx = childNode.getPath().lastIndexOf("/"); //$NON-NLS-1$
+				if (idx >= 0) {
+					String parentPath = childNode.getPath().substring(0, idx);
+					return this.getNodeByPath(parentPath);
+				}
+			}
+		} finally {
+			this.unlockForRead();
+		}
+		return null;
+	}
+
+	public List<ResourceTreeNode> getNodesByPath(String pathString) {
+		ArrayList<ResourceTreeNode> nodes = new ArrayList<ResourceTreeNode>();
+		IPath path = new Path(null, pathString);
+
+		if (path.segmentCount() > 0) {
+			try {
+				lockForRead();
+
+				if (this.db != null) {
+					EList<TreeRoot> roots = this.db.getRoots();
+
+					for (TreeRoot treeRoot : roots) {
+						if (path.segment(0).equals(treeRoot.getName())) {
+							nodes.add(treeRoot);
+
+							if (path.segmentCount() == 1) {
+								return nodes;
+							}
+
+							ResourceTreeNode currentNode = treeRoot;
+							boolean withinExistingTree = true;
+
+							for (int i = 1; i < path.segmentCount(); i++) {
+								String name = path.segment(i);
+
+								if (withinExistingTree) {
+									EList<ResourceTreeNode> children = currentNode.getChildren();
+									boolean found = false;
+									for (ResourceTreeNode resourceTreeNode : children) {
+										if (resourceTreeNode.getName().equals(name)) {
+											currentNode = resourceTreeNode;
+											found = true;
+											break;
+										}
+									}
+
+									if (!found) {
+										currentNode = createNonExistingNode(path.removeLastSegments(path.segmentCount() - i - 1));
+										withinExistingTree = false;
+									}
+								} else {
+									currentNode = createNonExistingNode(path.removeLastSegments(path.segmentCount() - i - 1));
+								}
+
+								nodes.add(currentNode);
+							}
+							return nodes;
+						}
+					}
+				}
+
+				// no root found, create new node hierarchy outside the tree
+				nodes.add(createRootNode(path.segment(0)));
+
+				for (int i = 1; i < path.segmentCount(); i++) {
+					nodes.add(createNonExistingNode(path.removeLastSegments(path.segmentCount() - i - 1)));
+				}
+			} finally {
+				unlockForRead();
+			}
+		}
+
+		return nodes;
+	}
+
+	ResourceTreeNode getNodeByPath(String pathString) {
+		IPath path = new Path(null, pathString);
+
+		// we do never return the virtual root node ("semanticfs:/")
+		if (path.segmentCount() > 0) {
+			try {
+				lockForRead();
+
+				if (this.db != null) {
+					EList<TreeRoot> roots = this.db.getRoots();
+
+					for (TreeRoot treeRoot : roots) {
+						if (path.segment(0).equals(treeRoot.getName())) {
+							if (path.segmentCount() == 1) {
+								return treeRoot;
+							}
+
+							String[] segments = path.segments();
+							ResourceTreeNode currentNode = treeRoot;
+							boolean ready = true;
+
+							for (int i = 1; i < segments.length; i++) {
+								String name = segments[i];
+								EList<ResourceTreeNode> children = currentNode.getChildren();
+								boolean found = false;
+
+								for (ResourceTreeNode resourceTreeNode : children) {
+									if (resourceTreeNode.getName().equals(name)) {
+										currentNode = resourceTreeNode;
+										found = true;
+										break;
+									}
+								}
+								if (!found) {
+									ready = false;
+									break;
+								}
+							}
+							if (ready) {
+								return currentNode;
+							}
+							return createNonExistingNode(path);
+						}
+					}
+				}
+			} finally {
+				unlockForRead();
+			}
+
+			// no root found, create new node outside the tree
+			if (path.segmentCount() == 1) {
+				return createRootNode(path.segment(0));
+			}
+
+			return createNonExistingNode(path);
+		}
+
+		return null;
+	}
+
+	ISemanticContentProvider mkdir(ResourceTreeNode actNode, ResourceTreeNode parent) throws CoreException {
+		ISemanticContentProvider parentProvider = null;
+
+		if (parent != null && !parent.isExists()) {
+			ResourceTreeNode parentParent = this.getParentNode(parent);
+			parentProvider = mkdir(parent, parentParent);
+		} else if (parent != null) { // and exists
+			parentProvider = this.getStore(parent).getEffectiveContentProvider();
+		} else { // parent == null
+			parentProvider = this.getStore(actNode).getEffectiveContentProvider();
+		}
+
+		return makeFolder(actNode, parent, parentProvider);
+	}
+
+	ISemanticContentProvider makeFolder(ResourceTreeNode actNode, ResourceTreeNode parent, ISemanticContentProvider parentProvider)
+			throws CoreException {
+		ISemanticContentProvider effectiveProvider = parentProvider;
+		String federatedContentProviderId = null;
+
+		if (actNode.getType() == TreeNodeType.FILE) {
+			// wrong type encountered
+			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_WITH_OTHER_TYPE_EXISTS, this.getStore(actNode)
+					.getPath(), Messages.SemanticFileStore_MkDirOnFile_XMSG);
+		}
+
+		if (!actNode.isExists()) {
+			if (parentProvider instanceof ISemanticContentProviderFederation) {
+				federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider).getFederatedProviderIDForPath(new Path(
+						actNode.getPath()));
+			}
+
+			actNode.setTemplateID(federatedContentProviderId);
+
+		}
+
+		// TODO 0.2: this should be intercepted by the content provider to
+		// avoid unwanted folder creation
+		this.switchToExists(actNode, parent);
+
+		if (actNode.getType() != TreeNodeType.PROJECT) {
+			// set type folder if it is not already a project
+			actNode.setType(TreeNodeType.FOLDER);
+		}
+
+		if (actNode.getTemplateID() != null) {
+			effectiveProvider = this.getStore(actNode).getEffectiveContentProvider();
+		}
+		return effectiveProvider;
+	}
+
+	void switchToExists(ResourceTreeNode node, ResourceTreeNode parent) {
+		if (!node.isExists()) {
+			if (node instanceof TreeRoot) {
+				((TreeRoot) node).setParentDB(this.db);
+			} else {
+
+				if (parent != null) {
+					node.setParent(parent);
+				}
+			}
+
+			node.setPath(null);
+			node.setExists(true);
+		}
+	}
+
+	private ResourceTreeNode createNonExistingNode(IPath childPath) {
+		// all callers have a lock, so we don't lock here
+		ResourceTreeNode child = SemanticResourceDBFactory.eINSTANCE.createResourceTreeNode();
+
+		child.setName(childPath.lastSegment());
+		child.setType(TreeNodeType.UNKNOWN);
+		child.setExists(false);
+		child.setPath(childPath.toString());
+		child.setLocalOnly(true);
+
+		return child;
+	}
+
+	public IPath getPathForNode(ResourceTreeNode node) {
+		try {
+			lockForRead();
+			if (node.isExists()) {
+				StringBuilder sb = new StringBuilder(50);
+				sb.append('/');
+				sb.append(node.getName());
+				ResourceTreeNode parent = node.getParent();
+				while (parent != null) {
+					sb.insert(0, parent.getName());
+					sb.insert(0, '/');
+					parent = parent.getParent();
+				}
+				return new Path(sb.toString());
+			}
+			if (node.getPath() != null) {
+				return new Path(node.getPath());
+			}
+
+			return EMPTY;
+		} finally {
+			unlockForRead();
+		}
+	}
+
+	protected ISemanticFileStore getStore(ResourceTreeNode node) {
 		return new SemanticFileStore(this, node);
 	}
 
@@ -263,6 +520,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 				for (EObject eObject : contents) {
 					if (eObject instanceof SemanticDB) {
 						this.db = (SemanticDB) eObject;
+						this.migrateSemanticDB();
 						break;
 					}
 				}
@@ -279,6 +537,43 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 					Messages.SemanticFileSystem_SFSInitError_XMSG, e));
 
 		}
+	}
+
+	private void migrateSemanticDB() {
+		TreeIterator<EObject> objects = this.db.eAllContents();
+		ArrayList<ResourceTreeNode> toBeRemoved = new ArrayList<ResourceTreeNode>();
+
+		try {
+			while (objects.hasNext()) {
+				EObject eObject = objects.next();
+				if (eObject instanceof TreeRoot) {
+					TreeRoot root = (TreeRoot) eObject;
+
+					if (!root.isExists()) {
+						toBeRemoved.add(root);
+					}
+				} else if (eObject instanceof ResourceTreeNode) {
+					ResourceTreeNode node = (ResourceTreeNode) eObject;
+
+					if (!node.isExists()) {
+						toBeRemoved.add(node);
+					}
+				}
+			}
+
+			for (ResourceTreeNode resourceTreeNode : toBeRemoved) {
+				if (resourceTreeNode instanceof TreeRoot) {
+					((TreeRoot) resourceTreeNode).setParentDB(null);
+				} else {
+					resourceTreeNode.setParent(null);
+				}
+			}
+		} catch (Throwable e) {
+			this.db = null;
+			this.log.log(new SemanticResourceException(SemanticResourceStatusCode.SFS_INITIALIZATION_ERROR, SemanticFileSystem.EMPTY,
+					Messages.SemanticFileSystem_SFSInitError_XMSG, e));
+		}
+
 	}
 
 	private void initSemanticDB(String metadataLocation) {
@@ -305,8 +600,9 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 		root.setName(name);
 		root.setExists(false);
+		root.setPath("/" + name); //$NON-NLS-1$
 		root.setType(TreeNodeType.PROJECT);
-		root.setParentDB(this.db);
+		// root.setParentDB(this.db);
 
 		return root;
 	}
@@ -429,16 +725,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		}
 
 		public IPath getPathForNode(ResourceTreeNode node) {
-			StringBuilder sb = new StringBuilder(50);
-			sb.append('/');
-			sb.append(node.getName());
-			ResourceTreeNode parent = node.getParent();
-			while (parent != null) {
-				sb.insert(0, parent.getName());
-				sb.insert(0, '/');
-				parent = parent.getParent();
-			}
-			return new Path(sb.toString());
+			return this.fs.getPathForNode(node);
 		}
 
 		public void rebuildMapping(IProgressMonitor monitor) {

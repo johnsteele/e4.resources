@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public abstract class SemanticProperties extends FileStore implements ISemanticProperties {
 
-	protected final ResourceTreeNode node;
+	protected ResourceTreeNode node;
 	protected final SemanticFileSystem fs;
 
 	SemanticProperties(SemanticFileSystem fs, ResourceTreeNode node) {
@@ -39,28 +39,12 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 	}
 
 	private IPath getPathForTrace() {
-
 		try {
-			this.fs.lockForRead();
-
-			StringBuilder sb = new StringBuilder(50);
-			sb.append('/');
-			sb.append(this.node.getName());
-			ResourceTreeNode parent = this.node.getParent();
-			while (parent != null) {
-				sb.insert(0, parent.getName());
-				sb.insert(0, '/');
-				parent = parent.getParent();
-			}
-			return new Path(sb.toString());
+			return this.fs.getPathForNode(this.node);
 		} catch (RuntimeException rte) {
 			// $JL-EXC$
 			return new Path(this.node.getName());
-
-		} finally {
-			this.fs.unlockForRead();
 		}
-
 	}
 
 	/**
@@ -157,16 +141,19 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 			} else {
 				oldValue = map.get(keyString);
 			}
-			if (value != null) {
-				map.put(keyString, value);
-			} else {
-				map.remove(keyString);
+
+			if (!isEqualValue(value, oldValue)) {
+				if (value != null) {
+					map.put(keyString, value);
+				} else {
+					map.remove(keyString);
+				}
+				this.node.setPersistentProperties(map);
+
+				this.notifyPersistentPropertySet(keyString, oldValue, value);
+
+				this.fs.requestFlush(false);
 			}
-			this.node.setPersistentProperties(map);
-
-			this.notifyPersistentPropertySet(keyString, oldValue, value);
-
-			this.fs.requestFlush(false);
 		} finally {
 			this.fs.unlockForWrite();
 		}
@@ -307,11 +294,41 @@ public abstract class SemanticProperties extends FileStore implements ISemanticP
 	 * @throws CoreException
 	 */
 	protected void checkAccessible() throws CoreException {
+		checkAndJoinTreeIfAnotherEntryExists();
 
-		if (!node.isExists()) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.PROJECT_NOT_ACCESSIBLE, getPathForTrace(),
+		if (!this.node.isExists()) {
+			throw new SemanticResourceException(SemanticResourceStatusCode.NOT_ACCESSIBLE, getPathForTrace(),
 					Messages.SemanticProperties_StoreNotAccessible_XMSG);
 		}
-
 	}
+
+	protected void checkAndJoinTreeIfAnotherEntryExists() {
+		try {
+			this.fs.lockForRead();
+			if (!this.node.isExists()) {
+				ResourceTreeNode other = this.fs.getNodeByPath(this.node.getPath());
+
+				if (other.isExists()) {
+					this.node = other;
+				}
+			}
+		} finally {
+			this.fs.unlockForRead();
+			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation());
+			}
+		}
+	}
+
+	private boolean isEqualValue(String value, String oldValue) {
+		if (value == null && oldValue == null) {
+			return true;
+		} else if (value != null && oldValue == null) {
+			return false;
+		} else if (value == null && oldValue != null) {
+			return false;
+		}
+		return value.equals(oldValue);
+	}
+
 }

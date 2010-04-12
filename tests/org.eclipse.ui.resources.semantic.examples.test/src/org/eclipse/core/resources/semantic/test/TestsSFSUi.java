@@ -71,7 +71,6 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemConfiguration;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
-import org.eclipse.ui.texteditor.ConfigurationElementSorter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -711,21 +710,7 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		int actionSize = configElements.size();
 		if (actionSize > 0) {
-			IConfigurationElement element;
-			if (actionSize > 1) {
-				IConfigurationElement[] actionArray = configElements.toArray(new IConfigurationElement[actionSize]);
-				ConfigurationElementSorter sorter = new ConfigurationElementSorter() {
-
-					@Override
-					public IConfigurationElement getConfigurationElement(Object object) {
-						return (IConfigurationElement) object;
-					}
-				};
-				sorter.sort(actionArray);
-				element = actionArray[0];
-			} else {
-				element = configElements.get(0);
-			}
+			IConfigurationElement element = configElements.get(0);
 
 			return (IObjectActionDelegate) element.createExecutableExtension("class");
 		}

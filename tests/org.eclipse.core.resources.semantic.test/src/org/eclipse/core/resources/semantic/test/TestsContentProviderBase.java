@@ -1321,4 +1321,39 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 	}
 
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testConcurrentStoreCreation() throws Exception {
+		final IFolder root = this.testProject.getFolder("root");
+		final IFolder parent = root.getFolder("Folder1");
+
+		ISemanticFileStore parentStore1 = (ISemanticFileStore) EFS.getStore(parent.getLocationURI());
+		ISemanticFileStore parentStore2 = (ISemanticFileStore) EFS.getStore(parent.getLocationURI());
+
+		Assert.assertFalse(parentStore1.isExists());
+		Assert.assertFalse(parentStore2.isExists());
+
+		parentStore1.mkdir(0, null);
+
+		Assert.assertTrue(parentStore1.isExists());
+		Assert.assertTrue(parentStore2.isExists());
+
+		IFile file = parent.getFile("File1");
+
+		ISemanticFileStore fileStore1 = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+		ISemanticFileStore fileStore2 = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+
+		Assert.assertFalse(fileStore1.isExists());
+		Assert.assertFalse(fileStore2.isExists());
+
+		Util.safeClose(fileStore1.openOutputStream(0, null));
+
+		Assert.assertTrue(fileStore1.isExists());
+		Assert.assertTrue(fileStore2.isExists());
+
+	}
+
 }

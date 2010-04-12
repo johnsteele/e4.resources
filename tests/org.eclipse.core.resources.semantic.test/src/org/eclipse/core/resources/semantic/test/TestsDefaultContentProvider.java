@@ -618,6 +618,11 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 	public void testFileStoreBehaviorAfterRemove() throws Exception {
 
 		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
+
+		((IFolder) file.getParent()).create(false, true, null);
+
+		file.create(new ByteArrayInputStream("".getBytes()), false, null);
+
 		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
 		ISemanticFileStore store2 = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
 		IPath beforePath = store.getPath();

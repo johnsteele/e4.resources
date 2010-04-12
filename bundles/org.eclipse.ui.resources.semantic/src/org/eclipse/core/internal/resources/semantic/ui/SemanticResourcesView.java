@@ -187,20 +187,6 @@ public class SemanticResourcesView extends ViewPart {
 			// view mode with tool bar manager
 			IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
 
-			Action hideNonExisting = new Action(Messages.BrowseSFSDialog_Hide_XCKL, IAction.AS_CHECK_BOX) {
-
-				@Override
-				public void run() {
-					SFSBrowserTreeContentProvider prov = (SFSBrowserTreeContentProvider) SemanticResourcesView.this.sfsTree
-							.getContentProvider();
-					prov.setHideNonExisting(isChecked());
-					SemanticResourcesView.this.sfsTree.refresh();
-
-				}
-			};
-
-			mgr.add(hideNonExisting);
-
 			Action refresh = new Action(Messages.BrowseSFSDialog_Refresh_XBUT, IAction.AS_PUSH_BUTTON) {
 
 				@Override
@@ -248,23 +234,6 @@ public class SemanticResourcesView extends ViewPart {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					scheduleRefresh(0);
-				}
-
-			});
-
-			final ToolItem hideNonExisting = new ToolItem(tb, SWT.CHECK);
-			hideNonExisting.setText(Messages.BrowseSFSDialog_Hide_XCKL);
-
-			hideNonExisting.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-
-					SFSBrowserTreeContentProvider prov = (SFSBrowserTreeContentProvider) SemanticResourcesView.this.sfsTree
-							.getContentProvider();
-					prov.setHideNonExisting(hideNonExisting.getSelection());
-
-					SemanticResourcesView.this.sfsTree.refresh();
 				}
 
 			});
