@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.locks.Lock;
@@ -302,20 +303,26 @@ public class FileHandleFactory implements IContentHandleFactory {
 	private void retryToDeleteAlternatives() {
 		boolean saveNeeded = false;
 		HashSet<String> deletions = this.deletionsOfAlternatives;
+		ArrayList<String> toBeRemoved = new ArrayList<String>();
 
 		for (String filePath : deletions) {
 			File file = new File(filePath);
 
 			if (file.exists()) {
 				if (file.delete()) {
-					deletions.remove(filePath);
+					toBeRemoved.add(filePath);
 					saveNeeded = true;
 				}
 			} else {
 				saveNeeded = true;
-				deletions.remove(filePath);
+				toBeRemoved.add(filePath);
 			}
 		}
+
+		for (String string : toBeRemoved) {
+			deletions.remove(string);
+		}
+
 		if (saveNeeded) {
 			this.saveDeletionsOfAlternatives();
 		}

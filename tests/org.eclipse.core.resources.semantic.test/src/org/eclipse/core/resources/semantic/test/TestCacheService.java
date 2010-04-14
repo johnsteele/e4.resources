@@ -151,28 +151,41 @@ public class TestCacheService {
 
 		writeToCache(service, path, input);
 
+		IPath path1 = new Path("/test2/file1.txt");
+		String content1 = "test1";
+		InputStream input1 = new ByteArrayInputStream(content1.getBytes("UTF-8"));
+
+		writeToCache(service, path1, input1);
+
 		// this will open an input stream that will prevent a file from being
 		// deleted
 		InputStream is = service.getContent(path);
+		InputStream is1 = service.getContent(path1);
 
 		try {
 			writeToCache(service, path, new ByteArrayInputStream("test2".getBytes("UTF-8")));
+			writeToCache(service, path1, new ByteArrayInputStream("test2".getBytes("UTF-8")));
 
 			readFromCache(service, path, "test2");
+			readFromCache(service, path1, "test2");
 
 			// this will open an input stream that will prevent an alternative
 			// file from being
 			// deleted
 			InputStream is2 = service.getContent(path);
+			InputStream is3 = service.getContent(path1);
 
 			try {
 				writeToCache(service, path, new ByteArrayInputStream("test3".getBytes("UTF-8")));
+				writeToCache(service, path1, new ByteArrayInputStream("test3".getBytes("UTF-8")));
 
 				readFromCache(service, path, "test3");
+				readFromCache(service, path1, "test3");
 			} finally {
 				// this will close the stream so that an alternative file can be
 				// deleted
 				Util.safeClose(is2);
+				Util.safeClose(is3);
 			}
 		} catch (CoreException e) {
 			// $JL-EXC$ ignore exception
@@ -181,6 +194,7 @@ public class TestCacheService {
 		} finally {
 			// this will close the stream so that a file can be deleted
 			Util.safeClose(is);
+			Util.safeClose(is1);
 		}
 
 		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
