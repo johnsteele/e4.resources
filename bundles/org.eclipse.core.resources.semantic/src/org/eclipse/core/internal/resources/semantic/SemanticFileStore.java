@@ -1439,22 +1439,22 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
-	private void cleanupNode(ResourceTreeNode resourceTreeNode) throws CoreException {
-		resourceTreeNode.setExists(false);
+	private static void cleanupNodeAndChildren(ResourceTreeNode node, IPath path) {
+		EList<ResourceTreeNode> children = node.getChildren();
 
-		resourceTreeNode.setPersistentProperties(null);
-		resourceTreeNode.setSessionProperties(null);
-
-		// TODO cleanup children, run a check for now
-		boolean checkChildren = false;
-		if (checkChildren) {
-			EList<ResourceTreeNode> children = resourceTreeNode.getChildren();
-			for (ResourceTreeNode resourceTreeNode2 : children) {
-				if (resourceTreeNode2.isExists()) {
-					throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPlugin.PLUGIN_ID, "children not empty")); //$NON-NLS-1$
-				}
-			}
+		for (ResourceTreeNode resourceTreeNode : children) {
+			cleanupNodeAndChildren(resourceTreeNode, path.append(resourceTreeNode.getName()));
 		}
+
+		// keep the last path so that getPath returns something meaningful after
+		// remove
+		node.setPath(path.toString());
+		node.setExists(false);
+
+		node.setPersistentProperties(null);
+		node.setSessionProperties(null);
+
+		children.clear();
 	}
 
 	public IStatus validateEdit(Object shell) {
@@ -1600,58 +1600,24 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 					NLS.bind(Messages.SemanticFileStore_RemovingResource_XMSG, getPath().toString()));
 		}
 
-		this.checkAccessible();
+		try {
+			this.fs.lockForWrite();
 
-		IFileStore parent = getParent();
+			this.checkAccessible();
 
-		if (parent != null) {
+			SemanticFileStore.cleanupNodeAndChildren(node, getPath());
 
-			if (parent instanceof SemanticFileStore) {
-
-				try {
-					this.fs.lockForWrite();
-					// keep the last path so that getPath returns something
-					// meaningful after remove
-					this.node.setPath(getPath().toString());
-
-					this.node.setParent(null);
-
-					cleanupNode(this.node);
-
-					this.fs.requestFlush(false);
-
-					this.fs.requestURILocatorRebuild();
-				} finally {
-					this.fs.unlockForWrite();
-				}
+			if (this.node instanceof TreeRoot) {
+				((TreeRoot) this.node).setParentDB(null);
 			} else {
-				// TODO 0.1: this needs to be handled if a resource is contained
-				// in a non-Semantic container or possibly if it is a symbolic
-				// link
+				this.node.setParent(null);
 			}
-		} else {
-			// delete children and mark the node non existent
-			try {
-				this.fs.lockForWrite();
 
-				// keep the last path so that getPath returns something
-				// meaningful after remove
-				this.node.setPath(getPath().toString());
+			this.fs.requestFlush(false);
 
-				this.node.getChildren().clear();
-
-				this.cleanupNode(node);
-
-				if (this.node instanceof TreeRoot) {
-					((TreeRoot) this.node).setParentDB(null);
-				}
-
-				this.fs.requestFlush(false);
-
-				this.fs.requestURILocatorRebuild();
-			} finally {
-				this.fs.unlockForWrite();
-			}
+			this.fs.requestURILocatorRebuild();
+		} finally {
+			this.fs.unlockForWrite();
 		}
 	}
 
