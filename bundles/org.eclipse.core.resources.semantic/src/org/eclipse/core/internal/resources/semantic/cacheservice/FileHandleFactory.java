@@ -130,6 +130,52 @@ public class FileHandleFactory implements IContentHandleFactory {
 		}
 	}
 
+	public void removeContentRecursive(CacheService cacheService, IPath path) {
+		try {
+			lockForWrite();
+
+			File root = getCacheFile(path);
+			if (root.exists() && !root.equals(this.cacheRoot)) {
+				ArrayList<File> filesToBeDeleted = new ArrayList<File>();
+
+				this.collectFiles(root, filesToBeDeleted);
+
+				for (File file : filesToBeDeleted) {
+					if (!file.delete()) {
+						this.reportDeletionFailed(file);
+					}
+				}
+
+				this.compactFileSystemRecursively(root);
+
+				this.compactFileSystem(root);
+			}
+		} finally {
+			unlockForWrite();
+		}
+	}
+
+	private void collectFiles(File root, ArrayList<File> filesToBeDeleted) {
+		if (root.isDirectory()) {
+			File[] children = root.listFiles();
+
+			if (children != null) {
+				for (File child : children) {
+					if (child.isDirectory()) {
+						collectFiles(child, filesToBeDeleted);
+					} else {
+						filesToBeDeleted.add(child);
+					}
+				}
+			}
+		} else {
+			// single file
+			if (root.exists()) {
+				filesToBeDeleted.add(root);
+			}
+		}
+	}
+
 	/**
 	 * Renames the file, deletes destination file before, deletes source file in
 	 * case of error
@@ -296,6 +342,25 @@ public class FileHandleFactory implements IContentHandleFactory {
 				if (children.length == 0) {
 					parent.delete();
 				}
+			}
+		}
+	}
+
+	private void compactFileSystemRecursively(File root) {
+		File[] children = root.listFiles();
+
+		if (children != null && children.length > 0) {
+			for (File file : children) {
+				if (file.isDirectory()) {
+					this.compactFileSystemRecursively(file);
+				}
+			}
+		}
+
+		children = root.listFiles();
+		if (children != null) {
+			if (children.length == 0) {
+				root.delete();
 			}
 		}
 	}

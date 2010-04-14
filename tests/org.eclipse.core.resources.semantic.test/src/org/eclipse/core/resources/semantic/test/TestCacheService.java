@@ -24,12 +24,14 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
 import org.eclipse.core.resources.semantic.spi.ICacheUpdateCallback;
+import org.eclipse.core.resources.semantic.spi.MemoryCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.SemanticFileCache;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.junit.Test;
 
@@ -136,6 +138,143 @@ public class TestCacheService {
 		Assert.assertTrue(!service.hasContent(path));
 		Assert.assertTrue(!cacheFile.exists());
 		Assert.assertTrue(!cacheFile.getParentFile().exists());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRecursiveContentDeletion() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath rootPath = new Path("/testrecursive/testroot/");
+
+		IPath path = rootPath.append("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		IPath path2 = rootPath.append("/test2/test3/file.txt");
+		String content2 = "test";
+		InputStream input2 = new ByteArrayInputStream(content2.getBytes("UTF-8"));
+		File cacheFile2 = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		appendToCache(service, path, input);
+
+		appendToCache(service, path2, input2);
+
+		removeFromCacheRecursive(service, rootPath);
+
+		Assert.assertTrue(!service.hasContent(path));
+		Assert.assertTrue(!service.hasContent(path2));
+		Assert.assertTrue(!cacheFile.exists());
+		Assert.assertTrue(!cacheFile.getParentFile().exists());
+		Assert.assertTrue(!cacheFile2.exists());
+		Assert.assertTrue(!cacheFile2.getParentFile().exists());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRecursiveContentDeletion2() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath rootPath = new Path("/testrecursive/testroot/");
+
+		IPath path = rootPath.append("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		IPath path2 = rootPath.append("/test2/test3/file.txt");
+		String content2 = "test";
+		InputStream input2 = new ByteArrayInputStream(content2.getBytes("UTF-8"));
+		File cacheFile2 = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		appendToCache(service, path, input);
+
+		appendToCache(service, path2, input2);
+
+		// this will open an input stream that will prevent a file from being
+		// deleted
+		InputStream is = service.getContent(path);
+
+		try {
+			removeFromCacheRecursive(service, rootPath);
+		} finally {
+			Util.safeClose(is);
+		}
+
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			Assert.assertTrue("File must still be present", cacheFile.exists());
+			Assert.assertTrue("Parent folder must still be present", cacheFile.getParentFile().exists());
+		}
+
+		// the cache file must be removed during check method and both checks
+		// return false
+		Assert.assertTrue(!service.hasContent(path));
+		Assert.assertTrue(!service.hasContent(path2));
+		Assert.assertTrue(!cacheFile.exists());
+		Assert.assertTrue(!cacheFile.getParentFile().exists());
+		Assert.assertTrue(!cacheFile2.exists());
+		Assert.assertTrue(!cacheFile2.getParentFile().exists());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRecursiveContentDeletion3() throws Exception {
+		ICacheService service = new MemoryCacheServiceFactory().getCacheService();
+
+		IPath rootPath = new Path("/testrecursive/testroot/");
+
+		IPath path = rootPath.append("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		IPath path2 = rootPath.append("/test2/test3/file.txt");
+		String content2 = "test";
+		InputStream input2 = new ByteArrayInputStream(content2.getBytes("UTF-8"));
+
+		appendToCache(service, path, input);
+
+		appendToCache(service, path2, input2);
+
+		removeFromCacheRecursive(service, rootPath);
+
+		Assert.assertTrue(!service.hasContent(path));
+		Assert.assertTrue(!service.hasContent(path2));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRecursiveContentDeletion4() throws Exception {
+		ICacheService service = new MemoryCacheServiceFactory().getCacheService();
+
+		IPath rootPath = new Path("/testrecursive/testroot/");
+
+		IPath path = rootPath.append("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		IPath path2 = rootPath.append("/test2/test3/file.txt");
+		String content2 = "test";
+		InputStream input2 = new ByteArrayInputStream(content2.getBytes("UTF-8"));
+
+		appendToCache(service, path, input);
+
+		appendToCache(service, path2, input2);
+
+		removeFromCacheRecursive(service, path);
+
+		Assert.assertTrue(!service.hasContent(path));
+		Assert.assertTrue(service.hasContent(path2));
 	}
 
 	/**
@@ -259,6 +398,15 @@ public class TestCacheService {
 		service.removeContent(path, null);
 
 		Assert.assertTrue(!service.hasContent(path));
+	}
+
+	/**
+	 * @param service
+	 * @param path
+	 * @throws CoreException
+	 */
+	public void removeFromCacheRecursive(ICacheService service, IPath path) throws CoreException {
+		service.removeContentRecursive(path, null);
 	}
 
 	/**

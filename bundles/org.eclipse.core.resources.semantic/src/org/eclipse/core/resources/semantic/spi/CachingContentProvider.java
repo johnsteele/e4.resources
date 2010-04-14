@@ -192,13 +192,9 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 * @throws CoreException
 	 */
 	protected void deleteCache(ISemanticFileStore store, IProgressMonitor monitor) throws CoreException {
-		MultiStatus status = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
-				Messages.CachingContentProvider_DeletingCache_XMSG, store.getPath().toString()), null);
-		dropCache(store, monitor, this.deleteAllVisitor, status);
-		if (!status.isOK()) {
-			throw new CoreException(status);
-		}
+		ICacheService cacheService = this.getCacheService();
 
+		cacheService.removeContentRecursive(store.getPath(), monitor);
 	}
 
 	/**

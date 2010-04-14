@@ -59,4 +59,16 @@ public interface IContentHandleFactory {
 	 *             upon failure
 	 */
 	ICachedContentHandle createCacheContentHandle(ICacheService service, IPath path) throws CoreException;
+
+	/**
+	 * Removes all content underneath the specified path
+	 * 
+	 * @param cacheService
+	 *            the cache service
+	 * @param path
+	 *            the path
+	 * @throws CoreException
+	 *             upon failure
+	 */
+	void removeContentRecursive(CacheService cacheService, IPath path) throws CoreException;
 }

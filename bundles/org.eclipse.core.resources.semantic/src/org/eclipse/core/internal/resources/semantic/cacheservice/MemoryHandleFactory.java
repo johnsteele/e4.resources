@@ -37,4 +37,9 @@ public class MemoryHandleFactory implements IContentHandleFactory {
 		return new TemporaryMemoryHandle(path, append, new ByteArrayOutputStream());
 	}
 
+	public void removeContentRecursive(CacheService cacheService, IPath path) {
+		MemoryCache.getInstance().removeStore(path.toString());
+		MemoryCache.getInstance().removeStoresRecursively(path.addTrailingSeparator().toString());
+	}
+
 }

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.cacheservice;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +66,20 @@ class MemoryCache {
 	 */
 	public void removeStore(String path) {
 		this.cacheMap.remove(path);
+	}
+
+	public void removeStoresRecursively(String path) {
+		ArrayList<String> keysToBeRemoved = new ArrayList<String>();
+
+		for (String storePath : this.cacheMap.keySet()) {
+			if (storePath.startsWith(path)) {
+				keysToBeRemoved.add(storePath);
+			}
+		}
+
+		for (String string : keysToBeRemoved) {
+			this.cacheMap.remove(string);
+		}
 	}
 
 }

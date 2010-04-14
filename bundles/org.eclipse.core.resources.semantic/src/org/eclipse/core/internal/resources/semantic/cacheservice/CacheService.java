@@ -165,6 +165,21 @@ public class CacheService implements ICacheService {
 		}
 	}
 
+	public void removeContentRecursive(IPath path, IProgressMonitor monitor) throws CoreException {
+
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
+		try {
+			lockForWrite();
+
+			this.handleFactory.removeContentRecursive(this, path);
+		} finally {
+			unlockForWrite();
+		}
+	}
+
 	public OutputStream wrapOutputStream(IPath path, boolean append, ICacheUpdateCallback callback, IProgressMonitor monitor)
 			throws CoreException {
 		try {

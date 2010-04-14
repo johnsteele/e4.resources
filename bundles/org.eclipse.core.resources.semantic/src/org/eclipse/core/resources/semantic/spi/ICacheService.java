@@ -77,6 +77,19 @@ public interface ICacheService {
 	public void removeContent(IPath path, IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * removes all content that starts with the specified path
+	 * 
+	 * @param path
+	 *            the path
+	 * @param monitor
+	 *            may be null
+	 * @throws CoreException
+	 *             upon failure
+	 * @since 0.3
+	 */
+	public void removeContentRecursive(IPath path, IProgressMonitor monitor) throws CoreException;
+
+	/**
 	 * 
 	 * @param path
 	 *            the path
