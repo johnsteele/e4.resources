@@ -67,7 +67,7 @@ public class SynchronizeAction extends ActionBase {
 
 					try {
 						IWorkspace ws = ResourcesPlugin.getWorkspace();
-						ISchedulingRule rule = ws.getRuleFactory().modifyRule(resource.getAdaptedResource());
+						ISchedulingRule rule = ws.getRuleFactory().refreshRule(resource.getAdaptedResource());
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
 						throw new InvocationTargetException(ce);

@@ -8,11 +8,19 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/eclipse/core/internal/resources/semantic/team/DelegatingResourceRuleFactory.java" type="org.eclipse.core.internal.resources.semantic.team.DelegatingResourceRuleFactory">
-        <filter id="574619656">
+    <resource path="src/org/eclipse/core/resources/semantic/spi/DefaultSemanticResourceRuleFactory.java" type="org.eclipse.core.resources.semantic.spi.DefaultSemanticResourceRuleFactory">
+        <filter id="338792546">
             <message_arguments>
-                <message_argument value="IResourceRuleFactory"/>
-                <message_argument value="DelegatingResourceRuleFactory"/>
+                <message_argument value="org.eclipse.core.resources.semantic.spi.DefaultSemanticResourceRuleFactory"/>
+                <message_argument value="markerRule(ISemanticFileStore)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/core/resources/semantic/spi/ISemanticResourceRuleFactory.java" type="org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory">
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory"/>
+                <message_argument value="markerRule(ISemanticFileStore)"/>
             </message_arguments>
         </filter>
     </resource>

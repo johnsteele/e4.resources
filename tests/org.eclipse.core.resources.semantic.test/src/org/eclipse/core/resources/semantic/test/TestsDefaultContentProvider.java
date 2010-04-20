@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -59,6 +61,7 @@ import org.junit.Test;
  * Tests the default content provider
  */
 public class TestsDefaultContentProvider extends TestsContentProviderUtil {
+	IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
 	private static final String UTF_8_CHARSET = "utf-8";
 	private static final String TEST = "test";
@@ -110,7 +113,6 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 	@Before
 	public void beforeMethod() throws Exception {
 
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		if (project.exists()) {
@@ -143,7 +145,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 		};
 
-		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+		workspace.run(myRunnable, project, IWorkspace.AVOID_UPDATE, null);
 
 		this.testProject = project;
 
@@ -163,7 +165,6 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 		this.testProject = null;
 
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
@@ -175,7 +176,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 
 	}
 
@@ -218,7 +219,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -263,7 +264,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject.getParent(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -311,7 +312,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -357,7 +358,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -403,7 +404,8 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		ISchedulingRule rule = workspace.getRuleFactory().createRule(testProject.getFolder("someFolder"));
+		workspace.run(runnable, rule, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -461,7 +463,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
@@ -543,7 +545,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, 0, new NullProgressMonitor());
 
 	}
 
@@ -567,7 +569,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 	}
 
 	/**
@@ -605,7 +607,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(dcpfolder), 0, new NullProgressMonitor());
 
 	}
 
@@ -631,6 +633,39 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 		IPath afterPath2 = store2.getPath();
 		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath);
 		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath2);
+
+		try {
+			store.getPersistentProperties();
+			Assert.assertTrue("GetPersistentProperties should have failed.", false);
+		} catch (CoreException e) {
+			// ignore
+		}
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testFileStoreBehaviorAfterRemove2() throws Exception {
+
+		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
+
+		((IFolder) file.getParent()).create(false, true, null);
+
+		file.create(new ByteArrayInputStream("".getBytes()), false, null);
+
+		ISemanticFileStore store = (ISemanticFileStore) EFS.getStore(file.getLocationURI());
+		ISemanticFileStore parentStore = (ISemanticFileStore) EFS.getStore(file.getParent().getLocationURI());
+		IPath beforePath = store.getPath();
+		IPath beforePath2 = parentStore.getPath();
+		parentStore.remove(null);
+		IPath afterPath = store.getPath();
+		IPath afterPath2 = parentStore.getPath();
+		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath, afterPath);
+		Assert.assertEquals("Path should be the same after removal of semantic file store", beforePath2, afterPath2);
+		Assert.assertTrue("Folder should not exist", !parentStore.isExists());
+		Assert.assertTrue("Child file should not exist as well", !store.isExists());
 
 		try {
 			store.getPersistentProperties();
@@ -679,7 +714,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, testProject, 0, new NullProgressMonitor());
 	}
 
 	/**
@@ -713,7 +748,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 	}
 
 	/**
@@ -754,7 +789,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 	}
 
 	/**
@@ -823,6 +858,70 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, 0, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testRuleFactory() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+		final IFolder subfolder = folder.getFolder("someSubfolder");
+		final IFolder file = subfolder.getFolder("someFile");
+		IResourceRuleFactory factory = workspace.getRuleFactory();
+
+		Assert.assertEquals(testProject, factory.modifyRule(testProject));
+		Assert.assertEquals(folder, factory.modifyRule(folder));
+		Assert.assertEquals(subfolder, factory.modifyRule(subfolder));
+		Assert.assertEquals(file, factory.modifyRule(file));
+
+		Assert.assertEquals(testProject, factory.refreshRule(testProject));
+		Assert.assertEquals(testProject, factory.refreshRule(folder));
+		Assert.assertEquals(folder, factory.refreshRule(subfolder));
+		Assert.assertEquals(subfolder, factory.refreshRule(file));
+
+		Assert.assertEquals(testProject, factory.deleteRule(testProject));
+		Assert.assertEquals(testProject, factory.deleteRule(folder));
+		Assert.assertEquals(folder, factory.deleteRule(subfolder));
+		Assert.assertEquals(subfolder, factory.deleteRule(file));
+
+		Assert.assertEquals(testProject, factory.createRule(testProject));
+		Assert.assertEquals(testProject, factory.createRule(folder));
+		Assert.assertEquals(folder, factory.createRule(subfolder));
+		Assert.assertEquals(subfolder, factory.createRule(file));
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testImplicitFolderCreation() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+		final IFolder subfolder = folder.getFolder("someSubfolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sFolder = (ISemanticFolder) subfolder.getAdapter(ISemanticFolder.class);
+
+				File testfile = createTestFile("test.txt");
+
+				try {
+					writeContentsToFile(testfile, TEST, UTF_8_CHARSET);
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+
+				try {
+					sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options, monitor);
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(subfolder), 0, new NullProgressMonitor());
 	}
 }

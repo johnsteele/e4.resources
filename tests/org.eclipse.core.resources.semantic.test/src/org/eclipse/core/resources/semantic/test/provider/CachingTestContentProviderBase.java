@@ -28,17 +28,19 @@ import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem;
-import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
+import org.eclipse.core.resources.semantic.spi.DefaultMinimalSemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderLocking;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderRemote;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
+import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.Util;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.test.TestPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -244,6 +246,11 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 		}
 		timeStampSetter.setTimestamp(((RemoteFile) item).getTimestamp());
 		return new ByteArrayInputStream(((RemoteFile) item).getContent());
+	}
+
+	@Override
+	public ISemanticResourceRuleFactory getRuleFactory() {
+		return new DefaultMinimalSemanticResourceRuleFactory(this.getRootStore());
 	}
 
 	public void removeResource(ISemanticFileStore childStore, IProgressMonitor monitor) throws CoreException {

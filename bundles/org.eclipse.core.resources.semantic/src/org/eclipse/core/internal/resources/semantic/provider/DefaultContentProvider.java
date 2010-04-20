@@ -29,12 +29,14 @@ import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
+import org.eclipse.core.resources.semantic.spi.DefaultMinimalSemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
+import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
@@ -342,6 +344,43 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 	public IStatus validateSave(ISemanticFileStore childStore) {
 		return validateEdit(new ISemanticFileStore[] {childStore}, null);
+	}
+
+	@Override
+	public ISemanticResourceRuleFactory getRuleFactory() {
+		return new DefaultMinimalSemanticResourceRuleFactory(this.getRootStore());
+		/*
+		 * return new ISemanticResourceRuleFactory() {
+		 * 
+		 * public ISemanticFileStore validateEditRule(ISemanticFileStore[]
+		 * stores) { if (stores.length == 1) { return stores[0]; } return null;
+		 * }
+		 * 
+		 * private ISemanticFileStore getParent(ISemanticFileStore store) { if
+		 * (store.getType() == ISemanticFileStore.PROJECT) { return store; }
+		 * return (ISemanticFileStore) store.getParent(); }
+		 * 
+		 * public ISemanticFileStore refreshRule(ISemanticFileStore store) {
+		 * return getParent(store); }
+		 * 
+		 * public ISemanticFileStore moveRule(ISemanticFileStore source,
+		 * ISemanticFileStore destination) { return null; }
+		 * 
+		 * public ISemanticFileStore modifyRule(ISemanticFileStore store) {
+		 * return store; }
+		 * 
+		 * public ISemanticFileStore deleteRule(ISemanticFileStore store) {
+		 * return getParent(store); }
+		 * 
+		 * public ISemanticFileStore createRule(ISemanticFileStore store) {
+		 * return getParent(store); }
+		 * 
+		 * public ISemanticFileStore copyRule(ISemanticFileStore source,
+		 * ISemanticFileStore destination) { return null; }
+		 * 
+		 * public ISemanticFileStore charsetRule(ISemanticFileStore store) {
+		 * return store; } };
+		 */
 	}
 
 	// not supported stuff

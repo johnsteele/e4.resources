@@ -68,7 +68,7 @@ public class DeleteAction extends ActionBase {
 
 						IWorkspace workspace = ResourcesPlugin.getWorkspace();
 						try {
-							workspace.run(myRunnable, workspace.getRuleFactory().deleteRule(resource.getAdaptedResource()), 0, null);
+							workspace.run(myRunnable, workspace.getRuleFactory().refreshRule(resource.getAdaptedResource()), 0, null);
 						} catch (CoreException e) {
 							throw new InvocationTargetException(e);
 						}

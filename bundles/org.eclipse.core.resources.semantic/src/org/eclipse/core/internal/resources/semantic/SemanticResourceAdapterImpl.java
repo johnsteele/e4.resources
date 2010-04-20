@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.internal.resources.semantic.team.DelegatingResourceRuleFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceRuleFactory;
@@ -47,13 +48,15 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	 * 
 	 */
 	protected enum RuleType {
-		CREATE, DELETE, MODIFY, VALIDATE_EDIT
+		CREATE, DELETE, MODIFY, VALIDATE_EDIT, REFRESH
 	}
 
 	private final IResource resource;
+	private final ISemanticFileSystem fs;
 
 	SemanticResourceAdapterImpl(IResource resource, ISemanticFileSystem fileSystem) {
 		this.resource = resource;
+		this.fs = fileSystem;
 	}
 
 	public IResource getAdaptedResource() {
@@ -122,7 +125,7 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 	}
 
-	private ISchedulingRule getRuleForType(RuleType ruleType, IResource actResource) throws SemanticResourceException {
+	ISchedulingRule getRuleForType(RuleType ruleType, IResource actResource) throws SemanticResourceException {
 
 		if (actResource instanceof IWorkspaceRoot) {
 			return actResource;
@@ -135,13 +138,15 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 					Messages.SemanticResourceAdapterImpl_ProjectNotAccessible_XMSG, project.getName()));
 		}
 
+		IResourceRuleFactory rf;
+
 		// we obtain the "expected" rule from the content provider
 		RepositoryProvider provider = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
-		if (provider == null) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.PROJECT_NOT_MAPPED, actResource.getFullPath(), NLS.bind(
-					Messages.SemanticResourceAdapterImpl_ProjectNotMapped_XMSG, project.getName()));
+		if (provider != null) {
+			rf = provider.getRuleFactory();
+		} else {
+			rf = new DelegatingResourceRuleFactory(this.fs);
 		}
-		IResourceRuleFactory rf = provider.getRuleFactory();
 
 		ISchedulingRule checkRule;
 
@@ -154,6 +159,9 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 				break;
 			case MODIFY :
 				checkRule = rf.modifyRule(actResource);
+				break;
+			case REFRESH :
+				checkRule = rf.refreshRule(actResource);
 				break;
 			case VALIDATE_EDIT :
 				checkRule = rf.validateEditRule(new IResource[] {actResource});
@@ -183,25 +191,25 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 	public void deleteRemotely(int options, IProgressMonitor monitor) throws CoreException {
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.DELETE);
+		checkCurrentRule(RuleType.DELETE);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.deleteRemotely(monitor);
 
-		refreshLocalIfNeeded(RuleType.DELETE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.DELETE, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 
 	}
 
 	public void remove(int options, IProgressMonitor monitor) throws CoreException {
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.DELETE);
+		checkCurrentRule(RuleType.DELETE);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.removeFromWorkspace(monitor);
 
-		refreshLocalIfNeeded(RuleType.DELETE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.DELETE, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 
 	}
 
@@ -232,13 +240,13 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	}
 
 	public void synchronizeContentWithRemote(SyncDirection direction, int options, IProgressMonitor monitor) throws CoreException {
-		ISchedulingRule rule = checkCurrentRule(RuleType.MODIFY);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.synchronizeContentWithRemote(direction, monitor);
 
-		refreshLocalIfNeeded(RuleType.MODIFY, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 	}
 
 	public ISemanticResourceInfo fetchResourceInfo(int options, IProgressMonitor monitor) throws CoreException {
@@ -254,29 +262,26 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	}
 
 	public IStatus lockResource(int options, IProgressMonitor monitor) throws CoreException {
-		// we check the MODIFY rule
-		ISchedulingRule rule = checkCurrentRule(RuleType.MODIFY);
+		checkCurrentRule(RuleType.REFRESH);
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		IStatus result = store.lockResource(monitor);
 
 		if (result.isOK()) {
-			refreshLocalIfNeeded(RuleType.MODIFY, rule, options, monitor);
+			refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 		}
 
 		return result;
 	}
 
 	public IStatus unlockResource(int options, IProgressMonitor monitor) throws CoreException {
-
-		// we check the MODIFY rule
-		ISchedulingRule rule = checkCurrentRule(RuleType.MODIFY);
+		checkCurrentRule(RuleType.REFRESH);
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		IStatus result = store.unlockResource(monitor);
 
 		if (result.isOK()) {
-			refreshLocalIfNeeded(RuleType.MODIFY, rule, options, monitor);
+			refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 		}
 
 		return result;
@@ -307,7 +312,6 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	}
 
 	public void setPersistentProperty(QualifiedName key, String value) throws CoreException {
-		// we check the MODIFY rule
 		checkCurrentRule(RuleType.MODIFY);
 		ISemanticFileStoreInternal store = getOwnStore();
 
@@ -316,7 +320,6 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	}
 
 	public void setSessionProperty(QualifiedName key, Object value) throws CoreException {
-		// we check the MODIFY rule
 		checkCurrentRule(RuleType.MODIFY);
 		ISemanticFileStoreInternal store = getOwnStore();
 
@@ -325,13 +328,13 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 	}
 
 	public void setRemoteURI(URI uri, int options, IProgressMonitor monitor) throws CoreException {
-		ISchedulingRule rule = checkCurrentRule(RuleType.MODIFY);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.setRemoteURI(uri, monitor);
 
-		refreshLocalIfNeeded(RuleType.MODIFY, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 	}
 
 }

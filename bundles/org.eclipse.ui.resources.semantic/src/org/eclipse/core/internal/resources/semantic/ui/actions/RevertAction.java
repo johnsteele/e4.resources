@@ -66,7 +66,7 @@ public class RevertAction extends ActionBase {
 
 					IWorkspace workspace = ResourcesPlugin.getWorkspace();
 					try {
-						workspace.run(myRunnable, workspace.getRuleFactory().modifyRule(file.getAdaptedResource()), 0, null);
+						workspace.run(myRunnable, workspace.getRuleFactory().refreshRule(file.getAdaptedResource()), 0, null);
 					} catch (CoreException e) {
 						throw new InvocationTargetException(e);
 					}

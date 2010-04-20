@@ -19,7 +19,6 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.internal.resources.semantic.SfsTraceLocation;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
@@ -28,6 +27,8 @@ import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
+import org.eclipse.core.resources.team.ResourceRuleFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -37,7 +38,11 @@ import org.eclipse.core.runtime.jobs.MultiRule;
  * Delegates to the responsible content provider
  * 
  */
-public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
+public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
+
+	protected enum RuleType {
+		CREATE, DELETE, MODIFY, VALIDATE_EDIT, REFRESH, CHARSET, COPY, MOVE
+	}
 
 	final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
@@ -49,16 +54,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		// nothing
 	}
 
-	public ISchedulingRule buildRule() {
-		// since this has no resource parameter, we can't obtain the provider
-
-		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), this.root.getFullPath().toString());
-		}
-
-		return this.root;
-	}
-
+	@Override
 	public ISchedulingRule charsetRule(IResource resource) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -71,7 +67,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			if (sres != null) {
 				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
 
-				result = toRule(sfs.getEffectiveContentProvider().getRuleFactory().charsetRule(sfs));
+				result = toRule(new IResource[] {resource}, RuleType.CHARSET, sfs.getEffectiveContentProvider().getRuleFactory()
+						.charsetRule(sfs));
 			} else {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
 					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
@@ -88,16 +85,17 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), result);
 			}
 		}
-		return result;
+		return new MultiRule(new ISchedulingRule[] {result, super.charsetRule(resource)});
 	}
 
+	@Override
 	public ISchedulingRule copyRule(IResource source, IResource destination) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -116,12 +114,14 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				if (sourceStore.getEffectiveContentProvider().getClass().getName().equals(
 				// source and target provider are the same
 						destinationStore.getEffectiveContentProvider().getClass().getName())) {
-					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore));
+					result = toRule(new IResource[] {source}, RuleType.COPY, sourceStore.getEffectiveContentProvider().getRuleFactory()
+							.copyRule(sourceStore, destinationStore));
 				}
 				// if source and target come from different providers, return
 				// MultiRule
-				result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore),
-						destinationStore.getEffectiveContentProvider().getRuleFactory().copyRule(sourceStore, destinationStore));
+				result = toRule(new IResource[] {source, destination}, RuleType.COPY, sourceStore.getEffectiveContentProvider()
+						.getRuleFactory().copyRule(sourceStore, destinationStore), destinationStore.getEffectiveContentProvider()
+						.getRuleFactory().copyRule(sourceStore, destinationStore));
 			} else {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
 					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
@@ -138,7 +138,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -149,6 +149,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		return result;
 	}
 
+	@Override
 	public ISchedulingRule createRule(IResource resource) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -158,27 +159,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		ISchedulingRule result;
 
 		try {
-			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
-			if (sres != null) {
-
-				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
-				ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
-				// federation: we ask the parent provider to determine the
-				// proper rule
-				if (effectiveProvider.getRootStore().getPath().equals(sfs.getPath())) {
-					ISemanticFileStore parentStore = (ISemanticFileStore) sfs.getParent();
-					if (parentStore != null) {
-						result = toRule(parentStore.getEffectiveContentProvider().getRuleFactory().createRule(sfs));
-					}
-				}
-				result = toRule(effectiveProvider.getRuleFactory().createRule(sfs));
-			} else {
-				if (SfsTraceLocation.RULEFACTORY.isActive()) {
-					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
-							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
-				}
-				result = this.root;
-			}
+			result = this.calculateRuleForType2(resource, RuleType.CREATE);
 		} catch (CoreException e) {
 			if (SfsTraceLocation.RULEFACTORY.isActive()) {
 				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
@@ -188,7 +169,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -198,6 +179,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		return result;
 	}
 
+	@Override
 	public ISchedulingRule deleteRule(IResource resource) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -206,31 +188,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		ISchedulingRule result;
 		try {
-			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
-			if (sres != null) {
-
-				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
-				ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
-				// federation: we ask the parent provider to determine the
-				// proper rule
-				if (effectiveProvider.getRootStore().getPath().equals(sfs.getPath())) {
-					ISemanticFileStore parentStore = (ISemanticFileStore) sfs.getParent();
-					if (parentStore != null) {
-						result = toRule(parentStore.getEffectiveContentProvider().getRuleFactory().deleteRule(sfs));
-					} else {
-						result = toRule(effectiveProvider.getRuleFactory().deleteRule(sfs));
-					}
-				} else {
-					result = toRule(effectiveProvider.getRuleFactory().deleteRule(sfs));
-				}
-
-			} else {
-				if (SfsTraceLocation.RULEFACTORY.isActive()) {
-					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
-							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
-				}
-				result = this.root;
-			}
+			result = this.calculateRuleForType2(resource, RuleType.DELETE);
 		} catch (CoreException e) {
 			if (SfsTraceLocation.RULEFACTORY.isActive()) {
 				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
@@ -240,7 +198,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -252,38 +210,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 	}
 
-	public ISchedulingRule markerRule(IResource resource) {
-
-		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
-		}
-
-		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), null);
-		}
-		// TODO 0.2: the current org.eclipse.core.internal.resources.Rules
-		// implementation does not delegate to this method
-
-		return null;
-
-		// try {
-		// ISemanticResource sres = (ISemanticResource)
-		// resource.getAdapter(ISemanticResource.class);
-		// if (sres != null) {
-		// ISemanticFileStore sfs = (ISemanticFileStore)
-		// EFS.getStore(resource.getLocationURI());
-		//
-		// return
-		// toRule(sfs.getEffectiveContentProvider().getRuleFactory().markerRule(sfs));
-		// }
-		// } catch (CoreException e) {
-		// SemanticFileSystemTrace.trace(TraceLocation.RULEFACTORY, e);
-		// // $JL-EXC$ ignore here
-		// return this.root;
-		// }
-		// return this.root;
-	}
-
+	@Override
 	public ISchedulingRule modifyRule(IResource resource) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -296,7 +223,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			if (sres != null) {
 				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
 
-				result = toRule(sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(sfs));
+				result = toRule(new IResource[] {resource}, RuleType.MODIFY, sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(
+						sfs));
 			} else {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
 					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
@@ -313,7 +241,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -321,9 +249,14 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			}
 		}
 
+		ISchedulingRule superRule = super.modifyRule(resource);
+		if (superRule.contains(result)) {
+			return superRule;
+		}
 		return result;
 	}
 
+	@Override
 	public ISchedulingRule moveRule(IResource source, IResource destination) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -343,10 +276,12 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				// root
 				if (sourceStore.getEffectiveContentProvider().getClass().getName().equals(
 						destinationStore.getEffectiveContentProvider().getClass().getName())) {
-					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
+					result = toRule(new IResource[] {source}, RuleType.MOVE, sourceStore.getEffectiveContentProvider().getRuleFactory()
+							.moveRule(sourceStore, destinationStore));
 				} else {
-					result = toRule(sourceStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore),
-							destinationStore.getEffectiveContentProvider().getRuleFactory().moveRule(sourceStore, destinationStore));
+					result = toRule(new IResource[] {source, destination}, RuleType.MOVE, sourceStore.getEffectiveContentProvider()
+							.getRuleFactory().moveRule(sourceStore, destinationStore), destinationStore.getEffectiveContentProvider()
+							.getRuleFactory().moveRule(sourceStore, destinationStore));
 				}
 			} else {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -364,7 +299,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -375,6 +310,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		return result;
 	}
 
+	@Override
 	public ISchedulingRule refreshRule(IResource resource) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -383,32 +319,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 
 		ISchedulingRule result;
 		try {
-			ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
-			if (sres != null) {
-
-				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
-				ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
-				// // federation: we ask the parent provider to determine the
-				// proper rule
-				// if
-				// (effectiveProvider.getRootStore().getPath().equals(sfs.getPath()))
-				// {
-				// ISemanticFileStore parentStore = (ISemanticFileStore)
-				// sfs.getParent();
-				// if (parentStore != null) {
-				// return
-				// toRule(parentStore.getEffectiveContentProvider().getRuleFactory().refreshRule(sfs));
-				// }
-				// }
-				result = toRule(effectiveProvider.getRuleFactory().refreshRule(sfs));
-
-			} else {
-				if (SfsTraceLocation.RULEFACTORY.isActive()) {
-					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
-							Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
-				}
-				result = this.root;
-			}
+			result = calculateRuleForType2(resource, RuleType.REFRESH);
 		} catch (CoreException e) {
 			if (SfsTraceLocation.RULEFACTORY.isActive()) {
 				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(), e.getMessage(), e);
@@ -418,7 +329,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -429,6 +340,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		return result;
 	}
 
+	@Override
 	public ISchedulingRule validateEditRule(IResource[] resources) {
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -448,7 +360,8 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				ISemanticResource sres = (ISemanticResource) resources[0].getAdapter(ISemanticResource.class);
 				if (sres != null) {
 
-					result = toRule(stores[0].getEffectiveContentProvider().getRuleFactory().validateEditRule(stores));
+					result = toRule(resources, RuleType.VALIDATE_EDIT, stores[0].getEffectiveContentProvider().getRuleFactory()
+							.validateEditRule(stores));
 				} else {
 					if (SfsTraceLocation.RULEFACTORY.isActive()) {
 						SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
@@ -487,8 +400,10 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 								ruleStores.clear();
 								break;
 							}
+						} else {
+							ruleStores.clear();
+							break;
 						}
-
 					} else {
 						ruleStores.clear();
 						break;
@@ -501,7 +416,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 					}
 					result = this.root;
 				} else {
-					result = toRule(ruleStores.toArray(new ISemanticFileStore[0]));
+					result = toRule(resources, RuleType.VALIDATE_EDIT, ruleStores.toArray(new ISemanticFileStore[0]));
 				}
 			} catch (CoreException e) {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
@@ -513,7 +428,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		}
 
 		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			if (result instanceof IResource) {
+			if (result != null && result instanceof IResource) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(),
 						((IResource) result).getFullPath().toString());
 			} else {
@@ -524,23 +439,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 		return result;
 	}
 
-	/*
-	 * Added for compatibility with Eclipse 3.6
-	 */
-	public ISchedulingRule derivedRule(IResource resource) {
-		// TODO 0.1 add implementation
-		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			SfsTraceLocation.getTrace().traceEntry(SfsTraceLocation.RULEFACTORY.getLocation(), resource.getFullPath().toString());
-		}
-
-		if (SfsTraceLocation.RULEFACTORY.isActive()) {
-			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.RULEFACTORY.getLocation(), null);
-		}
-
-		return null;
-	}
-
-	private ISchedulingRule toRule(ISemanticFileStore... stores) throws CoreException {
+	private ISchedulingRule toRule(IResource[] resources, RuleType type, ISemanticFileStore... stores) throws CoreException {
 
 		if (stores.length == 1) {
 			// single rule
@@ -548,14 +447,10 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 				// if the rule is null, return the root
 				return this.root;
 			}
-			IPath path = stores[0].getPath();
-			IResource rule = this.root.findMember(path);
-			// we find the first existing resource
-			while ((rule == null || !rule.exists()) && path.segmentCount() > 0) {
-				path = path.removeLastSegments(1);
-				rule = this.root.findMember(path);
-			}
-			if (rule == null || !rule.exists()) {
+
+			IResource rule = getRuleForStore(stores[0], resources[0], type);
+
+			if (rule == null) {
 				throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_FOR_STORE_NOT_FOUND, stores[0].getPath(),
 						MessageFormat.format(Messages.DelegatingResourceRuleFactory_NoExistingParentFound_XMSG, stores[0].getPath()
 								.toString()));
@@ -570,7 +465,7 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			// MultiRule
 			ISemanticFileStore store = stores[i];
 			if (store == null) {
-				// null translates to workspace root, so we don't nee a multi
+				// null translates to workspace root, so we don't need a multi
 				// rule here
 				return this.root;
 			}
@@ -587,6 +482,45 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			rules[i] = rule;
 		}
 		return new MultiRule(rules);
+	}
+
+	private IResource getRuleForStore(ISemanticFileStore store, IResource resource, RuleType type) {
+		IResource rule = null;
+
+		IResource[] rules;
+
+		if (store.getType() == ISemanticFileStore.FILE) {
+			rules = this.root.findFilesForLocationURI(store.toURI());
+		} else {
+			rules = this.root.findContainersForLocationURI(store.toURI());
+		}
+
+		IPath resourcePath = resource.getFullPath();
+		int max = 0;
+		for (int i = 0; i < rules.length; i++) {
+			IPath path1 = rules[i].getFullPath();
+
+			int matchingSegments = resourcePath.matchingFirstSegments(path1);
+			if (matchingSegments > max) {
+				max = matchingSegments;
+				rule = rules[i];
+			}
+		}
+		if (rule == null) {
+			switch (type) {
+				case REFRESH :
+				case CREATE :
+				case DELETE :
+					rule = resource.getParent();
+					break;
+				case MODIFY :
+					rule = resource;
+					break;
+				default :
+					break;
+			}
+		}
+		return rule;
 	}
 
 	private ISemanticFileStore[] allStoresFromSameProvider(IResource... resources) {
@@ -613,6 +547,102 @@ public class DelegatingResourceRuleFactory implements IResourceRuleFactory {
 			}
 		}
 		return result;
+	}
+
+	ISchedulingRule calculateRuleForType(IResource resource, RuleType type) throws CoreException {
+		ISchedulingRule result;
+		ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
+		if (sres != null) {
+			ISemanticFileStore rule;
+			ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
+			ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
+			if (effectiveProvider.getRootStore().getPath().equals(sfs.getPath())) {
+				// federation: we ask the parent provider to determine the
+				// proper rule for the root store of the provider
+				ISemanticFileStore parentStore = (ISemanticFileStore) sfs.getParent();
+				if (parentStore != null) {
+					rule = determineRule(parentStore, type);
+				} else {
+					rule = determineRule(sfs, type);
+				}
+			} else {
+				rule = determineRule(sfs, type);
+			}
+			result = toRule(new IResource[] {resource}, type, rule);
+		} else {
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+						Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+			}
+			result = this.root;
+		}
+		return result;
+	}
+
+	private ISemanticFileStore determineRule(ISemanticFileStore sfs, RuleType type) throws CoreException {
+		ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
+		IPath rootStorePath = effectiveProvider.getRootStore().getPath();
+		ISemanticResourceRuleFactory factory = effectiveProvider.getRuleFactory();
+		ISemanticFileStore rule = getRuleForType(factory, type, sfs);
+		IPath rulePath;
+
+		while (rule != null) {
+			rulePath = rule.getPath();
+			if (!rootStorePath.isPrefixOf(rulePath)) {
+				// we are outside the current content provider
+				effectiveProvider = rule.getEffectiveContentProvider();
+				rootStorePath = effectiveProvider.getRootStore().getPath();
+				factory = effectiveProvider.getRuleFactory();
+
+				rule = getRuleForType(factory, type, rule);
+			} else {
+				break;
+			}
+		}
+		return rule;
+	}
+
+	private ISchedulingRule calculateRuleForType2(IResource resource, RuleType type) throws CoreException {
+		ISchedulingRule result;
+		ISemanticResource sres = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
+		if (sres != null) {
+			ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
+
+			ISemanticFileStore rule = determineRule2(sfs, type);
+
+			result = toRule(new IResource[] {resource}, type, rule);
+		} else {
+			if (SfsTraceLocation.RULEFACTORY.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
+						Messages.DelegatingResourceRuleFactory_ResourceNotAdapter_XMSG);
+			}
+			result = this.root;
+		}
+		return result;
+	}
+
+	private ISemanticFileStore determineRule2(ISemanticFileStore sfs, RuleType type) throws CoreException {
+		ISemanticContentProvider effectiveProvider = sfs.getEffectiveContentProvider();
+		ISemanticResourceRuleFactory factory = effectiveProvider.getRuleFactory();
+		ISemanticFileStore rule = getRuleForType(factory, type, sfs);
+		return rule;
+	}
+
+	private ISemanticFileStore getRuleForType(ISemanticResourceRuleFactory factory, RuleType type, ISemanticFileStore rule) {
+		switch (type) {
+			case REFRESH :
+				rule = factory.refreshRule(rule);
+				break;
+			case CREATE :
+				rule = factory.createRule(rule);
+				break;
+			case DELETE :
+				rule = factory.deleteRule(rule);
+				break;
+			default :
+				break;
+		}
+		return rule;
 	}
 
 }

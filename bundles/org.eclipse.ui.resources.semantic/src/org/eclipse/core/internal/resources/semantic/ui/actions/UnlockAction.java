@@ -70,9 +70,9 @@ public class UnlockAction extends ActionBase {
 
 					try {
 						IWorkspace ws = ResourcesPlugin.getWorkspace();
-						// we use the modify rule here as specified in
+						// we use the refresh rule here as specified in
 						// ISemanticResource.unlockResource(IProgressMonitor)
-						ISchedulingRule rule = ws.getRuleFactory().modifyRule(resource.getAdaptedResource());
+						ISchedulingRule rule = ws.getRuleFactory().refreshRule(resource.getAdaptedResource());
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
 						throw new InvocationTargetException(ce);

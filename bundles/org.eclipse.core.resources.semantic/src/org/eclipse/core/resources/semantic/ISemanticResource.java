@@ -68,8 +68,6 @@ import org.eclipse.core.runtime.MultiStatus;
  * managed by the platform's adapter manager.
  * </p>
  * 
- * @since 4.0
- * 
  * @see IResource
  * @see ISemanticFileSystem#SFS_REPOSITORY_PROVIDER
  * 
@@ -240,8 +238,8 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * However, callers should make no assumptions about the returned status
 	 * objects.
 	 * <p>
-	 * In order to avoid lock extension, a proper modify scheduling rule must be
-	 * obtained before executing this operation.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
 	 * options, this resource will be refreshed locally.
@@ -259,7 +257,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *             in case of operation failure
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#modifyRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public void synchronizeContentWithRemote(SyncDirection direction, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -311,8 +309,8 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * {@link IStatus#CANCEL}. Applications can check whether locking is
 	 * supported using {@link ISemanticResourceInfo#isLockingSupported()}.
 	 * <p>
-	 * In order to avoid lock extension, a proper modify scheduling rule must be
-	 * obtained before executing this method.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this method.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
 	 * options, this resource will be refreshed locally if the lock operation
@@ -331,7 +329,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *             in case of failure
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#modifyRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public IStatus lockResource(int options, IProgressMonitor monitor) throws CoreException;
 
@@ -347,8 +345,8 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * {@link IStatus#CANCEL}. Applications can check whether locking is
 	 * supported using {@link ISemanticResourceInfo#isLockingSupported()}.
 	 * <p>
-	 * In order to avoid lock extension, a proper modify scheduling rule must be
-	 * obtained before executing this method.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this method.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
 	 * options, this resource will be refreshed locally if the lock operation
@@ -367,7 +365,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *             in case of failure
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#modifyRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public IStatus unlockResource(int options, IProgressMonitor monitor) throws CoreException;
 
@@ -375,8 +373,8 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * Sets or updates the remote URI of the resource.
 	 * 
 	 * <p>
-	 * In order to avoid lock extension, a proper modify scheduling rule must be
-	 * obtained before executing this method.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this method.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
 	 * options, this resource will be refreshed locally.
@@ -390,6 +388,9 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *            is not desired
 	 * @throws CoreException
 	 *             in case of failure
+	 *             
+	 * @see IWorkspace#getRuleFactory()
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public void setRemoteURI(URI uri, int options, IProgressMonitor monitor) throws CoreException;
 }

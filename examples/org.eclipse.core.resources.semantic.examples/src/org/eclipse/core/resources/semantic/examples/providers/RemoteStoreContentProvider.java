@@ -28,9 +28,9 @@ import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteItem;
+import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStore;
 import org.eclipse.core.resources.semantic.examples.remote.SemanticResourcesPluginExamplesCore;
-import org.eclipse.core.resources.semantic.examples.remote.RemoteItem.Type;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheService;
@@ -38,6 +38,7 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderRemote;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
@@ -45,7 +46,6 @@ import org.eclipse.core.resources.semantic.spi.SemanticRevisionStorage;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticTreeWalker;
 import org.eclipse.core.resources.semantic.spi.Util;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -69,7 +69,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 	private static final QualifiedName ATTR_READONLY = new QualifiedName(SemanticResourcesPluginExamplesCore.PLUGIN_ID, "ReadOnly"); //$NON-NLS-1$
 
 	@Override
-	@SuppressWarnings( {"rawtypes"})
+	@SuppressWarnings({"rawtypes"})
 	public Object getAdapter(Class adapter) {
 
 		if (adapter == ISemanticFileHistoryProvider.class) {
@@ -550,10 +550,6 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 			}
 
 			public ISemanticFileStore modifyRule(ISemanticFileStore store) {
-				return (ISemanticFileStore) getRootStore().getParent();
-			}
-
-			public ISemanticFileStore markerRule(ISemanticFileStore store) {
 				return (ISemanticFileStore) getRootStore().getParent();
 			}
 

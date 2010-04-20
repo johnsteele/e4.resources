@@ -24,9 +24,8 @@ import org.eclipse.core.resources.IResourceRuleFactory;
  * hierarchy of the resource will be followed upward up to the first existing
  * resource that will returned as scheduling rule.
  * 
- * @since 4.0
- * 
  * @noextend This interface is not intended to be extended by clients.
+ * @noimplement This interface is not intended to be implemented by clients.
  * 
  */
 public interface ISemanticResourceRuleFactory {
@@ -78,18 +77,6 @@ public interface ISemanticResourceRuleFactory {
 	 *         root will be locked
 	 */
 	public ISemanticFileStore deleteRule(ISemanticFileStore store);
-
-	/**
-	 * Returns the scheduling rule that is required for creating, modifying, or
-	 * deleting markers on a resource.
-	 * 
-	 * @param store
-	 *            the store owning the marker to be modified
-	 * @return a store that corresponds to a resource that should be used as
-	 *         scheduling rule; if <code>null</code> is returned, the workspace
-	 *         root will be locked
-	 */
-	public ISemanticFileStore markerRule(ISemanticFileStore store);
 
 	/**
 	 * Returns the scheduling rule that is required for modifying a resource.

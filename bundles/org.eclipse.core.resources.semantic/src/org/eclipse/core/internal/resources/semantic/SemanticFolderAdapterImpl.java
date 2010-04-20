@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
  * The {@link ISemanticFolder} implementation.
@@ -55,13 +54,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 	public ISemanticResource addResource(String name, int options, IProgressMonitor monitor) throws CoreException {
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		ISemanticFileStoreInternal childStore = store.addResourceFromRemote(name, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithResource(name, childStore);
 	}
@@ -70,13 +69,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FILE);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addFileFromRemote(name, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFile(name);
 	}
@@ -85,13 +84,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FOLDER);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addFolderFromRemote(name, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFolder(name);
 	}
@@ -100,13 +99,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FILE);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addFileFromRemoteByURI(name, uri, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFile(name);
 	}
@@ -115,13 +114,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FOLDER);
 
-		checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addFolderFromRemoteByURI(name, uri, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, this.container, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFolder(name);
 	}
@@ -131,13 +130,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FOLDER);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addResource(name, true, contentProviderID, properties, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFolder(name);
 	}
@@ -147,13 +146,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FOLDER);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.addResource(name, false, contentProviderID, properties, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFile(name);
 	}
@@ -173,13 +172,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 		validateName(name, IResource.FILE);
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.createFileRemotely(name, source, context, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithFile(name);
 	}
@@ -187,13 +186,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 	public ISemanticResource createResourceRemotely(String name, Object context, int options, IProgressMonitor monitor)
 			throws CoreException {
 
-		ISchedulingRule rule = checkCurrentRule(RuleType.CREATE);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		ISemanticFileStoreInternal childStore = store.createResourceRemotely(name, context, monitor);
 
-		refreshLocalIfNeeded(RuleType.CREATE, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.container), options, monitor);
 
 		return wrapChildWithResource(name, childStore);
 	}

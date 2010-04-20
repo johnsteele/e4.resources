@@ -52,7 +52,6 @@ import org.eclipse.core.runtime.QualifiedName;
  * check the names since the type of the child that is to be created is not
  * known.
  * 
- * @since 4.0
  * @see ISemanticResource
  * @see IFolder
  * @see IWorkspace#validateName(String, int)
@@ -93,7 +92,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * list of this folder.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -116,7 +115,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticResource createResourceRemotely(String name, Object context, int options, IProgressMonitor monitor)
 			throws CoreException;
@@ -128,7 +127,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * members list of this folder.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -153,7 +152,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFile createFileRemotely(String name, InputStream source, Object context, int options, IProgressMonitor monitor)
 			throws CoreException;
@@ -167,7 +166,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * remote content is created.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -187,7 +186,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticResource addResource(String name, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -196,7 +195,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * given name. No remote content is created.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -216,7 +215,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFile addFile(String name, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -225,7 +224,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * given name.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -245,7 +244,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	ISemanticFolder addFolder(String name, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -260,8 +259,8 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * Content providers that support this method must implement
 	 * <code>ISemanticContentProviderREST</code>.
 	 * <p>
-	 * In order to avoid lock extension, a proper create scheduling rule must be
-	 * obtained before executing this operation.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this operation.
 	 * <p>
 	 * A <code>CoreException</code> with error code
 	 * {@link SemanticResourceStatusCode#METHOD_NOT_SUPPORTED} will be thrown if
@@ -292,7 +291,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * 
 	 * @see IStatus#getCode()
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFile addFile(String name, URI uri, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -305,8 +304,8 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * Content providers that support this method must implement
 	 * <code>ISemanticContentProviderREST</code>.
 	 * <p>
-	 * In order to avoid lock extension, a proper create scheduling rule must be
-	 * obtained before executing this operation.
+	 * In order to avoid lock extension, a proper refresh scheduling rule must
+	 * be obtained before executing this operation.
 	 * <p>
 	 * A <code>CoreException</code> with error code
 	 * {@link SemanticResourceStatusCode#METHOD_NOT_SUPPORTED} will be thrown if
@@ -333,7 +332,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * 
 	 * @see IStatus#getCode()
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFolder addFolder(String name, URI uri, int options, IProgressMonitor monitor) throws CoreException;
 
@@ -342,7 +341,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * the given name.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -369,7 +368,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFolder addFolder(String name, String contentProviderID, Map<QualifiedName, String> properties, int options,
 			IProgressMonitor monitor) throws CoreException;
@@ -379,7 +378,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 * given name. No remote content is created.
 	 * <p>
 	 * Some other resources may be also added as result of this operation. In
-	 * order to avoid lock extension, a proper create scheduling rule must be
+	 * order to avoid lock extension, a proper refresh scheduling rule must be
 	 * obtained before executing this operation.
 	 * <p>
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
@@ -406,7 +405,7 @@ public interface ISemanticFolder extends ISemanticResource {
 	 *             already exists
 	 * 
 	 * @see IWorkspace#getRuleFactory()
-	 * @see IResourceRuleFactory#createRule(IResource)
+	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */
 	public ISemanticFile addFile(String name, String contentProviderID, Map<QualifiedName, String> properties, int options,
 			IProgressMonitor monitor) throws CoreException;

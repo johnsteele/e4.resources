@@ -17,7 +17,6 @@ import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
  * The {@link ISemanticFile} implementation.
@@ -67,14 +66,13 @@ public class SemanticFileAdapterImpl extends SemanticResourceAdapterImpl impleme
 	}
 
 	public void revertChanges(int options, IProgressMonitor monitor) throws CoreException {
-
-		ISchedulingRule rule = checkCurrentRule(RuleType.MODIFY);
+		checkCurrentRule(RuleType.REFRESH);
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
 		store.revertChanges(monitor);
 
-		refreshLocalIfNeeded(RuleType.MODIFY, rule, options, monitor);
+		refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.file), options, monitor);
 
 	}
 }

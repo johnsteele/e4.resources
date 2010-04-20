@@ -74,7 +74,6 @@ import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -445,8 +444,6 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	 * @throws Exception
 	 */
 	@Test
-	@Ignore
-	// currently not working in less than millisecond timestamp environment
 	public void testSynchronizeAction() throws Exception {
 
 		// org.eclipse.core.internal.resources.semantic.ui.SynchronizeAction

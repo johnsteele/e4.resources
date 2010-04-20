@@ -54,20 +54,21 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Base class for content provider tests
  * <p>
- * Creates a test project an initializes the reamote repository
+ * Creates a test project an initializes the remote repository
  * 
  */
 public abstract class TestsContentProviderBase extends TestsContentProviderUtil {
+	IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
 	/**
 	 * The constructor
@@ -98,7 +99,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 	@Before
 	public void beforeMethod() throws Exception {
 
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		if (project.exists()) {
@@ -168,7 +168,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		RemoteStoreTransient store = (RemoteStoreTransient) this.testProject.getAdapter(RemoteStoreTransient.class);
 		store.reset();
 
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(this.projectName);
 
 		this.testProject = null;
@@ -183,7 +182,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 	}
 
@@ -242,7 +241,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		};
 
 		// we need to use the project since the root folder is not yet synched
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, 0, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, 0, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", true, file.exists());
 		Assert.assertEquals("Folder existence", true, parent.exists());
@@ -308,7 +307,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertTrue("File should exist", file.exists());
 
@@ -325,7 +324,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(parent), 0, new NullProgressMonitor());
 
 		Assert.assertFalse("File should not exist", file.exists());
 
@@ -359,8 +358,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, ResourcesPlugin.getWorkspace().getRuleFactory().refreshRule(file), 0,
-				new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(parent), 0, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", true, file.exists());
 		Assert.assertEquals("Folder existence", true, parent.exists());
@@ -413,7 +411,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		};
 
 		// we need to use the project since the root folder is not yet synched
-		ResourcesPlugin.getWorkspace().run(runnable, this.testProject, 0, new NullProgressMonitor());
+		workspace.run(runnable, this.testProject, 0, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", true, file.exists());
 		Assert.assertEquals("Folder existence", true, parent.exists());
@@ -437,7 +435,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().modifyRule(file), 0, new NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -458,7 +456,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().modifyRule(file), 0, new NullProgressMonitor());
 
 		// TODO project close/open should drop session props
 		// runnable = new IWorkspaceRunnable() {
@@ -481,7 +479,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 		// }
 		// };
 		//
-		// ResourcesPlugin.getWorkspace().run(runnable, new
+		// workspace.run(runnable, new
 		// NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
@@ -491,13 +489,13 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				sf.remove(TestsContentProviderBase.this.options, null);
 				if (!TestsContentProviderBase.this.autoRefresh) {
 					Assert.assertEquals("File existence", true, file.exists());
-					file.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					file.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 				}
 				Assert.assertEquals("File existence", false, file.exists());
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().deleteRule(file), 0, new NullProgressMonitor());
 
 		Assert.assertFalse("File should not exist", file.exists());
 
@@ -508,8 +506,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 	 * @throws Exception
 	 */
 	@Test
-	@Ignore
-	// currently not working with less than millisecond timestamp accuracy
 	public void testTimestamp() throws Exception {
 
 		final IFolder root = this.testProject.getFolder("root");
@@ -532,7 +528,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(parent), 0, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", true, file.exists());
 
@@ -554,7 +550,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 	}
 
 	/**
@@ -602,7 +598,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -617,7 +613,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 	}
 
 	/**
@@ -650,7 +646,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 	}
 
@@ -694,7 +690,8 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		ISchedulingRule rule = workspace.getRuleFactory().refreshRule(parent);
+		workspace.run(runnable, rule, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
 
 	}
 
@@ -726,7 +723,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", true, file.exists());
 
@@ -738,7 +735,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -753,7 +750,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", false, file.exists());
 
@@ -786,7 +783,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("Folder existence", true, folder.exists());
 
@@ -803,7 +800,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("Folder existence", false, folder.exists());
 
@@ -834,7 +831,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		assertContentsEqual(file, "Hello");
 
@@ -858,7 +855,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		assertContentsEqual(file, "NewString");
 
@@ -888,11 +885,11 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		assertContentsEqual(file, "NewStringAppended");
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -905,7 +902,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		assertContentsEqual(file, "Hello");
 
@@ -924,7 +921,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("File existence", false, file.exists());
 
@@ -935,8 +932,6 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 	 * @throws Exception
 	 */
 	@Test
-	@Ignore
-	// currently not working with less than millisecond timestamp accuracy
 	public void testChangeFileContentRemote() throws Exception {
 
 		final IFolder root = this.testProject.getFolder("root");
@@ -956,7 +951,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertTrue("File should exist", file.exists());
 
@@ -992,7 +987,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		assertContentsEqual(file, "NewString");
 
@@ -1006,7 +1001,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		runnable = new IWorkspaceRunnable() {
 
@@ -1019,7 +1014,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertFalse("File should not exist", file.exists());
 
@@ -1050,7 +1045,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertTrue("File should exist", file.exists());
 
@@ -1076,7 +1071,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("Wrong lock state", true, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
@@ -1094,7 +1089,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertEquals("Wrong lock state", false, sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_LOCKED, null).isLocked());
 
@@ -1109,7 +1104,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertFalse("File should not exist", file.exists());
 
@@ -1145,7 +1140,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertTrue("Child should be available", sf.hasResource("NewFromClient"));
 
@@ -1163,7 +1158,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 		Assert.assertFalse("Child should not be available", sf.hasResource("NewFromClient"));
 
@@ -1199,7 +1194,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 
 	}
 
@@ -1225,7 +1220,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 		IStatus stat = result[0];
 		Assert.assertTrue("ValidateEdit should be ok", stat.getSeverity() == IStatus.OK);
 
@@ -1258,7 +1253,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 		IStatus stat = result[0];
 		Assert.assertTrue("ValidateRemoteDelete should be ok", stat.getSeverity() == IStatus.OK);
 
@@ -1293,7 +1288,7 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 			}
 		};
 
-		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+		workspace.run(runnable, new NullProgressMonitor());
 		IStatus stat = result[0];
 		Assert.assertTrue("ValidateSave should be ok", stat.getSeverity() == IStatus.OK);
 
