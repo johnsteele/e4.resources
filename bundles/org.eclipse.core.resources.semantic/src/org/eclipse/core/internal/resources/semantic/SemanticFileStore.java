@@ -63,8 +63,6 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	// we can't use the class name, since we don't have it in the class loader
 	private final static String DEFAULT_CONTENT_PROVIDER_ID = "org.eclipse.core.resources.semantic.provider.DefaultContentProvider"; //$NON-NLS-1$
 
-	private final static String ATTRIBUTE_URI_STRING = Util.qualifiedNameToString(SemanticFileSystem.ATTRIBUTE_URI);
-
 	private final ISemanticFileSystemLog log;
 	private ISemanticContentProvider provider;
 
@@ -577,7 +575,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		try {
 			this.fs.lockForRead();
 			try {
-				return new URI(ISemanticFileSystem.SCHEME, null, getPath().toString(), null);
+				return new URI(ISemanticFileSystem.SCHEME, null, null, -1, getPath().toString(), node.getQueryPart(), null);
 			} catch (URISyntaxException e) {
 				throw new RuntimeException(e);
 			}
@@ -1296,6 +1294,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	public boolean hasChild(String name) {
+		return hasResource(name);
+	}
+
 	public String getContentProviderID() {
 		try {
 			this.fs.lockForRead();
@@ -1308,14 +1310,22 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
-	public String getRemoteURIString() throws CoreException {
+	public URI getRemoteURI() throws CoreException {
 
 		checkAccessible();
 
 		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
 
 		if (effectiveProvider instanceof ISemanticContentProviderREST) {
-			return ((ISemanticContentProviderREST) effectiveProvider).getURIString(this);
+			try {
+				String uriString = ((ISemanticContentProviderREST) effectiveProvider).getURIString(this);
+
+				return new URI(uriString);
+			} catch (URISyntaxException e) {
+				throw new SemanticResourceException(SemanticResourceStatusCode.INVALID_URI_SYNTAX, getPath(), NLS.bind(
+						Messages.SemanticFileStore_InvalidURISyntax_XMSG, effectiveProvider.getClass().getName(),
+						ISemanticContentProviderREST.class.getName()));
+			}
 		}
 		throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, getPath(), NLS.bind(
 				Messages.SemanticFileStore_IntefaceNotImplemented_XMSG, effectiveProvider.getClass().getName(),
@@ -1344,6 +1354,18 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			return this.node.isLocalOnly();
 		} finally {
 			this.fs.unlockForRead();
+		}
+	}
+
+	public void setLocalOnly(boolean isLocalOnly) {
+		try {
+			this.fs.lockForWrite();
+
+			this.checkAndJoinTreeIfAnotherEntryExists();
+
+			this.node.setLocalOnly(isLocalOnly);
+		} finally {
+			this.fs.unlockForWrite();
 		}
 	}
 
@@ -1661,28 +1683,33 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	 */
 	@Override
 	protected void notifyPersistentPropertySet(String keyString, String oldValue, String newValue) throws CoreException {
-		// TODO tracing
-
-		if (keyString.equals(ATTRIBUTE_URI_STRING)) {
-			// if uri locator has not been requested yet, it will be rebuild
-			// later
-			if (this.fs.getURILocator() != null) {
-
-				if ((oldValue == null && newValue != null) || (oldValue != null && !oldValue.equals(newValue))) {
-					IPath path = getPath();
-					if (oldValue != null) {
-						this.fs.getURILocator().removeURI(path, oldValue);
-					}
-					if (newValue != null) {
-						this.fs.getURILocator().addURI(path, newValue);
-					}
-				}
-			}
-		}
+		// nothing to do for now
 	}
 
 	public IPath[] findURI(URI uri, IProgressMonitor monitor) throws CoreException {
 		return this.fs.getURILocatorService(monitor).locateURI(uri, getPath());
+	}
+
+	public String getRemoteURIString() {
+		return node.getRemoteURI();
+	}
+
+	public void setRemoteURIString(String uriString) {
+		String oldValue = node.getRemoteURI();
+
+		node.setRemoteURI(uriString);
+
+		if (this.fs.getURILocator() != null) {
+			if ((oldValue == null && uriString != null) || (oldValue != null && !oldValue.equals(uriString))) {
+				IPath path = getPath();
+				if (oldValue != null) {
+					this.fs.getURILocator().removeURI(path, oldValue);
+				}
+				if (uriString != null) {
+					this.fs.getURILocator().addURI(path, uriString);
+				}
+			}
+		}
 	}
 
 }

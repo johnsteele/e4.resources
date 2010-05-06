@@ -119,6 +119,7 @@ public interface ISemanticResourceInfo {
 	 * 
 	 * @return content type or <code>null</code>
 	 * @throws CoreException
+	 * @see ISemanticFileSystem#RESOURCE_INFO_CONTENT_TYPE
 	 */
 	public String getContentType() throws CoreException;
 }

@@ -31,44 +31,48 @@ import org.eclipse.emf.ecore.EReference;
  * <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
+ * 
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBFactory
  * @model kind="package"
  * @generated
  */
 public interface SemanticResourceDBPackage extends EPackage {
 	/**
-	 * The package name.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The package name. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	String eNAME = "SemanticResourceDB"; //$NON-NLS-1$
 
 	/**
-	 * The package namespace URI.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The package namespace URI. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	String eNS_URI = "http://www.eclipse.org/core/2009/resources/semantic"; //$NON-NLS-1$
 
 	/**
-	 * The package namespace name.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The package namespace name. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	String eNS_PREFIX = "SemanticResourceDB"; //$NON-NLS-1$
 
 	/**
-	 * The singleton instance of the package.
-	 * <!-- begin-user-doc --> <!--
+	 * The singleton instance of the package. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	SemanticResourceDBPackage eINSTANCE = org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl.init();
+	SemanticResourceDBPackage eINSTANCE = org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl
+			.init();
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl <em>Resource Tree Node</em>}' class.
-	 * <!-- begin-user-doc --> <!--
+	 * The meta object id for the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl
+	 * <em>Resource Tree Node</em>}' class. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getResourceTreeNode()
 	 * @generated
@@ -85,8 +89,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int RESOURCE_TREE_NODE__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Children</b></em>' containment reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -122,6 +127,7 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The feature id for the '<em><b>Persistent Properties</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -148,6 +154,7 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The feature id for the '<em><b>Session Properties</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -163,12 +170,31 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int RESOURCE_TREE_NODE__PATH = 9;
 
 	/**
-	 * The number of structural features of the '<em>Resource Tree Node</em>' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Query Part</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE_TREE_NODE_FEATURE_COUNT = 10;
+	int RESOURCE_TREE_NODE__QUERY_PART = 10;
+
+	/**
+	 * The feature id for the '<em><b>Remote URI</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_TREE_NODE__REMOTE_URI = 11;
+
+	/**
+	 * The number of structural features of the '<em>Resource Tree Node</em>'
+	 * class. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_TREE_NODE_FEATURE_COUNT = 12;
 
 	/**
 	 * The meta object id for the '
@@ -183,8 +209,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int SEMANTIC_DB = 1;
 
 	/**
-	 * The feature id for the '<em><b>Roots</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Roots</b></em>' containment reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -193,14 +220,17 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The number of structural features of the '<em>Semantic DB</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int SEMANTIC_DB_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.TreeRootImpl <em>Tree Root</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The meta object id for the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.TreeRootImpl
+	 * <em>Tree Root</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.TreeRootImpl
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getTreeRoot()
 	 * @generated
@@ -217,8 +247,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int TREE_ROOT__NAME = RESOURCE_TREE_NODE__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Children</b></em>' containment reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -254,6 +285,7 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The feature id for the '<em><b>Persistent Properties</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -280,6 +312,7 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The feature id for the '<em><b>Session Properties</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -295,8 +328,27 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int TREE_ROOT__PATH = RESOURCE_TREE_NODE__PATH;
 
 	/**
+	 * The feature id for the '<em><b>Query Part</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int TREE_ROOT__QUERY_PART = RESOURCE_TREE_NODE__QUERY_PART;
+
+	/**
+	 * The feature id for the '<em><b>Remote URI</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int TREE_ROOT__REMOTE_URI = RESOURCE_TREE_NODE__REMOTE_URI;
+
+	/**
 	 * The feature id for the '<em><b>Parent DB</b></em>' container reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -335,6 +387,7 @@ public interface SemanticResourceDBPackage extends EPackage {
 	/**
 	 * The meta object id for the '<em>Persistent Properties</em>' data type.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see java.util.HashMap
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getPersistentProperties()
 	 * @generated
@@ -364,8 +417,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EClass getResourceTreeNode();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName
+	 * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName()
 	 * @see #getResourceTreeNode()
@@ -374,9 +429,12 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_Name();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren <em>Children</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Children</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren
+	 * <em>Children</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Children</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren()
 	 * @see #getResourceTreeNode()
 	 * @generated
@@ -384,8 +442,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EReference getResourceTreeNode_Children();
 
 	/**
-	 * Returns the meta object for the container reference '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent <em>Parent</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the container reference '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent
+	 * <em>Parent</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the container reference '<em>Parent</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent()
 	 * @see #getResourceTreeNode()
@@ -394,8 +454,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EReference getResourceTreeNode_Parent();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isExists <em>Exists</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isExists
+	 * <em>Exists</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Exists</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isExists()
 	 * @see #getResourceTreeNode()
@@ -404,8 +466,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_Exists();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID <em>Template ID</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID
+	 * <em>Template ID</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Template ID</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID()
 	 * @see #getResourceTreeNode()
@@ -414,10 +478,13 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_TemplateID();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties <em>Persistent Properties</em>}'.
-	 * <!-- begin-user-doc --> <!--
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties
+	 * <em>Persistent Properties</em>}'. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @return the meta object for the attribute '<em>Persistent Properties</em>'.
+	 * 
+	 * @return the meta object for the attribute '<em>Persistent Properties</em>
+	 *         '.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties()
 	 * @see #getResourceTreeNode()
 	 * @generated
@@ -425,8 +492,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_PersistentProperties();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly <em>Local Only</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly
+	 * <em>Local Only</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Local Only</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly()
 	 * @see #getResourceTreeNode()
@@ -435,8 +504,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_LocalOnly();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType
+	 * <em>Type</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Type</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType()
 	 * @see #getResourceTreeNode()
@@ -458,8 +529,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_SessionProperties();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath
+	 * <em>Path</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Path</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath()
 	 * @see #getResourceTreeNode()
@@ -468,8 +541,34 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getResourceTreeNode_Path();
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB <em>Semantic DB</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getQueryPart
+	 * <em>Query Part</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the attribute '<em>Query Part</em>'.
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getQueryPart()
+	 * @see #getResourceTreeNode()
+	 * @generated
+	 */
+	EAttribute getResourceTreeNode_QueryPart();
+
+	/**
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getRemoteURI
+	 * <em>Remote URI</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the attribute '<em>Remote URI</em>'.
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getRemoteURI()
+	 * @see #getResourceTreeNode()
+	 * @generated
+	 */
+	EAttribute getResourceTreeNode_RemoteURI();
+
+	/**
+	 * Returns the meta object for class '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB
+	 * <em>Semantic DB</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Semantic DB</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB
 	 * @generated
@@ -477,9 +576,12 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EClass getSemanticDB();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB#getRoots <em>Roots</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Roots</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB#getRoots
+	 * <em>Roots</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Roots</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticDB#getRoots()
 	 * @see #getSemanticDB()
 	 * @generated
@@ -487,8 +589,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EReference getSemanticDB_Roots();
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot <em>Tree Root</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for class '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot
+	 * <em>Tree Root</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for class '<em>Tree Root</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot
 	 * @generated
@@ -496,8 +600,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EClass getTreeRoot();
 
 	/**
-	 * Returns the meta object for the container reference '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB <em>Parent DB</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the container reference '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB
+	 * <em>Parent DB</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the container reference '<em>Parent DB</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getParentDB()
 	 * @see #getTreeRoot()
@@ -506,8 +612,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EReference getTreeRoot_ParentDB();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getRootURI <em>Root URI</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getRootURI
+	 * <em>Root URI</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Root URI</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeRoot#getRootURI()
 	 * @see #getTreeRoot()
@@ -516,8 +624,10 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EAttribute getTreeRoot_RootURI();
 
 	/**
-	 * Returns the meta object for enum '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType <em>Tree Node Type</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the meta object for enum '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
+	 * <em>Tree Node Type</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for enum '<em>Tree Node Type</em>'.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
 	 * @generated
@@ -525,12 +635,14 @@ public interface SemanticResourceDBPackage extends EPackage {
 	EEnum getTreeNodeType();
 
 	/**
-	 * Returns the meta object for data type '{@link java.util.HashMap <em>Persistent Properties</em>}'.
-	 * <!-- begin-user-doc --> <!--
+	 * Returns the meta object for data type '{@link java.util.HashMap
+	 * <em>Persistent Properties</em>}'. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @return the meta object for data type '<em>Persistent Properties</em>'.
 	 * @see java.util.HashMap
-	 * @model instanceClass="java.util.HashMap<java.lang.String, java.lang.String>"
+	 * @model 
+	 *        instanceClass="java.util.HashMap<java.lang.String, java.lang.String>"
 	 * @generated
 	 */
 	EDataType getPersistentProperties();
@@ -567,14 +679,17 @@ public interface SemanticResourceDBPackage extends EPackage {
 	 * <li>and each data type</li>
 	 * </ul>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("hiding")
 	interface Literals {
 		/**
-		 * The meta object literal for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl <em>Resource Tree Node</em>}' class.
-		 * <!-- begin-user-doc --> <!--
+		 * The meta object literal for the '
+		 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl
+		 * <em>Resource Tree Node</em>}' class. <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
+		 * 
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getResourceTreeNode()
 		 * @generated
@@ -582,37 +697,42 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EClass RESOURCE_TREE_NODE = eINSTANCE.getResourceTreeNode();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute
+		 * feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__NAME = eINSTANCE.getResourceTreeNode_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Children</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!--
+		 * The meta object literal for the '<em><b>Children</b></em>'
+		 * containment reference list feature. <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EReference RESOURCE_TREE_NODE__CHILDREN = eINSTANCE.getResourceTreeNode_Children();
 
 		/**
-		 * The meta object literal for the '<em><b>Parent</b></em>' container reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Parent</b></em>' container
+		 * reference feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EReference RESOURCE_TREE_NODE__PARENT = eINSTANCE.getResourceTreeNode_Parent();
 
 		/**
-		 * The meta object literal for the '<em><b>Exists</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Exists</b></em>' attribute
+		 * feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__EXISTS = eINSTANCE.getResourceTreeNode_Exists();
 
 		/**
-		 * The meta object literal for the '<em><b>Template ID</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Template ID</b></em>'
+		 * attribute feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__TEMPLATE_ID = eINSTANCE.getResourceTreeNode_TemplateID();
@@ -627,37 +747,59 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EAttribute RESOURCE_TREE_NODE__PERSISTENT_PROPERTIES = eINSTANCE.getResourceTreeNode_PersistentProperties();
 
 		/**
-		 * The meta object literal for the '<em><b>Local Only</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Local Only</b></em>'
+		 * attribute feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__LOCAL_ONLY = eINSTANCE.getResourceTreeNode_LocalOnly();
 
 		/**
-		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute
+		 * feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__TYPE = eINSTANCE.getResourceTreeNode_Type();
 
 		/**
-		 * The meta object literal for the '<em><b>Session Properties</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Session Properties</b></em>'
+		 * attribute feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__SESSION_PROPERTIES = eINSTANCE.getResourceTreeNode_SessionProperties();
 
 		/**
-		 * The meta object literal for the '<em><b>Path</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Path</b></em>' attribute
+		 * feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__PATH = eINSTANCE.getResourceTreeNode_Path();
 
 		/**
-		 * The meta object literal for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl <em>Semantic DB</em>}' class.
-		 * <!-- begin-user-doc --> <!--
+		 * The meta object literal for the '<em><b>Query Part</b></em>'
+		 * attribute feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
+		 * @generated
+		 */
+		EAttribute RESOURCE_TREE_NODE__QUERY_PART = eINSTANCE.getResourceTreeNode_QueryPart();
+
+		/**
+		 * The meta object literal for the '<em><b>Remote URI</b></em>'
+		 * attribute feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
+		 * @generated
+		 */
+		EAttribute RESOURCE_TREE_NODE__REMOTE_URI = eINSTANCE.getResourceTreeNode_RemoteURI();
+
+		/**
+		 * The meta object literal for the '
+		 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl
+		 * <em>Semantic DB</em>}' class. <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
+		 * 
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticDBImpl
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getSemanticDB()
 		 * @generated
@@ -665,8 +807,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EClass SEMANTIC_DB = eINSTANCE.getSemanticDB();
 
 		/**
-		 * The meta object literal for the '<em><b>Roots</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Roots</b></em>' containment
+		 * reference list feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EReference SEMANTIC_DB__ROOTS = eINSTANCE.getSemanticDB_Roots();
@@ -684,23 +827,27 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EClass TREE_ROOT = eINSTANCE.getTreeRoot();
 
 		/**
-		 * The meta object literal for the '<em><b>Parent DB</b></em>' container reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Parent DB</b></em>' container
+		 * reference feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EReference TREE_ROOT__PARENT_DB = eINSTANCE.getTreeRoot_ParentDB();
 
 		/**
-		 * The meta object literal for the '<em><b>Root URI</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Root URI</b></em>' attribute
+		 * feature. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @generated
 		 */
 		EAttribute TREE_ROOT__ROOT_URI = eINSTANCE.getTreeRoot_RootURI();
 
 		/**
-		 * The meta object literal for the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType <em>Tree Node Type</em>}' enum.
-		 * <!-- begin-user-doc --> <!--
+		 * The meta object literal for the '
+		 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
+		 * <em>Tree Node Type</em>}' enum. <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
+		 * 
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getTreeNodeType()
 		 * @generated
@@ -708,8 +855,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EEnum TREE_NODE_TYPE = eINSTANCE.getTreeNodeType();
 
 		/**
-		 * The meta object literal for the '<em>Persistent Properties</em>' data type.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em>Persistent Properties</em>' data
+		 * type. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @see java.util.HashMap
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getPersistentProperties()
 		 * @generated
@@ -717,8 +865,9 @@ public interface SemanticResourceDBPackage extends EPackage {
 		EDataType PERSISTENT_PROPERTIES = eINSTANCE.getPersistentProperties();
 
 		/**
-		 * The meta object literal for the '<em>Session Properties</em>' data type.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em>Session Properties</em>' data
+		 * type. <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @see java.util.HashMap
 		 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.SemanticResourceDBPackageImpl#getSessionProperties()
 		 * @generated

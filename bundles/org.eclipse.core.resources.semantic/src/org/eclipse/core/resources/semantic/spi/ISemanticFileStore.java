@@ -56,7 +56,6 @@ import org.eclipse.core.runtime.QualifiedName;
  * information where needed.
  * <p>
  * 
- * @since 4.0
  * @see ISemanticContentProvider
  * @see ISemanticContentProviderREST
  * @see ISemanticProperties
@@ -229,5 +228,39 @@ public interface ISemanticFileStore extends ISemanticProperties, IFileStore {
 	 * @return <code>true</code> if this refers to a local-only resource
 	 */
 	public boolean isLocalOnly();
+
+	/**
+	 * Changes the local only flag
+	 * 
+	 * @param isLocalOnly
+	 * @since 0.3
+	 */
+	public void setLocalOnly(boolean isLocalOnly);
+
+	/**
+	 * 
+	 * @param name
+	 *            of the child store
+	 * @return true if child exists
+	 * @since 0.3
+	 */
+	public boolean hasChild(String name);
+
+	/**
+	 * 
+	 * @return remote uri string
+	 * @throws CoreException
+	 * @since 0.3
+	 */
+	public String getRemoteURIString() throws CoreException;
+
+	/**
+	 * 
+	 * @param uriString
+	 *            remote uri string
+	 * @throws CoreException
+	 * @since 0.3
+	 */
+	public void setRemoteURIString(String uriString) throws CoreException;
 
 }

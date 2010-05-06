@@ -140,12 +140,21 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 		IResourceRuleFactory rf;
 
-		// we obtain the "expected" rule from the content provider
-		RepositoryProvider provider = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
-		if (provider != null) {
-			rf = provider.getRuleFactory();
+		if (actResource.isLinked()) {
+			// fallback to default factory
+			rf = actResource.getWorkspace().getRuleFactory();
 		} else {
-			rf = new DelegatingResourceRuleFactory(this.fs);
+			// we obtain the "expected" rule from the content provider
+			RepositoryProvider provider = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+			if (provider != null) {
+				rf = provider.getRuleFactory();
+			} else {
+				if (actResource.getType() == IResource.PROJECT) {
+					rf = actResource.getWorkspace().getRuleFactory();
+				} else {
+					rf = new DelegatingResourceRuleFactory(this.fs);
+				}
+			}
 		}
 
 		ISchedulingRule checkRule;

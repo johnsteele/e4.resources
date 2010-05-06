@@ -251,6 +251,24 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	public EAttribute getResourceTreeNode_QueryPart() {
+		return (EAttribute) resourceTreeNodeEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public EAttribute getResourceTreeNode_RemoteURI() {
+		return (EAttribute) resourceTreeNodeEClass.getEStructuralFeatures().get(11);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public EClass getSemanticDB() {
 		return semanticDBEClass;
 	}
@@ -358,6 +376,8 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__TYPE);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__SESSION_PROPERTIES);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__PATH);
+		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__QUERY_PART);
+		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__REMOTE_URI);
 
 		semanticDBEClass = createEClass(SEMANTIC_DB);
 		createEReference(semanticDBEClass, SEMANTIC_DB__ROOTS);
@@ -450,6 +470,14 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 				getResourceTreeNode_Path(),
 				ecorePackage.getEString(),
 				"path", null, 0, 1, ResourceTreeNode.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(
+				getResourceTreeNode_QueryPart(),
+				ecorePackage.getEString(),
+				"queryPart", null, 0, 1, ResourceTreeNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(
+				getResourceTreeNode_RemoteURI(),
+				ecorePackage.getEString(),
+				"remoteURI", null, 0, 1, ResourceTreeNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(semanticDBEClass, SemanticDB.class, "SemanticDB", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(

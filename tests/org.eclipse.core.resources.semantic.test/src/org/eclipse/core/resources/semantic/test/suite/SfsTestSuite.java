@@ -15,6 +15,7 @@ import org.eclipse.core.resources.semantic.test.TestCacheService;
 import org.eclipse.core.resources.semantic.test.TestsCachingProvider;
 import org.eclipse.core.resources.semantic.test.TestsDefaultContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsFederatingProvider;
+import org.eclipse.core.resources.semantic.test.TestsLinkedResources;
 import org.eclipse.core.resources.semantic.test.TestsNullContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsPlainProvider;
 import org.junit.runner.RunWith;
@@ -24,14 +25,13 @@ import org.junit.runners.Suite;
  * All SFS tests
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { TestsDefaultContentProvider.class, //
-	TestsPlainProvider.class, //
-	TestsCachingProvider.class,//
-	TestsFederatingProvider.class,//
+@Suite.SuiteClasses({TestsDefaultContentProvider.class, //
+		TestsPlainProvider.class, //
+		TestsCachingProvider.class,//
+		TestsFederatingProvider.class,//
 		TestsNullContentProvider.class,//
-	TestCacheService.class
-
-})
+		TestCacheService.class,//
+		TestsLinkedResources.class})
 public class SfsTestSuite {
 	// the suite
 }

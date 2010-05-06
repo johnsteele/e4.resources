@@ -29,6 +29,7 @@ public class Messages extends NLS {
 	public static String SemanticFileStore_CreateResourceRemtoe_XMSG;
 	public static String SemanticFileStore_DeleteResourceRemote_XMSG;
 	public static String SemanticFileStore_IntefaceNotImplemented_XMSG;
+	public static String SemanticFileStore_InvalidURISyntax_XMSG;
 	public static String SemanticFileStore_Locking_XMSG;
 	public static String SemanticFileStore_MkDir_XMSG;
 	public static String SemanticFileStore_MkDirOnFile_XMSG;

@@ -23,23 +23,49 @@ import org.eclipse.emf.ecore.EObject;
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Resource Tree Node</b></em>'. <!-- end-user-doc -->
- *
+ * 
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName <em>Name</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren <em>Children</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent <em>Parent</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isExists <em>Exists</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID <em>Template ID</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties <em>Persistent Properties</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly <em>Local Only</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType <em>Type</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getSessionProperties <em>Session Properties</em>}</li>
- *   <li>{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName
+ * <em>Name</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren
+ * <em>Children</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent
+ * <em>Parent</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isExists
+ * <em>Exists</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID
+ * <em>Template ID</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties
+ * <em>Persistent Properties</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly
+ * <em>Local Only</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType
+ * <em>Type</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getSessionProperties
+ * <em>Session Properties</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath
+ * <em>Path</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getQueryPart
+ * <em>Query Part</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getRemoteURI
+ * <em>Remote URI</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode()
  * @model
  * @generated
@@ -63,24 +89,30 @@ public interface ResourceTreeNode extends EObject {
 	String getName();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getName
+	 * <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
 	 */
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Children</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode}.
-	 * It is bidirectional and its opposite is '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent <em>Parent</em>}'.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Children</b></em>' containment reference
+	 * list. The list contents are of type
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode}
+	 * . It is bidirectional and its opposite is '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent
+	 * <em>Parent</em>}'. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Children</em>' containment reference list
 	 * isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Children</em>' containment reference list.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_Children()
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent
@@ -90,14 +122,16 @@ public interface ResourceTreeNode extends EObject {
 	EList<ResourceTreeNode> getChildren();
 
 	/**
-	 * Returns the value of the '<em><b>Parent</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren <em>Children</em>}'.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Parent</b></em>' container reference. It
+	 * is bidirectional and its opposite is '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getChildren
+	 * <em>Children</em>}'. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Parent</em>' container reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Parent</em>' container reference.
 	 * @see #setParent(ResourceTreeNode)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_Parent()
@@ -108,24 +142,27 @@ public interface ResourceTreeNode extends EObject {
 	ResourceTreeNode getParent();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent <em>Parent</em>}' container reference.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getParent
+	 * <em>Parent</em>}' container reference. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Parent</em>' container reference.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Parent</em>' container reference.
 	 * @see #getParent()
 	 * @generated
 	 */
 	void setParent(ResourceTreeNode value);
 
 	/**
-	 * Returns the value of the '<em><b>Exists</b></em>' attribute.
-	 * The default value is <code>"true"</code>.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Exists</b></em>' attribute. The default
+	 * value is <code>"true"</code>. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Exists</em>' attribute isn't clear, there
 	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Exists</em>' attribute.
 	 * @see #setExists(boolean)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_Exists()
@@ -165,23 +202,27 @@ public interface ResourceTreeNode extends EObject {
 	String getTemplateID();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID <em>Template ID</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getTemplateID
+	 * <em>Template ID</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Template ID</em>' attribute.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Template ID</em>' attribute.
 	 * @see #getTemplateID()
 	 * @generated
 	 */
 	void setTemplateID(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Persistent Properties</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Persistent Properties</b></em>'
+	 * attribute. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Persistent Properties</em>' attribute isn't
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Persistent Properties</em>' attribute.
 	 * @see #setPersistentProperties(HashMap)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_PersistentProperties()
@@ -191,24 +232,28 @@ public interface ResourceTreeNode extends EObject {
 	HashMap<String, String> getPersistentProperties();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties <em>Persistent Properties</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPersistentProperties
+	 * <em>Persistent Properties</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Persistent Properties</em>' attribute.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Persistent Properties</em>'
+	 *            attribute.
 	 * @see #getPersistentProperties()
 	 * @generated
 	 */
 	void setPersistentProperties(HashMap<String, String> value);
 
 	/**
-	 * Returns the value of the '<em><b>Local Only</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Local Only</b></em>' attribute. The
+	 * default value is <code>"false"</code>. <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Local Only</em>' attribute isn't clear, there
 	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Local Only</em>' attribute.
 	 * @see #setLocalOnly(boolean)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_LocalOnly()
@@ -218,25 +263,29 @@ public interface ResourceTreeNode extends EObject {
 	boolean isLocalOnly();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly <em>Local Only</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#isLocalOnly
+	 * <em>Local Only</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Local Only</em>' attribute.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Local Only</em>' attribute.
 	 * @see #isLocalOnly()
 	 * @generated
 	 */
 	void setLocalOnly(boolean value);
 
 	/**
-	 * Returns the value of the '<em><b>Type</b></em>' attribute.
-	 * The default value is <code>"FILE"</code>.
-	 * The literals are from the enumeration {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Type</b></em>' attribute. The default
+	 * value is <code>"FILE"</code>. The literals are from the enumeration
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType}
+	 * . <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Type</em>' attribute isn't clear, there really
 	 * should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Type</em>' attribute.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
 	 * @see #setType(TreeNodeType)
@@ -247,9 +296,12 @@ public interface ResourceTreeNode extends EObject {
 	TreeNodeType getType();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType <em>Type</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Type</em>' attribute.
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getType
+	 * <em>Type</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Type</em>' attribute.
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType
 	 * @see #getType()
 	 * @generated
@@ -264,19 +316,24 @@ public interface ResourceTreeNode extends EObject {
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Session Properties</em>' attribute.
 	 * @see #setSessionProperties(HashMap)
 	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_SessionProperties()
-	 * @model dataType="org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SessionProperties" transient="true"
+	 * @model dataType="org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SessionProperties"
+	 *        transient="true"
 	 * @generated
 	 */
 	HashMap<QualifiedName, Object> getSessionProperties();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getSessionProperties <em>Session Properties</em>}' attribute.
-	 * <!-- begin-user-doc --> <!--
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getSessionProperties
+	 * <em>Session Properties</em>}' attribute. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * @param value the new value of the '<em>Session Properties</em>' attribute.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Session Properties</em>' attribute.
 	 * @see #getSessionProperties()
 	 * @generated
 	 */
@@ -300,12 +357,75 @@ public interface ResourceTreeNode extends EObject {
 	String getPath();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath <em>Path</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Path</em>' attribute.
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getPath
+	 * <em>Path</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Path</em>' attribute.
 	 * @see #getPath()
 	 * @generated
 	 */
 	void setPath(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Query Part</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Query Part</em>' attribute isn't clear, there
+	 * really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Query Part</em>' attribute.
+	 * @see #setQueryPart(String)
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_QueryPart()
+	 * @model
+	 * @generated
+	 */
+	String getQueryPart();
+
+	/**
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getQueryPart
+	 * <em>Query Part</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Query Part</em>' attribute.
+	 * @see #getQueryPart()
+	 * @generated
+	 */
+	void setQueryPart(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Remote URI</b></em>' attribute. <!--
+	 * begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Remote URI</em>' attribute isn't clear, there
+	 * really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Remote URI</em>' attribute.
+	 * @see #setRemoteURI(String)
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_RemoteURI()
+	 * @model
+	 * @generated
+	 */
+	String getRemoteURI();
+
+	/**
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getRemoteURI
+	 * <em>Remote URI</em>}' attribute. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Remote URI</em>' attribute.
+	 * @see #getRemoteURI()
+	 * @generated
+	 */
+	void setRemoteURI(String value);
 
 } // ResourceTreeNode

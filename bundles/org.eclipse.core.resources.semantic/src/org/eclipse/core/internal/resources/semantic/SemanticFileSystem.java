@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -59,8 +58,6 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
  * 
  */
 public class SemanticFileSystem extends FileSystem implements ISemanticFileSystem {
-
-	protected static final QualifiedName ATTRIBUTE_URI = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID, "URIString"); //$NON-NLS-1$ 
 
 	private static final String METADATA_FILENAME = "metadata.xmi"; //$NON-NLS-1$
 	final static IPath EMPTY = new Path(""); //$NON-NLS-1$
@@ -133,7 +130,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		return EFS.getNullFileSystem().getStore(uri);
 	}
 
-	IFileStore getFileStoreImplementation(String pathString) {
+	IFileStore getFileStoreImplementation(String pathString, String queryString) {
 		IPath path;
 
 		if (pathString != null) {
@@ -148,7 +145,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		// we do never return the virtual root node ("semanticfs:/")
 		if (path.segmentCount() > 0) {
 			try {
-				lockForRead();
+				lockForWrite();
 
 				EList<TreeRoot> roots = this.db.getRoots();
 
@@ -157,11 +154,11 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 						if (path.segmentCount() == 1) {
 							return getStore(treeRoot);
 						}
-						return getFileStoreRecursive(path, treeRoot);
+						return getFileStoreRecursive(path, treeRoot, queryString);
 					}
 				}
 			} finally {
-				unlockForRead();
+				unlockForWrite();
 			}
 
 			// no root found, create new one
@@ -169,20 +166,21 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 			try {
 				lockForWrite();
+				if (path.segmentCount() == 1) {
+					treeRoot = createRootNode(path.segment(0), queryString);
+					return getStore(treeRoot);
+				}
 				treeRoot = createRootNode(path.segment(0));
 			} finally {
 				unlockForWrite();
 			}
 
 			try {
-				lockForRead();
+				lockForWrite();
 
-				if (path.segmentCount() == 1) {
-					return getStore(treeRoot);
-				}
-				return getFileStoreRecursive(path, treeRoot);
+				return getFileStoreRecursive(path, treeRoot, queryString);
 			} finally {
-				unlockForRead();
+				unlockForWrite();
 			}
 		}
 
@@ -191,10 +189,11 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 	private IFileStore getFileStoreImplementation(URI uri) {
 		String pathString = uri.getPath();
-		return getFileStoreImplementation(pathString);
+		String queryString = uri.getQuery();
+		return getFileStoreImplementation(pathString, queryString);
 	}
 
-	private IFileStore getFileStoreRecursive(IPath path, ResourceTreeNode rootNode) {
+	private IFileStore getFileStoreRecursive(IPath path, ResourceTreeNode rootNode, String queryString) {
 		String[] segments = path.segments();
 		ResourceTreeNode currentNode = rootNode;
 		boolean ready = true;
@@ -219,7 +218,22 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		if (ready) {
 			return getStore(currentNode);
 		}
-		return getStore(createNonExistingNode(path));
+
+		ResourceTreeNode newNode = createNonExistingNode(path);
+
+		if (applyQueryParameters(newNode, queryString)) {
+			if (newNode.getType().equals(TreeNodeType.FOLDER) || newNode.getType().equals(TreeNodeType.PROJECT)) {
+				ISemanticFileStore store = getStore(newNode);
+				try {
+					store.mkdir(EFS.NONE, null);
+				} catch (CoreException e) {
+					// ignore since no exceptions are allowed here
+				}
+				return store;
+			}
+		}
+
+		return getStore(newNode);
 	}
 
 	ResourceTreeNode getParentNode(ResourceTreeNode childNode) {
@@ -394,7 +408,7 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 					.getPath(), Messages.SemanticFileStore_MkDirOnFile_XMSG);
 		}
 
-		if (!actNode.isExists()) {
+		if (!actNode.isExists() && actNode.getTemplateID() == null) {
 			if (parentProvider instanceof ISemanticContentProviderFederation) {
 				federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider).getFederatedProviderIDForPath(new Path(
 						actNode.getPath()));
@@ -607,6 +621,37 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		return root;
 	}
 
+	private TreeRoot createRootNode(String name, String queryString) {
+		TreeRoot root = SemanticResourceDBFactory.eINSTANCE.createTreeRoot();
+
+		root.setName(name);
+		root.setQueryPart(queryString);
+		root.setExists(false);
+		root.setPath("/" + name); //$NON-NLS-1$
+		root.setType(TreeNodeType.PROJECT);
+
+		if (applyQueryParameters(root, queryString)) {
+			root.setExists(true);
+			root.setPath(null);
+			root.setParentDB(this.db);
+		}
+		return root;
+	}
+
+	private boolean applyQueryParameters(ResourceTreeNode node, String queryString) {
+		boolean createRequested = false;
+
+		if (queryString != null) {
+			SemanticQueryParser parser = new SemanticQueryParser(queryString);
+
+			node.setTemplateID(parser.getProviderID());
+			node.setType(parser.getType());
+			node.setRemoteURI(parser.getURI());
+			createRequested = parser.getShouldCreate();
+		}
+		return createRequested;
+	}
+
 	private void saveSemanticDB() throws CoreException {
 		try {
 			if (this.needsFlush) {
@@ -731,8 +776,6 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		public void rebuildMapping(IProgressMonitor monitor) {
 			this.uri2pathMapping.clear();
 
-			String keyString = Util.qualifiedNameToString(ATTRIBUTE_URI);
-
 			TreeIterator<EObject> contents = this.fs.metadataResource.getAllContents();
 
 			while (contents.hasNext()) {
@@ -740,12 +783,10 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 				if (eObject instanceof ResourceTreeNode) {
 					ResourceTreeNode node = (ResourceTreeNode) eObject;
 
-					if (node.getPersistentProperties() != null) {
-						String uriString = node.getPersistentProperties().get(keyString);
+					String uriString = node.getRemoteURI();
 
-						if (uriString != null) {
-							addURI(getPathForNode(node), uriString);
-						}
+					if (uriString != null) {
+						addURI(getPathForNode(node), uriString);
 					}
 				}
 			}

@@ -81,7 +81,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		childStore.addChildResource(name, false, getFederatedProviderIDForPath(childStore.getPath().append(name)), null);
 		ISemanticFileStore newChild = (ISemanticFileStore) childStore.getChild(name);
 
-		this.setURIStringInternal(newChild, uri.toString());
+		newChild.setRemoteURIString(uri.toString());
 		setReadOnly(newChild, true, monitor);
 
 		MultiStatus stat = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
@@ -102,18 +102,18 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		childStore.addChildResource(name, true, getFederatedProviderIDForPath(childStore.getPath().append(name)), null);
 		ISemanticFileStore newChild = (ISemanticFileStore) childStore.getChild(name);
 
-		this.setURIStringInternal(newChild, uri.toString());
+		newChild.setRemoteURIString(uri.toString());
 		setReadOnly(newChild, true, monitor);
 	}
 
 	public String getURIString(ISemanticFileStore childStore) throws CoreException {
-		return getURIStringInternal(childStore);
+		return childStore.getRemoteURIString();
 	}
 
 	public void setURIString(ISemanticFileStore semanticFileStore, URI uri, IProgressMonitor monitor) throws CoreException {
 
 		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
-			this.setURIStringInternal(semanticFileStore, uri.toString());
+			semanticFileStore.setRemoteURIString(uri.toString());
 			this.deleteCache(semanticFileStore, monitor);
 
 			MultiStatus status = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
@@ -142,7 +142,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 		String uriString;
 		if (SemanticSpiResourceInfo.isOptionRequested(ISemanticFileSystem.RESOURCE_INFO_URI_STRING, options)) {
-			uriString = this.getURIStringInternal(semanticFileStore);
+			uriString = semanticFileStore.getRemoteURIString();
 		} else {
 			uriString = null;
 		}

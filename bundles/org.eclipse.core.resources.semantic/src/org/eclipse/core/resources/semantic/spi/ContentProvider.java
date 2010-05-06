@@ -73,9 +73,16 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 	 * @return the URI as String
 	 * @throws CoreException
 	 *             upon failure
+	 * @deprecated {@link ISemanticFileStore#getRemoteURIString()} should be
+	 *             used instead
 	 */
+	@Deprecated
 	public String getURIStringInternal(ISemanticFileStore childStore) throws CoreException {
-		return childStore.getPersistentProperty(ATTRIBUTE_URI);
+		String uriString = childStore.getPersistentProperty(ATTRIBUTE_URI);
+		if (uriString == null) {
+			uriString = childStore.getRemoteURIString();
+		}
+		return uriString;
 	}
 
 	/**
@@ -87,9 +94,13 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 	 *            the URI as String
 	 * @throws CoreException
 	 *             upon failure
+	 * @deprecated {@link ISemanticFileStore#setRemoteURIString(String)} should
+	 *             be used instead
 	 */
+	@Deprecated
 	public void setURIStringInternal(ISemanticFileStore childStore, String uriString) throws CoreException {
-		childStore.setPersistentProperty(ATTRIBUTE_URI, uriString);
+		childStore.setPersistentProperty(ATTRIBUTE_URI, null);
+		childStore.setRemoteURIString(uriString);
 	}
 
 	/**

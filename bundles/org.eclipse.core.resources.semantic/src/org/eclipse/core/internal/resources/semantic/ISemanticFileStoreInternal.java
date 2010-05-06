@@ -77,7 +77,7 @@ interface ISemanticFileStoreInternal extends ISemanticProperties {
 
 	public void removeFromWorkspace(IProgressMonitor monitor) throws CoreException;
 
-	public String getRemoteURIString() throws CoreException;
+	public URI getRemoteURI() throws CoreException;
 
 	public void synchronizeContentWithRemote(SyncDirection direction, IProgressMonitor monitor) throws CoreException;
 

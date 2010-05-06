@@ -68,6 +68,12 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <li>
  * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getPath
  * <em>Path</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getQueryPart
+ * <em>Query Part</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getRemoteURI
+ * <em>Remote URI</em>}</li>
  * </ul>
  * </p>
  * 
@@ -226,6 +232,46 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * @ordered
 	 */
 	protected String path = PATH_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getQueryPart() <em>Query Part</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getQueryPart()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String QUERY_PART_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getQueryPart() <em>Query Part</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getQueryPart()
+	 * @generated
+	 * @ordered
+	 */
+	protected String queryPart = QUERY_PART_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getRemoteURI() <em>Remote URI</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getRemoteURI()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String REMOTE_URI_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getRemoteURI() <em>Remote URI</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getRemoteURI()
+	 * @generated
+	 * @ordered
+	 */
+	protected String remoteURI = REMOTE_URI_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -481,6 +527,50 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	public String getQueryPart() {
+		return queryPart;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setQueryPart(String newQueryPart) {
+		String oldQueryPart = queryPart;
+		queryPart = newQueryPart;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__QUERY_PART, oldQueryPart,
+					queryPart));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public String getRemoteURI() {
+		return remoteURI;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setRemoteURI(String newRemoteURI) {
+		String oldRemoteURI = remoteURI;
+		remoteURI = newRemoteURI;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI, oldRemoteURI,
+					remoteURI));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
@@ -554,6 +644,10 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return getSessionProperties();
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
 				return getPath();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__QUERY_PART :
+				return getQueryPart();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
+				return getRemoteURI();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -598,6 +692,12 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
 				setPath((String) newValue);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__QUERY_PART :
+				setQueryPart((String) newValue);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
+				setRemoteURI((String) newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -640,6 +740,12 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
 				setPath(PATH_EDEFAULT);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__QUERY_PART :
+				setQueryPart(QUERY_PART_EDEFAULT);
+				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
+				setRemoteURI(REMOTE_URI_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -672,6 +778,10 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return sessionProperties != null;
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__PATH :
 				return PATH_EDEFAULT == null ? path != null : !PATH_EDEFAULT.equals(path);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__QUERY_PART :
+				return QUERY_PART_EDEFAULT == null ? queryPart != null : !QUERY_PART_EDEFAULT.equals(queryPart);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
+				return REMOTE_URI_EDEFAULT == null ? remoteURI != null : !REMOTE_URI_EDEFAULT.equals(remoteURI);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -703,6 +813,10 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		result.append(sessionProperties);
 		result.append(", path: "); //$NON-NLS-1$
 		result.append(path);
+		result.append(", queryPart: "); //$NON-NLS-1$
+		result.append(queryPart);
+		result.append(", remoteURI: "); //$NON-NLS-1$
+		result.append(remoteURI);
 		result.append(')');
 		return result.toString();
 	}

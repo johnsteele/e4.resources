@@ -279,6 +279,9 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *            <li> {@link ISemanticFileSystem#RESOURCE_INFO_READ_ONLY}</li>
 	 *            <li>
 	 *            {@link ISemanticFileSystem#RESOURCE_INFO_EXISTS_REMOTELY}</li>
+	 *            <li>
+	 *            {@link ISemanticFileSystem#RESOURCE_INFO_URI_STRING}</li>
+	 *            <li>{@link ISemanticFileSystem#RESOURCE_INFO_CONTENT_TYPE}</li>
 	 *            </ul>
 	 *            <p>
 	 *            Multiple values can be specified using bitwise OR (i.e. the
@@ -388,7 +391,7 @@ public interface ISemanticResource extends ISemanticProperties {
 	 *            is not desired
 	 * @throws CoreException
 	 *             in case of failure
-	 *             
+	 * 
 	 * @see IWorkspace#getRuleFactory()
 	 * @see IResourceRuleFactory#refreshRule(IResource)
 	 */

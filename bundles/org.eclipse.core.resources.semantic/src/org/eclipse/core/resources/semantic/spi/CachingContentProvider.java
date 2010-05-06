@@ -169,7 +169,7 @@ public abstract class CachingContentProvider extends ContentProvider {
 
 		ICacheUpdateCallback callback = new ICacheUpdateCallback() {
 
-			public void cacheUpdated(InputStream newContent, long timestamp, boolean append) throws CoreException {
+			public void cacheUpdated(InputStream newContent, long timestamp, boolean append) {
 				onCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 		};
@@ -461,4 +461,19 @@ public abstract class CachingContentProvider extends ContentProvider {
 
 	}
 
+	/**
+	 * @since 0.3
+	 */
+	protected long getResourceTimestampInternal(ISemanticFileStore semanticFileStore) throws CoreException {
+		if (!semanticFileStore.isExists()) {
+			return EFS.NONE;
+		}
+
+		String stampString = semanticFileStore.getPersistentProperty(RESOURCE_TIMESTAMP);
+		if (stampString != null) {
+			return Long.parseLong(stampString);
+		}
+
+		return EFS.NONE;
+	}
 }
