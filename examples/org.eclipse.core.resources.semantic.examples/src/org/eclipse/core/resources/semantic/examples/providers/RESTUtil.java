@@ -43,12 +43,6 @@ public class RESTUtil {
 		public void setTimestamp(long timestamp);
 
 		/**
-		 * 
-		 * @return the retrieved timestamp
-		 */
-		public long getTimestamp();
-
-		/**
 		 * sets the content type
 		 * 
 		 * @param contentType
@@ -56,11 +50,6 @@ public class RESTUtil {
 		 */
 		public void setContentType(String contentType);
 
-		/**
-		 * 
-		 * @return the content type
-		 */
-		public String getContentType();
 	}
 
 	/**
@@ -154,7 +143,7 @@ public class RESTUtil {
 	public static StringBuffer readStreamIntoStringBuffer(InputStream is, String encoding) throws IOException {
 		StringBuffer buf = new StringBuffer();
 		char[] buffer = new char[4096];
-		//$JL-I18N$
+		// $JL-I18N$
 		Reader r = new InputStreamReader(is, encoding);
 
 		int len;

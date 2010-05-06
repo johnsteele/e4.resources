@@ -28,9 +28,9 @@ import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -168,13 +168,6 @@ public class SampleCompositeResourceContentProvider extends CachingContentProvid
 					}
 				}
 
-				public long getTimestamp() {
-					return timeStampSetter.getTimestamp();
-				}
-
-				public String getContentType() {
-					return null;
-				}
 			});
 		} catch (IOException e) {
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, store.getPath(), e.getMessage(), e);

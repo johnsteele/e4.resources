@@ -45,6 +45,10 @@
             class="org.eclipse.core.resources.semantic.examples.providers.SampleCompositeResourceContentProvider"
             id="org.eclipse.core.resources.semantic.examples.providers.SampleCompositeResourceContentProvider">
       </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.examples.providers.SampleWebDAVContentProvider"
+            id="org.eclipse.core.resources.semantic.examples.providers.SampleWebDAVContentProvider">
+      </contentProvider>
    </extension>
    <extension
          point="org.eclipse.core.resources.semantic.pathContentProviderMapping">
