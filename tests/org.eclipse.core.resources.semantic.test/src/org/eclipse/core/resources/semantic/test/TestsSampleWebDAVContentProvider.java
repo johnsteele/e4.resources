@@ -11,6 +11,7 @@
 package org.eclipse.core.resources.semantic.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +38,7 @@ import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.providers.SampleWebDAVContentProvider;
+import org.eclipse.core.resources.semantic.examples.webdav.WebDAVUtil;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -109,6 +111,7 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(final IProgressMonitor monitor) throws CoreException {
+
 				ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
 				try {
 					sFolder.addFolder("test", new URI(WEBDAV_TEST_URL), options, monitor);
@@ -189,8 +192,8 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 	}
 
 	@Test
-	public void testWebDAVAsLinkedResource() throws Exception {
-		final String linkedProjectName = "testWebDAVAsLinkedResource";
+	public void testWebDAVAsLinkedFolder() throws Exception {
+		final String linkedProjectName = "testWebDAVAsLinkedFolder";
 
 		final IProject project = workspace.getRoot().getProject(linkedProjectName);
 
@@ -250,6 +253,30 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 
 					Assert.assertTrue(status.isOK());
 
+					try {
+						boolean isFolder = WebDAVUtil.checkWebDAVURL(new URI(WEBDAV_TEST_URL), monitor);
+
+						Assert.assertTrue(isFolder);
+
+						isFolder = WebDAVUtil.checkWebDAVURL(new URI(WEBDAV_TEST_URL + "/test.txt"), monitor);
+
+						Assert.assertFalse(isFolder);
+					} catch (IOException e) {
+						throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					} catch (URISyntaxException e) {
+						throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					}
+
+					try {
+						WebDAVUtil.checkWebDAVURL(new URI(WEBDAV_TEST_URL + "/xxx.xxx"), monitor);
+
+						Assert.assertTrue("Should have failed", false);
+					} catch (IOException e) {
+						// ignore
+					} catch (URISyntaxException e) {
+						throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+					}
+
 				} catch (URISyntaxException e) {
 					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
 				} catch (UnsupportedEncodingException e) {
@@ -261,6 +288,58 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 		};
 
 		workspace.run(runnable, workspace.getRuleFactory().refreshRule(folder), 0, new NullProgressMonitor());
+
+	}
+
+	@Test
+	public void testWebDAVAsLinkedFile() throws Exception {
+		final String linkedProjectName = "testWebDAVAsLinkedFile";
+
+		final IProject project = workspace.getRoot().getProject(linkedProjectName);
+
+		if (project.exists()) {
+			throw new IllegalStateException("Project exists");
+		}
+
+		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				IProjectDescription description = workspace.newProjectDescription(linkedProjectName);
+
+				project.create(description, monitor);
+				project.open(monitor);
+			}
+		};
+
+		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+
+		final IFile file = project.getFile("test.txt");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				URI uri = null;
+				try {
+					uri = new URI("semanticfs", null, "/webdav/test.txt", "type=file;create=true;provider="
+							+ SampleWebDAVContentProvider.class.getName() + ";uri=" + WEBDAV_TEST_URL + "/test.txt", null);
+
+					file.createLink(uri, 0, monitor);
+
+					ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+
+					Assert.assertEquals(SampleWebDAVContentProvider.class.getName(), sFile.getContentProviderID());
+
+					sFile.synchronizeContentWithRemote(SyncDirection.INCOMING, options, monitor);
+
+					sFile.synchronizeContentWithRemote(SyncDirection.OUTGOING, options, monitor);
+
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} finally {
+					cleanupSFS(uri, monitor);
+				}
+			}
+		};
+
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(file), 0, new NullProgressMonitor());
 
 	}
 

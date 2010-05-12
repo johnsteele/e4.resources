@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class WebDAVUtil {
 	private static final String LOCK_TOKEN_HEADER = "Lock-Token"; //$NON-NLS-1$
+	private static final String DEPTH_HEADER = "Depth"; //$NON-NLS-1$
 
 	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
@@ -238,13 +239,34 @@ public class WebDAVUtil {
 		return new InputStreamWrapper(getMethod, is);
 	}
 
+	/**
+	 * 
+	 * @param uri
+	 *            uri that points to WebDAV resource
+	 * @param monitor
+	 * @return <code>true</code> in case of folder and <code>false</code> in
+	 *         case of file
+	 * @throws IOException
+	 */
+	public static boolean checkWebDAVURL(URI uri, IProgressMonitor monitor) throws IOException {
+		MultistatusType multistatus = WebDAVUtil.executePropfindRequest(uri.toString(), 0, monitor);
+
+		WebDAVNode node = convertResponseToNodeTree(uri, multistatus, monitor);
+
+		if (node != null) {
+			return node.isFolder;
+		}
+		// TODO extern
+		throw new IOException("No Node"); //$NON-NLS-1$
+	}
+
 	public static WebDAVNode retrieveRemoteState(URI rootURI, IProgressMonitor monitor) throws IOException {
-		MultistatusType multistatus = WebDAVUtil.executePropfindRequest(rootURI.toString(), monitor);
+		MultistatusType multistatus = WebDAVUtil.executePropfindRequest(rootURI.toString(), -1, monitor);
 
 		return convertResponseToNodeTree(rootURI, multistatus, monitor);
 	}
 
-	public static MultistatusType executePropfindRequest(String uriString, IProgressMonitor monitor) throws IOException {
+	public static MultistatusType executePropfindRequest(String uriString, int depth, IProgressMonitor monitor) throws IOException {
 
 		PropfindMethod propfindMethod = new PropfindMethod(uriString);
 
@@ -274,6 +296,11 @@ public class WebDAVUtil {
 		installCredentialsProvider(propfindMethod);
 
 		try {
+			if (depth == 0) {
+				propfindMethod.addRequestHeader(DEPTH_HEADER, "0"); //$NON-NLS-1$
+			} else if (depth == 1) {
+				propfindMethod.addRequestHeader(DEPTH_HEADER, "1"); //$NON-NLS-1$				
+			}
 			int statusCode = httpClient.executeMethod(propfindMethod);
 
 			monitor.worked(1);

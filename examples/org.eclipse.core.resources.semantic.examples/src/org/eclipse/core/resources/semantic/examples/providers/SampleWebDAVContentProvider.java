@@ -278,6 +278,17 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 		return Status.CANCEL_STATUS;
 	}
 
+	@Override
+	public void onRootStoreCreate(ISemanticFileStore newStore) {
+		try {
+			if (newStore.getType() == ISemanticFileStore.FILE) {
+				this.setReadOnlyInternal(newStore, true);
+			}
+		} catch (CoreException e) {
+			// ignore and log
+		}
+	}
+
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor) {
 		// TODO Auto-generated method stub
 
@@ -543,10 +554,14 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 
 		String fileURIString;
 
-		if (remoteURI.endsWith("/")) { //$NON-NLS-1$
-			fileURIString = remoteURI + relativePath.toString();
+		if (!relativePath.isEmpty()) {
+			if (remoteURI.endsWith("/")) { //$NON-NLS-1$
+				fileURIString = remoteURI + relativePath.toString();
+			} else {
+				fileURIString = remoteURI + "/" + relativePath.toString(); //$NON-NLS-1$
+			}
 		} else {
-			fileURIString = remoteURI + "/" + relativePath.toString(); //$NON-NLS-1$
+			fileURIString = remoteURI;
 		}
 
 		try {
@@ -648,10 +663,14 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 
 			String fileURIString;
 
-			if (remoteURI.endsWith("/")) { //$NON-NLS-1$
-				fileURIString = remoteURI + relativePath.toString();
+			if (!relativePath.isEmpty()) {
+				if (remoteURI.endsWith("/")) { //$NON-NLS-1$
+					fileURIString = remoteURI + relativePath.toString();
+				} else {
+					fileURIString = remoteURI + "/" + relativePath.toString(); //$NON-NLS-1$
+				}
 			} else {
-				fileURIString = remoteURI + "/" + relativePath.toString(); //$NON-NLS-1$
+				fileURIString = remoteURI;
 			}
 
 			final long timestamp[] = new long[1];
@@ -709,19 +728,22 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 		return semanticFileStore.getRemoteURIString();
 	}
 
-	public void setURIString(ISemanticFileStore semanticFileStore, URI uri, IProgressMonitor monitor) throws CoreException {
-		semanticFileStore.setRemoteURIString(uri.toString());
+	public void setURIString(ISemanticFileStore store, URI uri, IProgressMonitor monitor) throws CoreException {
+		store.setRemoteURIString(uri.toString());
 
 		// TODO 0.4: what to do on folders?
-		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
-			this.deleteCache(semanticFileStore, monitor);
-			// TODO messages
-			MultiStatus status = new MultiStatus(SemanticResourcesPluginExamplesCore.PLUGIN_ID, IStatus.OK, NLS.bind(
-					Messages.SampleRESTReadonlyContentProvider_MethodResult_XMSG, "setURISting"), null); //$NON-NLS-1$
-			this.fillCache(semanticFileStore, monitor, status);
+		if (store.getType() == ISemanticFileStore.FILE) {
+			this.deleteCache(store, monitor);
+			this.setResourceTimestamp(store, 0, monitor);
+			this.setReadOnlyInternal(store, true);
+			store.setPersistentProperty(LOCAL_CHANGE, null);
 
-			if (!status.isOK()) {
-				throw new CoreException(status);
+			WebDAVNode rootNode;
+			try {
+				rootNode = WebDAVUtil.retrieveRemoteState(uri, monitor);
+				checkAndSetWebDAVModificationProperties(store, rootNode.lastModified, rootNode.etag, rootNode.contentType, monitor);
+			} catch (IOException e) {
+				throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, store.getPath(), e.getMessage(), e);
 			}
 		}
 	}
