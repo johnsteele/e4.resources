@@ -14,6 +14,7 @@ package org.eclipse.core.internal.resources.semantic;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -142,6 +144,8 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		if (this.db == null) {
 			return EFS.getNullFileSystem().getStore(path);
 		}
+
+		ISemanticFileStore store;
 		// we do never return the virtual root node ("semanticfs:/")
 		if (path.segmentCount() > 0) {
 			try {
@@ -149,39 +153,60 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 				EList<TreeRoot> roots = this.db.getRoots();
 
-				for (TreeRoot treeRoot : roots) {
-					if (path.segment(0).equals(treeRoot.getName())) {
+				TreeRoot treeRoot = null;
+
+				for (TreeRoot root : roots) {
+					if (path.segment(0).equals(root.getName())) {
 						if (path.segmentCount() == 1) {
-							return getStore(treeRoot);
+							return getStore(root);
 						}
-						return getFileStoreRecursive(path, treeRoot, queryString);
+						treeRoot = root;
+						break;
 					}
 				}
-			} finally {
-				unlockForWrite();
-			}
 
-			// no root found, create new one
-			TreeRoot treeRoot;
-
-			try {
-				lockForWrite();
-				if (path.segmentCount() == 1) {
-					treeRoot = createRootNode(path.segment(0), queryString);
-					return getStore(treeRoot);
+				if (treeRoot == null) {
+					if (path.segmentCount() == 1) {
+						treeRoot = createRootNode(path.segment(0), queryString);
+						return getStore(treeRoot);
+					}
+					treeRoot = createRootNode(path.segment(0));
 				}
-				treeRoot = createRootNode(path.segment(0));
+
+				store = (ISemanticFileStore) getFileStoreRecursive(path, treeRoot, queryString);
 			} finally {
 				unlockForWrite();
 			}
 
-			try {
-				lockForWrite();
+			if (!store.isExists() && queryString != null) {
+				SemanticQueryParser parser = new SemanticQueryParser(queryString);
 
-				return getFileStoreRecursive(path, treeRoot, queryString);
-			} finally {
-				unlockForWrite();
+				if (parser.getShouldCreate()) {
+					try {
+						if (parser.getType().equals(TreeNodeType.FOLDER) || parser.getType().equals(TreeNodeType.PROJECT)) {
+							store.mkdir(EFS.NONE, new NullProgressMonitor());
+						} else if (parser.getType().equals(TreeNodeType.FILE)) {
+							ISemanticFileStore parent = (ISemanticFileStore) store.getParent();
+
+							parent.mkdir(EFS.NONE, new NullProgressMonitor());
+
+							((ISemanticFileStoreInternal) parent).addResource(path.lastSegment(), false, parser.getProviderID(), null,
+									new NullProgressMonitor());
+
+							ISemanticFileStoreInternal child = ((ISemanticFileStoreInternal) parent).getChildResource(path.lastSegment());
+
+							child.setRemoteURI(new URI(parser.getURI()), new NullProgressMonitor());
+						}
+
+						return store;
+					} catch (CoreException e) {
+						return EFS.getNullFileSystem().getStore(path);
+					} catch (URISyntaxException e) {
+						return EFS.getNullFileSystem().getStore(path);
+					}
+				}
 			}
+			return store;
 		}
 
 		return EFS.getNullFileSystem().getStore(path);
@@ -221,16 +246,10 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 
 		ResourceTreeNode newNode = createNonExistingNode(path);
 
-		if (applyQueryParameters(newNode, queryString)) {
-			if (newNode.getType().equals(TreeNodeType.FOLDER) || newNode.getType().equals(TreeNodeType.PROJECT)) {
-				ISemanticFileStore store = getStore(newNode);
-				try {
-					store.mkdir(EFS.NONE, null);
-				} catch (CoreException e) {
-					// ignore since no exceptions are allowed here
-				}
-				return store;
-			}
+		if (queryString != null) {
+			SemanticQueryParser parser = new SemanticQueryParser(queryString);
+
+			applyQueryParameters(newNode, parser);
 		}
 
 		return getStore(newNode);
@@ -408,6 +427,8 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 					.getPath(), Messages.SemanticFileStore_MkDirOnFile_XMSG);
 		}
 
+		boolean bExistedBefore = actNode.isExists();
+
 		if (!actNode.isExists() && actNode.getTemplateID() == null) {
 			if (parentProvider instanceof ISemanticContentProviderFederation) {
 				federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider).getFederatedProviderIDForPath(new Path(
@@ -428,7 +449,12 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		}
 
 		if (actNode.getTemplateID() != null) {
-			effectiveProvider = this.getStore(actNode).getEffectiveContentProvider();
+			ISemanticFileStore newStore = this.getStore(actNode);
+			effectiveProvider = newStore.getEffectiveContentProvider();
+
+			if (!bExistedBefore) {
+				effectiveProvider.onRootStoreCreate(newStore);
+			}
 		}
 		return effectiveProvider;
 	}
@@ -630,26 +656,24 @@ public class SemanticFileSystem extends FileSystem implements ISemanticFileSyste
 		root.setPath("/" + name); //$NON-NLS-1$
 		root.setType(TreeNodeType.PROJECT);
 
-		if (applyQueryParameters(root, queryString)) {
-			root.setExists(true);
-			root.setPath(null);
-			root.setParentDB(this.db);
+		if (queryString != null) {
+			SemanticQueryParser parser = new SemanticQueryParser(queryString);
+
+			applyQueryParameters(root, parser);
+
+			if (parser.getShouldCreate()) {
+				root.setExists(true);
+				root.setPath(null);
+				root.setParentDB(this.db);
+			}
 		}
 		return root;
 	}
 
-	private boolean applyQueryParameters(ResourceTreeNode node, String queryString) {
-		boolean createRequested = false;
-
-		if (queryString != null) {
-			SemanticQueryParser parser = new SemanticQueryParser(queryString);
-
-			node.setTemplateID(parser.getProviderID());
-			node.setType(parser.getType());
-			node.setRemoteURI(parser.getURI());
-			createRequested = parser.getShouldCreate();
-		}
-		return createRequested;
+	private void applyQueryParameters(ResourceTreeNode node, SemanticQueryParser parser) {
+		node.setTemplateID(parser.getProviderID());
+		node.setType(parser.getType());
+		node.setRemoteURI(parser.getURI());
 	}
 
 	private void saveSemanticDB() throws CoreException {

@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Status;
  * <p>
  * This class is intended to be subclassed.
  * 
- * @since 4.0
  * @see ISemanticContentProvider
  */
 public abstract class ContentProvider implements ISemanticContentProvider {
@@ -170,6 +169,13 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 	}
 
 	public void onImplicitStoreCreate(ISemanticFileStore newStore) {
+		// by default, we do nothing
+	}
+
+	/**
+	 * @since 0.3
+	 */
+	public void onRootStoreCreate(ISemanticFileStore newStore) {
 		// by default, we do nothing
 	}
 

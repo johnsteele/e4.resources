@@ -396,18 +396,17 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 			this.checkAndJoinTreeIfAnotherEntryExists();
 
-			checkChildExists(name);
+			store = findChild(name);
+
+			if (store != null) {
+				return store;
+			}
 
 			IPath childPath = this.getPath().append(name);
 
 			ResourceTreeNode newnode = createLocalChildNode(name, childPath, federatedContentProviderId);
 
 			result = this.fs.getStore(newnode);
-		} catch (CoreException e) {
-			if (SfsTraceLocation.CORE.isActive()) {
-				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), e.getMessage(), e);
-			}
-			return EFS.getNullFileSystem().getStore(getPath().append(name));
 		} finally {
 			this.fs.unlockForWrite();
 		}
@@ -1197,13 +1196,15 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		}
 
+		ResourceTreeNode child;
 		try {
 			this.fs.lockForWrite();
 
 			checkAccessible();
 
 			checkChildExists(name);
-			ResourceTreeNode child = createChildNode(name, asFolder, contentProviderID);
+
+			child = createChildNode(name, asFolder, contentProviderID);
 
 			HashMap<String, String> propsMap = new HashMap<String, String>();
 			if (properties != null && !properties.isEmpty()) {
@@ -1219,6 +1220,12 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 		} finally {
 			this.fs.unlockForWrite();
+		}
+
+		if (contentProviderID != null) {
+			ISemanticFileStore store = this.fs.getStore(child);
+
+			store.getEffectiveContentProvider().onRootStoreCreate(store);
 		}
 	}
 

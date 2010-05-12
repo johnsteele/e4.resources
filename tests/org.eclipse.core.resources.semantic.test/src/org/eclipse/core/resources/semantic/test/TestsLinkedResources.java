@@ -239,6 +239,31 @@ public class TestsLinkedResources extends TestsContentProviderUtil {
 	}
 
 	@Test
+	public void testAddFileLinkWithURLToSFS() throws Exception {
+		final IFile file = this.testProject.getFile("querytest");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					URI uri = new URI("semanticfs", null, "/filetest/test.html", "type=file;create=true;uri=" + HTTP_TEST_URL, null);
+					file.createLink(uri, 0, monitor);
+					ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+
+					Assert.assertTrue(file.exists());
+
+					ISemanticResourceInfo info = sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_URI_STRING, monitor);
+
+					Assert.assertEquals(HTTP_TEST_URL, info.getRemoteURIString());
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(file), 0, new NullProgressMonitor());
+	}
+
+	@Test
 	public void testAddQueryLinkWithProviderToSFS() throws Exception {
 		final IFolder folder = this.testProject.getFolder("querytest2");
 

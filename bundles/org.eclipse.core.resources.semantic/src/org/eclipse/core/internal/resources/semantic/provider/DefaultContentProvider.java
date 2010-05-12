@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -396,6 +397,12 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		switch (resourceType) {
 			case FILE_TYPE :
 				parentStore.addChildResource(name, false, contentProviderID, properties);
+
+				if (contentProviderID == null) {
+					// mark own children read only
+					ISemanticFileStore newChild = (ISemanticFileStore) parentStore.getChild(name);
+					setReadOnly(newChild, true, new NullProgressMonitor());
+				}
 				break;
 			case FOLDER_TYPE :
 				parentStore.addChildResource(name, true, contentProviderID, properties);

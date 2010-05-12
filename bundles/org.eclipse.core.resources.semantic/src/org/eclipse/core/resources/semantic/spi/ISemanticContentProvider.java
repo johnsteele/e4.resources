@@ -117,8 +117,6 @@ import org.eclipse.core.runtime.MultiStatus;
  * provider generic access to the remote history.
  * <p>
  * 
- * @since 4.0
- * 
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should subclass {@link ContentProvider} or one of its
  *              subclasses instead.
@@ -310,6 +308,19 @@ public interface ISemanticContentProvider extends ISemanticContentProviderBase, 
 	 *            the new store
 	 */
 	public void onImplicitStoreCreate(ISemanticFileStore newStore);
+
+	/**
+	 * Notifies this provider that a root store for this provider has been
+	 * created by a federating content provider.
+	 * <p>
+	 * Implementations may use this to update internal state, but must not
+	 * interact with the remote repository.
+	 * 
+	 * @param newStore
+	 *            the new store
+	 * @since 0.3
+	 */
+	public void onRootStoreCreate(ISemanticFileStore newStore);
 
 	/**
 	 * Validates if a resource can be removed locally.
