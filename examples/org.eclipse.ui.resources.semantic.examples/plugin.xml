@@ -18,15 +18,28 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.core.resources.semantic.examples.category"
-            name="Semantic File System">
+            name="%category.name">
       </category>
       <wizard
             category="org.eclipse.core.resources.semantic.examples.category"
             class="org.eclipse.core.resources.semantic.examples.NewDemoSemanticProjectWizard"
             icon="icons/newprj_wiz.gif"
             id="org.eclipse.core.resources.semantic.examples_demoProjectWizard"
-            name="Demo Project"
+            name="%wizard.name.DEMOProject"
             project="true">
+      </wizard>
+      <wizard
+            category="org.eclipse.core.resources.semantic.examples.category"
+            class="org.eclipse.core.resources.semantic.examples.wizard.AddWebDAVResourceWizard"
+            icon="icons/webdav.gif"
+            id="org.eclipse.ui.resources.semantic.examples.wizard1"
+            name="%wizard.name.WebDAVResource">
+         <selection
+               class="org.eclipse.core.resources.IContainer">
+         </selection>
+         <description>
+         %wizard.description.WebDAVResource
+         </description>
       </wizard>
    </extension>
    <extension
@@ -35,7 +48,7 @@
             class="org.eclipse.core.resources.semantic.examples.remote.RemoteStoreEditor"
             extensions="xml"
             id="org.eclipse.core.resources.semantic.examples.editors.RemoteStoreEditor"
-            name="RemoteStore Editor">
+            name="%editor.name">
       </editor>
    </extension>
    <extension
@@ -43,27 +56,27 @@
       <command
             defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddFromRemote"
             id="org.eclipse.core.resources.semantic.examples_addFromRemote"
-            name="Add Resource From Remote">
+            name="%command.name">
       </command>
       <command
             defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddRestResource"
             id="org.eclipse.core.resources.semantic.examples_addRESTResource"
-            name="Add Demo REST Resource">
+            name="%command.name.0">
       </command>
       <command
             defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddFileFromRemote"
             id="org.eclipse.core.resources.semantic.examples_addFileFromRemote"
-            name="Add a Local File System Resource">
+            name="%command.name.1">
       </command>
       <command
             defaultHandler="org.eclipse.core.resources.semantic.examples.HandleCreateRemotely"
             id="org.eclipse.core.resources.semantic.examples_createRemote"
-            name="Create a remote Resource">
+            name="%command.name.2">
       </command>
       <command
             defaultHandler="org.eclipse.core.resources.semantic.examples.HandleAddWsFileFromRemote"
             id="org.eclipse.core.resources.semantic.examples_addWSDLResource"
-            name="Add a WSDL Resource">
+            name="%command.name.3">
       </command>
    </extension>
 
