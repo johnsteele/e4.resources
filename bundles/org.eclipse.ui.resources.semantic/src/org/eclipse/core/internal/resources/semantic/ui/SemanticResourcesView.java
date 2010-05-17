@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileSystem;
@@ -38,6 +39,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -45,8 +47,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -56,12 +61,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 /**
@@ -288,6 +296,55 @@ public class SemanticResourcesView extends ViewPart {
 
 				path.getParent().layout(true);
 
+			}
+		});
+
+		this.sfsTree.getTree().addMenuDetectListener(new MenuDetectListener() {
+
+			public void menuDetected(MenuDetectEvent e) {
+				Menu previous = sfsTree.getTree().getMenu();
+				if (previous != null)
+					previous.dispose();
+				Menu newMenu = new Menu(sfsTree.getTree());
+
+				MenuItem delete = new MenuItem(newMenu, SWT.PUSH);
+				delete.setText(Messages.SemanticResourcesView_DeleteMenu);
+				delete.addSelectionListener(new SelectionAdapter() {
+
+					@SuppressWarnings("rawtypes")
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						IStructuredSelection sel = (IStructuredSelection) sfsTree.getSelection();
+
+						for (Iterator iter = sel.iterator(); iter.hasNext();) {
+							final SFSBrowserTreeObject selected = (SFSBrowserTreeObject) iter.next();
+							if (MessageDialog.openConfirm(getSite().getShell(), Messages.SemanticResourcesView_ConfirmDeleteTitle, NLS
+									.bind(Messages.SemanticResourcesView_ConfirmDeleteQuestion, selected.getPath().toString()))) {
+								IProgressService srv = (IProgressService) getSite().getService(IProgressService.class);
+
+								try {
+									srv.run(true, false, new IRunnableWithProgress() {
+
+										public void run(IProgressMonitor monitor) throws InvocationTargetException {
+											try {
+												selected.getStore().delete(0, monitor);
+												scheduleRefresh(0);
+											} catch (CoreException ce) {
+												throw new InvocationTargetException(ce);
+											}
+										}
+									});
+								} catch (InvocationTargetException e1) {
+									SemanticResourcesUIPlugin.handleError(e1.getCause().getMessage(), e1.getCause(), true);
+								} catch (InterruptedException e1) {
+									// ignore
+								}
+							}
+						}
+					}
+
+				});
+				sfsTree.getTree().setMenu(newMenu);
 			}
 		});
 

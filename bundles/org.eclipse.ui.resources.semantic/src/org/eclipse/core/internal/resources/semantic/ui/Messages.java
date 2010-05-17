@@ -51,6 +51,9 @@ public class Messages extends NLS {
 	public static String SemanticResourcePropertyPage_Type_XFLD;
 	public static String SemanticResourcePropertyPage_Value_XGRP;
 	public static String SemanticResourcesView_AutoRefresh_XCKL;
+	public static String SemanticResourcesView_ConfirmDeleteQuestion;
+	public static String SemanticResourcesView_ConfirmDeleteTitle;
+	public static String SemanticResourcesView_DeleteMenu;
 	public static String SemanticResourcesView_Exists_XFLD;
 	public static String SemanticResourcesView_Path_XFLD;
 	public static String SemanticResourcesView_PropertiesOf_XGRP;

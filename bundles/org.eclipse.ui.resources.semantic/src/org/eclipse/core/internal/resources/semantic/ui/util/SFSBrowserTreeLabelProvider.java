@@ -57,6 +57,9 @@ public class SFSBrowserTreeLabelProvider implements ITableLabelProvider {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				TreeItem item = tree.getItem(new Point(e.x, e.y));
+				if (item == null) {
+					return;
+				}
 				boolean expanded = tv.getExpandedState(item.getData());
 				if (expanded) {
 					tv.collapseToLevel(item.getData(), 1);
