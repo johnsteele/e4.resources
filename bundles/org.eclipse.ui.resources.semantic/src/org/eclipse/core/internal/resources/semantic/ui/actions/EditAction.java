@@ -46,7 +46,7 @@ public class EditAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings({"rawtypes"})
+			@SuppressWarnings( {"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -64,7 +64,9 @@ public class EditAction extends ActionBase {
 						public void run(IProgressMonitor monitor) throws CoreException {
 
 							IStatus validationResult = file.validateEdit(getShell());
-							if (!validationResult.isOK()) {
+							// in case of cancel, we don't want to see any error
+							// handling UI
+							if (!validationResult.isOK() && validationResult.getSeverity() != IStatus.CANCEL) {
 								throw new CoreException(validationResult);
 							}
 						}
@@ -76,7 +78,8 @@ public class EditAction extends ActionBase {
 						ISchedulingRule rule = ws.getRuleFactory().validateEditRule(new IResource[] {file.getAdaptedResource()});
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
-						throw new InvocationTargetException(ce);
+						throw new InvocationTargetException(ce, NLS.bind(Messages.EditAction_CouldNotOpenForEdit_XMSG, file
+								.getAdaptedFile().getFullPath().toString()));
 					}
 
 				}

@@ -45,7 +45,7 @@ public class SynchronizeAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings({"rawtypes"})
+			@SuppressWarnings( {"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -70,7 +70,10 @@ public class SynchronizeAction extends ActionBase {
 						ISchedulingRule rule = ws.getRuleFactory().refreshRule(resource.getAdaptedResource());
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
-						throw new InvocationTargetException(ce);
+						// pack the error text into the
+						// InvocationTargetException
+						throw new InvocationTargetException(ce, NLS.bind(Messages.SynchronizeAction_SyncFailedForResource_XMSG,
+								resource.getAdaptedResource().getFullPath().toString()));
 					}
 
 				}

@@ -43,7 +43,7 @@ public class RevertAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings({"rawtypes"})
+			@SuppressWarnings( {"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -68,7 +68,8 @@ public class RevertAction extends ActionBase {
 					try {
 						workspace.run(myRunnable, workspace.getRuleFactory().refreshRule(file.getAdaptedResource()), 0, null);
 					} catch (CoreException e) {
-						throw new InvocationTargetException(e);
+						throw new InvocationTargetException(e, NLS.bind(Messages.RevertAction_RevertFailed_XMSG, file.getAdaptedFile()
+								.getFullPath().toString()));
 					}
 
 				}

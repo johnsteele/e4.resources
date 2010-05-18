@@ -11,7 +11,9 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.ui;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -34,7 +36,30 @@ public class SemanticResourcesUIPlugin extends Plugin {
 	 * @param show
 	 */
 	public static void handleError(String message, Throwable throwable, boolean show) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, throwable);
+		if (throwable instanceof CoreException) {
+			IStatus causeStatus = ((CoreException) throwable).getStatus();
+			IStatus statusToShow;
+			if (causeStatus.isMultiStatus()) {
+				statusToShow = causeStatus;
+			} else {
+				MultiStatus status = new MultiStatus(PLUGIN_ID, 0, message, throwable);
+				status.add(((CoreException) throwable).getStatus());
+				statusToShow = status;
+			}
+			int style = StatusManager.LOG;
+			if (show)
+				style |= StatusManager.SHOW;
+			StatusManager.getManager().handle(statusToShow, style);
+		} else {
+			IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message, throwable);
+			int style = StatusManager.LOG;
+			if (show)
+				style |= StatusManager.SHOW;
+			StatusManager.getManager().handle(status, style);
+		}
+	}
+
+	public static void handleError(IStatus status, boolean show) {
 		int style = StatusManager.LOG;
 		if (show)
 			style |= StatusManager.SHOW;

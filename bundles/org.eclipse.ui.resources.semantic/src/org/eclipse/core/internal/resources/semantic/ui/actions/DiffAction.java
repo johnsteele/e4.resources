@@ -26,6 +26,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.synchronize.SyncInfo;
@@ -57,8 +58,8 @@ public class DiffAction extends ActionBase {
 			 */
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
+				ISemanticFile file = (ISemanticFile) getSelection().getFirstElement();
 				try {
-					ISemanticFile file = (ISemanticFile) getSelection().getFirstElement();
 					ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(file.getAdaptedFile().getLocationURI());
 					ISemanticFileHistoryProvider fhp = (ISemanticFileHistoryProvider) sfs.getEffectiveContentProvider().getAdapter(
 							ISemanticFileHistoryProvider.class);
@@ -103,7 +104,8 @@ public class DiffAction extends ActionBase {
 					CompareUI.openCompareEditor(input);
 
 				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
+					throw new InvocationTargetException(e, NLS.bind(Messages.DiffAction_DiffFailedForFile_XMSG, file.getAdaptedFile()
+							.getFullPath().toFile()));
 				}
 
 			}

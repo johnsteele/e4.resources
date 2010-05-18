@@ -44,7 +44,7 @@ public class DeleteAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings({"rawtypes"})
+			@SuppressWarnings( {"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -73,7 +73,8 @@ public class DeleteAction extends ActionBase {
 							throw new InvocationTargetException(e);
 						}
 					} else {
-						throw new InvocationTargetException(new CoreException(validationResult));
+						throw new InvocationTargetException(new CoreException(validationResult), NLS.bind(
+								Messages.DeleteAction_CouldNotDeleteResource_XMSG, resource.getAdaptedResource().getFullPath().toString()));
 					}
 
 				}

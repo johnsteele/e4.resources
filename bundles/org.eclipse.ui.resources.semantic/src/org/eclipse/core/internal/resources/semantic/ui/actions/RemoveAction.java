@@ -43,7 +43,7 @@ public class RemoveAction extends ActionBase {
 		action.setEnabled(checkSelectionSemanticResource());
 	}
 
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	public void run(IAction action) {
 		boolean askForForceRemoval = false;
 
@@ -91,7 +91,8 @@ public class RemoveAction extends ActionBase {
 					try {
 						workspace.run(myRunnable, workspace.getRuleFactory().refreshRule(resource.getAdaptedResource()), 0, null);
 					} catch (CoreException e) {
-						throw new InvocationTargetException(e);
+						throw new InvocationTargetException(e, NLS.bind(Messages.RemoveAction_CouldNotRemoveResource_XMSG, resource
+								.getAdaptedResource().getFullPath().toString()));
 					}
 
 				}

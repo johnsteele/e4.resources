@@ -15,19 +15,28 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.ui.actions.messages"; //$NON-NLS-1$
-	public static String ActionBase_ActionCancelded_XGRP;
-	public static String ActionBase_ActionCanceled_XMSG;
+	public static String ActionBase_ActionCancelled_XGRP;
+	public static String ActionBase_ActionCancelled_XMSG;
+	public static String ActionBase_ActionNotCompleted_XMSG;
+	public static String DeleteAction_CouldNotDeleteResource_XMSG;
 	public static String DeleteAction_Deleting_XMSG;
 	public static String DiffAction_CompareAction_XGRP;
+	public static String DiffAction_DiffFailedForFile_XMSG;
 	public static String DiffAction_NoHistory_XMSG;
+	public static String EditAction_CouldNotOpenForEdit_XMSG;
 	public static String EditAction_Editing_XMSG;
+	public static String LockAction_CouldNotLockResource_XMSG;
 	public static String LockAction_LockingRes_XMSG;
 	public static String RemoveAction_ConfirmResourceRemoval_XGRP;
+	public static String RemoveAction_CouldNotRemoveResource_XMSG;
 	public static String RemoveAction_DoYouWantToRemove_XMSG;
 	public static String RemoveAction_Remove_XGRP;
 	public static String RemoveAction_Removing_XMSG;
+	public static String RevertAction_RevertFailed_XMSG;
 	public static String RevertAction_Reverting_XMSG;
+	public static String SynchronizeAction_SyncFailedForResource_XMSG;
 	public static String SynchronizeAction_Synchronizing_XMSG;
+	public static String UnlockAction_UnlockFailed_XMSG;
 	public static String UnlockAction_Unlocking_XMSG;
 	public static String UnmapAction_Unmap_XGRP;
 	static {

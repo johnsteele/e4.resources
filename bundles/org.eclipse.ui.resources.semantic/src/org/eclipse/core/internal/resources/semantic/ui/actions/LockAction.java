@@ -45,7 +45,7 @@ public class LockAction extends ActionBase {
 
 		IRunnableWithProgress outerRunnable = new IRunnableWithProgress() {
 
-			@SuppressWarnings({"rawtypes"})
+			@SuppressWarnings( {"rawtypes"})
 			public void run(IProgressMonitor outerMonitor) throws InvocationTargetException, InterruptedException {
 
 				for (Iterator it = getSelection().iterator(); it.hasNext();) {
@@ -75,7 +75,8 @@ public class LockAction extends ActionBase {
 						ISchedulingRule rule = ws.getRuleFactory().refreshRule(resource.getAdaptedResource());
 						ResourcesPlugin.getWorkspace().run(wsRunnable, rule, IWorkspace.AVOID_UPDATE, outerMonitor);
 					} catch (CoreException ce) {
-						throw new InvocationTargetException(ce);
+						throw new InvocationTargetException(ce, NLS.bind(Messages.LockAction_CouldNotLockResource_XMSG, resource
+								.getAdaptedResource().getFullPath().toString()));
 					}
 
 				}

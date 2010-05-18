@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
@@ -62,7 +61,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return this.mySelection;
 	}
 
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkSelectionNonLocalOnly() {
 
 		boolean shouldEnable = true;
@@ -101,7 +100,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkSelectionSemanticResource() {
 
 		boolean shouldEnable = true;
@@ -121,7 +120,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkFilesWithReadOnlyFlagOnly(boolean readOnly) {
 
 		boolean shouldEnable = true;
@@ -157,7 +156,7 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings({"rawtypes"})
+	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkSelectionLockingSupportedOnly() {
 
 		boolean shouldEnable = true;
@@ -200,14 +199,15 @@ abstract class ActionBase implements IObjectActionDelegate {
 		try {
 			srv.busyCursorWhile(runnable);
 		} catch (InvocationTargetException e) {
-			// we don't try to unpack a status from a causing CoreException,
-			// since the status code might
-			// be CANCEL, which would not be shown in the error dialog below
-			IStatus error = new Status(IStatus.ERROR, SemanticResourcesUIPlugin.PLUGIN_ID, e.getCause().getMessage(), e.getCause());
-			ErrorDialog.openError(getShell(), Messages.RemoveAction_Remove_XGRP, null, error);
+			String popupText = e.getMessage();
+			if (popupText == null)
+				// fall back solution
+				popupText = Messages.ActionBase_ActionNotCompleted_XMSG;
+			IStatus errorStatus = new Status(IStatus.ERROR, SemanticResourcesUIPlugin.PLUGIN_ID, popupText, e.getCause());
+			SemanticResourcesUIPlugin.handleError(errorStatus, true);
 		} catch (InterruptedException e) {
 			// $JL-EXC$ ignore here
-			MessageDialog.openInformation(getShell(), Messages.ActionBase_ActionCancelded_XGRP, Messages.ActionBase_ActionCanceled_XMSG);
+			MessageDialog.openInformation(getShell(), Messages.ActionBase_ActionCancelled_XGRP, Messages.ActionBase_ActionCancelled_XMSG);
 		}
 	}
 
