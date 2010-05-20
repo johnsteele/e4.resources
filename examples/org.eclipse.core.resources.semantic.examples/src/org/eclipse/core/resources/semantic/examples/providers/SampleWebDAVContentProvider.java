@@ -38,7 +38,6 @@ import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderLocking;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileHistoryProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeVisitor;
@@ -46,6 +45,7 @@ import org.eclipse.core.resources.semantic.spi.SemanticFileRevision;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticTreeWalker;
 import org.eclipse.core.resources.semantic.spi.Util;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -626,14 +626,20 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 		boolean existsRemotely = false;
 		if (SemanticSpiResourceInfo.isOptionRequested(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, options)) {
 
-			String remoteURI = this.getWebDAVURIForStore(semanticFileStore).toString();
-
+			String remoteURI;
 			try {
-				InputStream is = WebDAVUtil.openInputStream(remoteURI, null);
-				existsRemotely = is != null;
-				Util.safeClose(is);
-			} catch (IOException e) {
-				// $JL-EXC$ ignore and simply return false here
+				remoteURI = this.getWebDAVURIForStore(semanticFileStore).toString();
+			} catch (CoreException ce) {
+				remoteURI = null;
+			}
+			if (remoteURI != null) {
+				try {
+					InputStream is = WebDAVUtil.openInputStream(remoteURI, null);
+					existsRemotely = is != null;
+					Util.safeClose(is);
+				} catch (IOException e) {
+					// $JL-EXC$ ignore and simply return false here
+				}
 			}
 
 		}

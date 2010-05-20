@@ -139,7 +139,7 @@
          point="org.eclipse.ui.views">
       <view
             category="org.eclipse.core.resources.semantic.category"
-            class="org.eclipse.core.internal.resources.semantic.ui.SemanticResourcesView"
+            class="org.eclipse.core.internal.resources.semantic.ui.SFSNavigator"
             id="org.eclipse.core.resources.semantic.resourceView"
             name="%view.name_XGRP"
             restorable="true">
@@ -243,6 +243,88 @@
       <implementation
             class="org.eclipse.core.internal.resources.semantic.ui.team.SemanticHistoryPageSource">
       </implementation>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.core.resources.semantic.resourceView">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.resources.semantic.navigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeContentProvider"
+            id="org.eclipse.ui.resources.semantic.navigatorContent"
+            labelProvider="org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeLabelProvider"
+            name="%navigatorContent_XGRP">
+         <triggerPoints>
+            <instanceof
+                  value="org.eclipse.core.resources.IWorkspaceRoot">
+            </instanceof>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof
+                  value="org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeObject">
+            </instanceof>
+         </possibleChildren>
+         <actionProvider
+               class="org.eclipse.core.internal.resources.semantic.ui.SFSBrowserActionProvider">
+         </actionProvider>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="org.eclipse.core.resources.semantic.resourceView"
+               minimized="false"
+               ratio="0.5"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               visible="false">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.eclipse.core.resources.semantic.resourceView"
+            typeMapper="org.eclipse.ui.views.properties.tabbed.AbstractTypeMapper">
+         <propertyCategory
+               category="org.eclipse.ui.resources.semantic.propertyCategory"></propertyCategory>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="org.eclipse.core.resources.semantic.resourceView">
+         <propertyTab
+               category="org.eclipse.ui.resources.semantic.propertyCategory"
+               id="TabResource"
+               label="%propertyTab_XGRP">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="org.eclipse.core.resources.semantic.resourceView">
+         <propertySection
+               class="org.eclipse.core.internal.resources.semantic.ui.PropertySection"
+               id="org.eclipse.ui.resources.semantic.propertySection1"
+               tab="TabResource">
+            <input
+                  type="org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeObject">
+            </input>
+         </propertySection>
+      </propertySections>
    </extension>
 
 

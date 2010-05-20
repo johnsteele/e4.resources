@@ -16,9 +16,11 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -84,7 +86,26 @@ public class SFSBrowserTreeContentProvider implements ITreeContentProvider {
 	}
 
 	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof IWorkspaceRoot) {
+			try {
+				return getRootObjects();
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return (Object[]) inputElement;
+	}
+
+	private SFSBrowserTreeObject[] getRootObjects() throws CoreException {
+		ISemanticFileSystem fs = (ISemanticFileSystem) EFS.getFileSystem(ISemanticFileSystem.SCHEME);
+		String[] roots = fs.getRootNames();
+		SFSBrowserTreeObject[] paths = new SFSBrowserTreeObject[roots.length];
+		for (int i = 0; i < roots.length; i++) {
+			IPath path = new Path('/' + roots[i]);
+			paths[i] = new SFSBrowserTreeObject((IFileSystem) fs, path);
+		}
+		return paths;
 	}
 
 	public void dispose() {

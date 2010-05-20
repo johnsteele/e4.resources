@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.ui.util;
 
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -28,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * Label provider
  */
-public class SFSBrowserTreeLabelProvider implements ITableLabelProvider {
+public class SFSBrowserTreeLabelProvider implements ITableLabelProvider, ILabelProvider {
 
 	private final static Image FOLDER = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 	private final static Image FILE = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
@@ -108,6 +109,14 @@ public class SFSBrowserTreeLabelProvider implements ITableLabelProvider {
 
 	public void removeListener(ILabelProviderListener listener) {
 		// nothing
+	}
+
+	public Image getImage(Object element) {
+		return getColumnImage(element, 0);
+	}
+
+	public String getText(Object element) {
+		return getColumnText(element, 0);
 	}
 
 }

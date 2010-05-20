@@ -35,13 +35,13 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticTreeWalker;
 import org.eclipse.core.resources.semantic.spi.Util;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -159,29 +159,25 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 			String remoteURI = getURIString(semanticFileStore);
 
-			if (remoteURI == null) {
-				throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_URI_NOT_FOUND, semanticFileStore.getPath(), NLS.bind(
-						Messages.DefaultContentProvider_RemotURINotSet_XMSG, semanticFileStore.getPath().toString()));
-			}
+			if (remoteURI != null) {
+				final URI uri = URI.create(remoteURI);
 
-			final URI uri = URI.create(remoteURI);
-
-			URL url;
-			try {
-				url = uri.toURL();
-				InputStream is = null;
+				URL url;
 				try {
-					is = url.openConnection().getInputStream();
-					existsRemotely = is != null;
-				} finally {
-					Util.safeClose(is);
+					url = uri.toURL();
+					InputStream is = null;
+					try {
+						is = url.openConnection().getInputStream();
+						existsRemotely = is != null;
+					} finally {
+						Util.safeClose(is);
+					}
+				} catch (MalformedURLException e) {
+					// $JL-EXC$ ignore and simply return false here
+				} catch (IOException e) {
+					// $JL-EXC$ ignore and simply return false here
 				}
-			} catch (MalformedURLException e) {
-				// $JL-EXC$ ignore and simply return false here
-			} catch (IOException e) {
-				// $JL-EXC$ ignore and simply return false here
 			}
-
 		}
 		return new SemanticSpiResourceInfo(options, false, false, readOnly, existsRemotely, uriString, null);
 	}
