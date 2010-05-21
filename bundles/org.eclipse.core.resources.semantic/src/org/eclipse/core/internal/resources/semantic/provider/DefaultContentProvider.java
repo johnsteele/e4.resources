@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
@@ -35,13 +36,13 @@ import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticTreeDeepFirstVisitor;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticTreeWalker;
 import org.eclipse.core.resources.semantic.spi.Util;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -115,6 +116,8 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 		if (semanticFileStore.getType() == ISemanticFileStore.FILE) {
 			semanticFileStore.setRemoteURIString(uri.toString());
+			setReadOnly(semanticFileStore, true, monitor);
+
 			this.deleteCache(semanticFileStore, monitor);
 
 			MultiStatus status = new MultiStatus(SemanticResourcesPlugin.PLUGIN_ID, IStatus.OK, NLS.bind(
@@ -172,6 +175,8 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 					} finally {
 						Util.safeClose(is);
 					}
+				} catch (IllegalArgumentException e) {
+					// $JL-EXC$ ignore and simply return false here
 				} catch (MalformedURLException e) {
 					// $JL-EXC$ ignore and simply return false here
 				} catch (IOException e) {
@@ -216,6 +221,10 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 			InputStream is = conn.getInputStream();
 			clearStateResourceNotAccessible(childStore);
 			return is;
+		} catch (UnknownHostException e) {
+			setStateResourceNotAccessible(childStore, e);
+			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), NLS.bind(
+					Messages.DefaultContentProvider_UnknownHostError, e.getMessage()), e);
 		} catch (IOException e) {
 			setStateResourceNotAccessible(childStore, e);
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), e.getMessage(),
@@ -411,7 +420,13 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 
 	private void setStateResourceNotAccessible(ISemanticFileStore childStore, Exception e) throws CoreException {
 		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE, TRUE);
-		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, e.getMessage());
+
+		if (e instanceof UnknownHostException) {
+			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, NLS.bind(Messages.DefaultContentProvider_UnknownHostError, e
+					.getMessage()));
+		} else {
+			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, e.getMessage());
+		}
 	}
 
 	private void clearStateResourceNotAccessible(ISemanticFileStore semanticFileStore) throws CoreException {

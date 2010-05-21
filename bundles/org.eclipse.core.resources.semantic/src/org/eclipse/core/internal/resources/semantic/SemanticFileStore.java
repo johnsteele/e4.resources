@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
@@ -1653,7 +1654,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	public ISemanticResourceInfo fetchResourceInfo(int options, IProgressMonitor monitor) throws CoreException {
 		// checkAccessible();
 
-		ISemanticSpiResourceInfo providerInfo = getEffectiveContentProvider().fetchResourceInfo(this, options, monitor);
+		ISemanticSpiResourceInfo providerInfo = getEffectiveContentProvider().fetchResourceInfo(this, options, getNotNullMonitor(monitor));
 		return new SemanticResourceInfo(options, providerInfo, isLocalOnly());
 	}
 
@@ -1719,4 +1720,10 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 	}
 
+	private IProgressMonitor getNotNullMonitor(IProgressMonitor monitor) {
+		if (monitor == null) {
+			return new NullProgressMonitor();
+		}
+		return monitor;
+	}
 }

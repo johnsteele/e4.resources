@@ -28,10 +28,10 @@ import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.Util;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -110,17 +110,14 @@ public class SampleRESTReadonlyContentProvider extends CachingContentProvider im
 
 			String remoteURI = getURIString(semanticFileStore);
 
-			if (remoteURI == null) {
-				throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_URI_NOT_FOUND, semanticFileStore.getPath(), NLS.bind(
-						Messages.SampleRESTReadonlyContentProvider_RemoteUriNotSet_XMSG, semanticFileStore.getPath().toString()));
-			}
-
-			try {
-				InputStream is = RESTUtil.openInputStream(remoteURI, null);
-				existsRemotely = is != null;
-				Util.safeClose(is);
-			} catch (IOException e) {
-				// $JL-EXC$ ignore and simply return false here
+			if (remoteURI != null) {
+				try {
+					InputStream is = RESTUtil.openInputStream(remoteURI, null);
+					existsRemotely = is != null;
+					Util.safeClose(is);
+				} catch (IOException e) {
+					// $JL-EXC$ ignore and simply return false here
+				}
 			}
 
 		}

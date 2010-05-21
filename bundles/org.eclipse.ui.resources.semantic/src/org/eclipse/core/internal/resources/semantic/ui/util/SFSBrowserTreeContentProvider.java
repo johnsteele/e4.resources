@@ -31,6 +31,10 @@ public class SFSBrowserTreeContentProvider implements ITreeContentProvider {
 
 	private ISemanticFileSystem myFs;
 
+	public SFSBrowserTreeContentProvider() {
+		super();
+	}
+
 	public Object[] getChildren(Object parentElement) {
 		try {
 			SFSBrowserTreeObject parent = (SFSBrowserTreeObject) parentElement;

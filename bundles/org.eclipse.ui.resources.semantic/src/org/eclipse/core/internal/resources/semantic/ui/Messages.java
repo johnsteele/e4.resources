@@ -15,6 +15,37 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.ui.messages"; //$NON-NLS-1$
+	public static String AddUrlResourceCheckURLPage_ConnectFailed_XMSG;
+	public static String AddUrlResourceCheckURLPage_IgnoreChecks_XBUT;
+	public static String AddUrlResourceCheckURLPage_IgnoringResult_XMSG;
+	public static String AddUrlResourceCheckURLPage_InavlidSyntax_XMSG;
+	public static String AddUrlResourceCheckURLPage_InvalidUrlWithMessage_XMSG;
+	public static String AddUrlResourceCheckURLPage_PageTitle_XGRP;
+	public static String AddUrlResourceCheckURLPage_Retrieve_XBUT;
+	public static String AddUrlResourceCheckURLPage_Url_XFLD;
+	public static String AddUrlResourceCheckURLPage_URLMissing_XMSG;
+	public static String AddUrlResourceNameAndURLPage_Browse_XBUT;
+	public static String AddUrlResourceNameAndURLPage_ChildExists_XMSG;
+	public static String AddUrlResourceNameAndURLPage_MissingURL_XMSG;
+	public static String AddUrlResourceNameAndURLPage_Name_XFLD;
+	public static String AddUrlResourceNameAndURLPage_NoLinkAllowed_XMSG;
+	public static String AddUrlResourceNameAndURLPage_NotSemanticParent_XMSG;
+	public static String AddUrlResourceNameAndURLPage_Overwrite_XFLD;
+	public static String AddUrlResourceNameAndURLPage_PageTitle_XGRP;
+	public static String AddUrlResourceNameAndURLPage_Parent_XFLD;
+	public static String AddUrlResourceNameAndURLPage_SelectChildName_XMSG;
+	public static String AddUrlResourceNameAndURLPage_SelectFolder_XGRP;
+	public static String AddUrlResourceNameAndURLPage_SelectFolder_XMSG;
+	public static String AddUrlResourceNameAndURLPage_SemanticParent_XMSG;
+	public static String AddUrlResourceNameAndURLPage_StoreExists_XMSG;
+	public static String AddUrlResourceNameAndURLPage_Url_XFLD;
+	public static String AddUrlResourceNameAndURLPage_WillOverwrite_XMSG;
+	public static String AddUrlResourceNameAndURLPage_WillOverwriteStore_XMSG;
+	public static String AddUrlResourceWizard_Aborted_XMSG;
+	public static String AddUrlResourceWizard_AlreadyExists_XMSG;
+	public static String AddUrlResourceWizard_CreationFailed_XMSG;
+	public static String AddUrlResourceWizard_PageTitle_XGRP;
+	public static String AddUrlResourceWizard_RetrieveContent_XMSG;
 	public static String BrowseSFSDialog_Browser_XGRP;
 	public static String BrowseSFSDialog_Path_XFLD;
 	public static String PropertiesContentProvider_ContentType_XFLD;
@@ -44,13 +75,14 @@ public class Messages extends NLS {
 	public static String SemanticFileSystemPreferencePage_PathToDb_XFLD;
 	public static String SemanticFileSystemPreferencePage_Restart_XGRP;
 	public static String SemanticFileSystemPreferencePage_Restart_XMSG;
-	public static String SFSBrowserActionProvider_AutoRefresh_XBUT;
 	public static String SFSBrowserActionProvider_ConfirmDelete_XGRP;
 	public static String SFSBrowserActionProvider_ConfirmDelete_XMSG;
 	public static String SFSBrowserActionProvider_Delete_XMIT;
 	public static String SFSBrowserActionProvider_DontAskAgain_XMSG;
+	public static String SFSBrowserActionProvider_OpenInProps_XMIT;
 	public static String SFSBrowserActionProvider_OpenInTextEditor_XMIT;
-	public static String SFSBrowserActionProvider_Refesh_XBUT;
+	public static String SFSNavigator_AutoRefresh_XMIT;
+	public static String SFSNavigator_Refresh_XBUT;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

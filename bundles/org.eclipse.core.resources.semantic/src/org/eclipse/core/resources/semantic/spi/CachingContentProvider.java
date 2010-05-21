@@ -451,6 +451,8 @@ public abstract class CachingContentProvider extends ContentProvider {
 			return Long.parseLong(stampString);
 		}
 
+		// TODO this is happening a lot -> check if we can avoid control flow by
+		// exception
 		throw new SemanticResourceException(SemanticResourceStatusCode.CACHED_CONTENT_NOT_FOUND, semanticFileStore.getPath(),
 				Messages.CachingContentProvider_TimestampNotInCache_XMSG);
 	}

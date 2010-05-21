@@ -44,7 +44,14 @@ public class UserCredentialsDialog extends Dialog {
 		super(parentShell);
 		this.host = host;
 		this.message = message;
-		setBlockOnOpen(true);
+		this.setBlockOnOpen(true);
+	}
+
+	@Override
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+
+		shell.setText(Messages.UserCredentialsDialog_PasswordRequired);
 	}
 
 	/**

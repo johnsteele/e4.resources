@@ -16,12 +16,8 @@
 
    <extension
          point="org.eclipse.ui.newWizards">
-      <category
-            id="org.eclipse.core.resources.semantic.examples.category"
-            name="%category.name">
-      </category>
       <wizard
-            category="org.eclipse.core.resources.semantic.examples.category"
+            category="org.eclipse.ui.resources.semantic.category"
             class="org.eclipse.core.resources.semantic.examples.NewDemoSemanticProjectWizard"
             icon="icons/newprj_wiz.gif"
             id="org.eclipse.core.resources.semantic.examples_demoProjectWizard"
@@ -29,7 +25,7 @@
             project="true">
       </wizard>
       <wizard
-            category="org.eclipse.core.resources.semantic.examples.category"
+            category="org.eclipse.ui.resources.semantic.category"
             class="org.eclipse.core.resources.semantic.examples.wizard.AddWebDAVResourceWizard"
             icon="icons/webdav.gif"
             id="org.eclipse.ui.resources.semantic.examples.wizard1"

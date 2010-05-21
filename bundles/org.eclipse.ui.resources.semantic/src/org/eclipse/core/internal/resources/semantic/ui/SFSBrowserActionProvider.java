@@ -11,29 +11,27 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.ui;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeObject;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
@@ -43,95 +41,8 @@ import org.eclipse.ui.progress.IProgressService;
 
 public class SFSBrowserActionProvider extends CommonActionProvider {
 
-	private static final long AUTOREFREH_MILLI = 5000;
-
-	Job autoRefreshJob;
-
-	Action autoRefreshAction;
-
-	boolean autoRefreshActive = false;
-
 	public SFSBrowserActionProvider() {
-		// empty
-	}
-
-	@Override
-	public void fillActionBars(IActionBars actionBars) {
-
-		if (autoRefreshAction != null)
-			return;
-
-		actionBars.getToolBarManager().add(new Separator());
-
-		Action refreshAction = new Action(Messages.SFSBrowserActionProvider_Refesh_XBUT) {
-
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void run() {
-				getActionSite().getStructuredViewer().refresh();
-				super.run();
-			}
-
-		};
-
-		actionBars.getToolBarManager().add(refreshAction);
-
-		autoRefreshAction = new Action(Messages.SFSBrowserActionProvider_AutoRefresh_XBUT, IAction.AS_CHECK_BOX) {
-
-			@Override
-			public void run() {
-				if (isChecked()) {
-					if (autoRefreshJob == null) {
-						autoRefreshJob = new Job("Auto-refesh of SFS Browser") { //$NON-NLS-1$
-
-							@Override
-							protected IStatus run(IProgressMonitor monitor) {
-								Display.getDefault().asyncExec(new Runnable() {
-									@SuppressWarnings("synthetic-access")
-									public void run() {
-										getActionSite().getStructuredViewer().refresh();
-									}
-								});
-								schedule(AUTOREFREH_MILLI);
-								return Status.OK_STATUS;
-							}
-						};
-						autoRefreshJob.setSystem(true);
-					}
-					autoRefreshJob.schedule();
-				} else {
-					if (autoRefreshJob != null) {
-						autoRefreshJob.cancel();
-						autoRefreshJob = null;
-					}
-				}
-			}
-
-		};
-
-		if (autoRefreshActive) {
-			autoRefreshAction.setChecked(true);
-			autoRefreshAction.run();
-		}
-
-		actionBars.getToolBarManager().add(autoRefreshAction);
-	}
-
-	@Override
-	public void restoreState(IMemento aMemento) {
-		// keep track of the auto refresh switch
-		super.restoreState(aMemento);
-		if (aMemento == null) {
-			return;
-		}
-		autoRefreshActive = aMemento.getBoolean("AutoRefreshActive"); //$NON-NLS-1$
-	}
-
-	@Override
-	public void saveState(IMemento aMemento) {
-		// keep track of the auto refresh switch
-		super.saveState(aMemento);
-		aMemento.putBoolean("AutoRefreshActive", autoRefreshAction.isChecked()); //$NON-NLS-1$
+		super();
 	}
 
 	@Override
@@ -201,7 +112,6 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 					} catch (InterruptedException e1) {
 						// ignore
 					}
-					// }
 				}
 
 				if (refresh[0]) {
@@ -221,9 +131,22 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 					@Override
 					public void run() {
 						try {
-							IEditorInput input = new FileStoreEditorInput(ob.getStore());
+							ISemanticFileStore sfstore = (ISemanticFileStore) ob.getStore();
+							File tempFile = sfstore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+							IEditorInput input = new FileStoreEditorInput(EFS.getStore(tempFile.toURI())) {
+
+								@Override
+								public String getName() {
+									return ob.getStore().getName();
+								}
+
+							};
 							IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), input,
 									EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+							// TODO can we somehow listen to close events from
+							// the editor and remove the cached file?
+							// TODO avoid multiple editors on the same store and
+							// link with editor
 						} catch (CoreException e) {
 							SemanticResourcesUIPlugin.handleError(e.getMessage(), e, true);
 						}
@@ -232,16 +155,22 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 				};
 				menu.add(showAction);
 			}
-		}
 
-	}
+			Action openPropsAction = new Action(Messages.SFSBrowserActionProvider_OpenInProps_XMIT) {
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		if (autoRefreshJob != null) {
-			autoRefreshJob.cancel();
-			autoRefreshJob = null;
+				@Override
+				public void run() {
+					try {
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IPageLayout.ID_PROP_SHEET);
+					} catch (PartInitException e) {
+						// ignore
+					}
+
+				}
+
+			};
+			menu.add(openPropsAction);
+
 		}
 	}
 

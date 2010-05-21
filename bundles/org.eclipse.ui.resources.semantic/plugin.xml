@@ -140,6 +140,7 @@
       <view
             category="org.eclipse.core.resources.semantic.category"
             class="org.eclipse.core.internal.resources.semantic.ui.SFSNavigator"
+            icon="icons/sfs.gif"
             id="org.eclipse.core.resources.semantic.resourceView"
             name="%view.name_XGRP"
             restorable="true">
@@ -213,7 +214,7 @@
          point="org.eclipse.team.ui.configurationWizards">
       <wizard
             class="org.eclipse.core.internal.resources.semantic.ui.team.RepositoryConfigurationWizard"
-            icon="icons/sample.gif"
+            icon="icons/sfs.gif"
             id="org.eclipse.core.resources.semantic.team.SharingWizard"
             name="%configwizard.name_XGRP">
       </wizard>
@@ -222,7 +223,7 @@
          point="org.eclipse.team.ui.synchronizeParticipants">
       <participant
             class="org.eclipse.core.internal.resources.semantic.ui.sync.SemanticSubscriberParticipant"
-            icon="icons/sample.gif"
+            icon="icons/sfs.gif"
             id="org.eclipse.core.resources.semantic.participant1"
             name="%synchparticipant.name_XGRP"
             persistent="false">
@@ -233,7 +234,7 @@
       <wizard
             class="org.eclipse.core.internal.resources.semantic.ui.sync.ConfigurationWizard"
             description="%synchwizard.description_XMSG"
-            icon="icons/sample.gif"
+            icon="icons/sfs.gif"
             id="SemanticFolders.wizard1"
             name="%synchwizard.name_XGRP">
       </wizard>
@@ -325,6 +326,23 @@
             </input>
          </propertySection>
       </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="org.eclipse.ui.resources.semantic.category"
+            class="org.eclipse.core.internal.resources.semantic.ui.wizard.AddUrlResourceWizard"
+            icon="icons/newhttpres_wiz.gif"
+            id="org.eclipse.ui.resources.semantic.newUrlResourceWizard"
+            name="%urlwizard_XGRP">
+         <selection
+               class="org.eclipse.core.resources.IContainer">
+         </selection>
+      </wizard>
+      <category
+            id="org.eclipse.ui.resources.semantic.category"
+            name="%wizcat_XGRP">
+      </category>
    </extension>
 
 

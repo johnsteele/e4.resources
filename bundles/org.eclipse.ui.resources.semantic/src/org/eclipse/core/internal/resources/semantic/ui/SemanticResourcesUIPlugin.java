@@ -16,7 +16,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,6 +30,16 @@ public class SemanticResourcesUIPlugin extends Plugin {
 
 	/** The plug-in ID */
 	public static final String PLUGIN_ID = "org.eclipse.ui.resources.semantic"; //$NON-NLS-1$
+	/** The refresh icon to be obtained from the {@link ImageRegistry} */
+	public static final String IMG_REFRESH = "refresh"; //$NON-NLS-1$
+
+	private static SemanticResourcesUIPlugin INSTANCE;
+
+	private ImageRegistry imageRegistry;
+
+	public static SemanticResourcesUIPlugin getInstance() {
+		return INSTANCE;
+	}
 
 	/**
 	 * Handle an error. The error is logged. If <code>show</code> is
@@ -64,6 +79,37 @@ public class SemanticResourcesUIPlugin extends Plugin {
 		if (show)
 			style |= StatusManager.SHOW;
 		StatusManager.getManager().handle(status, style);
+	}
+
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		INSTANCE = this;
+	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		INSTANCE = null;
+
+		if (imageRegistry != null)
+			imageRegistry.dispose();
+		imageRegistry = null;
+	}
+
+	public ImageRegistry getImageRegistry() {
+		if (imageRegistry == null) {
+
+			if (Display.getCurrent() != null) {
+				imageRegistry = new ImageRegistry(Display.getCurrent());
+			}
+
+			if (PlatformUI.isWorkbenchRunning()) {
+				imageRegistry = new ImageRegistry(PlatformUI.getWorkbench().getDisplay());
+			}
+			imageRegistry.put(IMG_REFRESH, ImageDescriptor.createFromURL(getBundle().getEntry("icons/refresh.gif"))); //$NON-NLS-1$
+		}
+		return imageRegistry;
 	}
 
 }

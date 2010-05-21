@@ -180,6 +180,28 @@ public class WebDAVUtil {
 		}
 	}
 
+	public static boolean checkExistence(String remoteURI, boolean bFolder, IProgressMonitor monitor) {
+		boolean existsRemotely = false;
+
+		if (bFolder) {
+			try {
+				WebDAVUtil.executePropfindRequest(remoteURI, 0, monitor);
+				existsRemotely = true;
+			} catch (IOException e) {
+				// $JL-EXC$ ignore and simply return false here
+			}
+		} else {
+			try {
+				InputStream is = WebDAVUtil.openInputStream(remoteURI, null);
+				existsRemotely = is != null;
+				Util.safeClose(is);
+			} catch (IOException e) {
+				// $JL-EXC$ ignore and simply return false here
+			}
+		}
+		return existsRemotely;
+	}
+
 	public static InputStream openInputStream(String remoteURI, IWebDAVCallback setter) throws IOException {
 		GetMethod getMethod = new GetMethod(remoteURI);
 
