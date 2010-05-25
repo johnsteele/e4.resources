@@ -19,7 +19,7 @@ public class Messages extends NLS {
 	public static String DefaultContentProvider_NoRemoteEdit_XMSG;
 	public static String DefaultContentProvider_NotSupported_XMSG;
 	public static String DefaultContentProvider_RemotURINotSet_XMSG;
-	public static String DefaultContentProvider_UnknownHostError;
+	public static String DefaultContentProvider_UnknownHostError_XMSG;
 	public static String DefaultContentProvider_ValidateEditResult_XGRP;
 	static {
 		// initialize resource bundle

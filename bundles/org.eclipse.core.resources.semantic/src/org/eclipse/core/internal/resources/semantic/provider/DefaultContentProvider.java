@@ -224,7 +224,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		} catch (UnknownHostException e) {
 			setStateResourceNotAccessible(childStore, e);
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), NLS.bind(
-					Messages.DefaultContentProvider_UnknownHostError, e.getMessage()), e);
+					Messages.DefaultContentProvider_UnknownHostError_XMSG, e.getMessage()), e);
 		} catch (IOException e) {
 			setStateResourceNotAccessible(childStore, e);
 			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), e.getMessage(),
@@ -422,7 +422,7 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE, TRUE);
 
 		if (e instanceof UnknownHostException) {
-			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, NLS.bind(Messages.DefaultContentProvider_UnknownHostError, e
+			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, NLS.bind(Messages.DefaultContentProvider_UnknownHostError_XMSG, e
 					.getMessage()));
 		} else {
 			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, e.getMessage());

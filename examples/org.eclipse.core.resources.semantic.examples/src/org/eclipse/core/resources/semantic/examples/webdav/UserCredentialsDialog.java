@@ -51,7 +51,7 @@ public class UserCredentialsDialog extends Dialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 
-		shell.setText(Messages.UserCredentialsDialog_PasswordRequired);
+		shell.setText(Messages.UserCredentialsDialog_PasswordRequired_XGRP);
 	}
 
 	/**

@@ -59,16 +59,16 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 
 	public AddWebDAVResourceNameAndURLPage() {
 		super(AddWebDAVResourceNameAndURLPage.class.getName());
-		setTitle(Messages.AddWebDAVResourceNameAndURLPage_PageTitle);
+		setTitle(Messages.AddWebDAVResourceNameAndURLPage_PageTitle_XGRP);
 	}
 
 	public void setResourceContainer(IContainer container) {
 		myContainer = container;
 		if (myContainer != null) {
 			if (myContainer.getAdapter(ISemanticResource.class) == null) {
-				setMessage(Messages.AddWebDAVResourceNameAndURLPage_ParentNotSemanticMessage);
+				setMessage(Messages.AddWebDAVResourceNameAndURLPage_ParentNotSemanticMessage_XMSG);
 			} else {
-				setMessage(Messages.AddWebDAVResourceNameAndURLPage_ParentIsSemanticMessage);
+				setMessage(Messages.AddWebDAVResourceNameAndURLPage_ParentIsSemanticMessage_XMSG);
 			}
 			if (parentText != null)
 				parentText.setText(myContainer.getFullPath().toString());
@@ -88,21 +88,21 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 
 		main.setLayout(new GridLayout(3, false));
 
-		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_ParentLabel);
+		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_ParentLabel_XFLD);
 		parentText = new Text(main, SWT.BORDER);
 		if (myContainer != null)
 			parentText.setText(myContainer.getFullPath().toString());
 		parentText.setEnabled(false);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(parentText);
 		Button browseButton = new Button(main, SWT.PUSH);
-		browseButton.setText(Messages.AddWebDAVResourceNameAndURLPage_BrowseButton);
+		browseButton.setText(Messages.AddWebDAVResourceNameAndURLPage_BrowseButton_XBUT);
 		browseButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				ContainerSelectionDialog csd = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), false,
-						Messages.AddWebDAVResourceNameAndURLPage_SelectFolderMessage);
+						Messages.AddWebDAVResourceNameAndURLPage_SelectFolderMessage_XMSG);
 				csd.setValidator(new ISelectionValidator() {
 
 					public String isValid(Object selection) {
@@ -110,12 +110,12 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 						if (path.segmentCount() > 1) {
 							IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
 							if (folder.isLinked())
-								return Messages.AddWebDAVResourceNameAndURLPage_LinksForbiddenMessage;
+								return Messages.AddWebDAVResourceNameAndURLPage_LinksForbiddenMessage_XMSG;
 							return null;
 						}
 						IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
 						if (project.isLinked())
-							return Messages.AddWebDAVResourceNameAndURLPage_LinksForbiddenMessage;
+							return Messages.AddWebDAVResourceNameAndURLPage_LinksForbiddenMessage_XMSG;
 						return null;
 					}
 				});
@@ -136,7 +136,7 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 
 		});
 
-		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_NameLabel);
+		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_NameLabel_XFLD);
 		childText = new Text(main, SWT.BORDER);
 		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(childText);
 		childText.addModifyListener(new ModifyListener() {
@@ -146,7 +146,7 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 			}
 		});
 
-		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_WebDAVUrlLabel);
+		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceNameAndURLPage_WebDAVUrlLabel_XFLD);
 		urlText = new Text(main, SWT.BORDER);
 		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(urlText);
 		urlText.addModifyListener(new ModifyListener() {
@@ -157,7 +157,7 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 		});
 
 		forceOverwrite = new Button(main, SWT.CHECK);
-		forceOverwrite.setText(Messages.AddWebDAVResourceNameAndURLPage_OverwriteLabel);
+		forceOverwrite.setText(Messages.AddWebDAVResourceNameAndURLPage_OverwriteLabel_XFLD);
 		GridDataFactory.fillDefaults().span(3, 1).applyTo(forceOverwrite);
 		forceOverwrite.addSelectionListener(new SelectionAdapter() {
 
@@ -178,20 +178,20 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 
 		try {
 			if (myContainer == null) {
-				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_ChooseParentFolderMessage);
+				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_ChooseParentFolderMessage_XMSG);
 				return;
 			}
 			if (childText.getText().length() == 0) {
-				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_MustProviderChildMessage);
+				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_MustProviderChildMessage_XMSG);
 				return;
 			}
 
 			if (myContainer.exists(new Path(childText.getText()))) {
 				if (forceOverwrite.getSelection())
-					setMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_OverwriteChildMessage, childText.getText()),
+					setMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_OverwriteChildMessage_XMSG, childText.getText()),
 							IMessageProvider.WARNING);
 				else
-					setErrorMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_ChildExistsMessage, childText.getText()));
+					setErrorMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_ChildExistsMessage_XMSG, childText.getText()));
 				forceOverwrite.setEnabled(true);
 				return;
 			}
@@ -209,10 +209,10 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 				if (EFS.getStore(sfsUri).fetchInfo().exists()) {
 
 					if (forceOverwrite.getSelection())
-						setMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_StoreOverwriteMessage, sfsUri.toString()),
+						setMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_StoreOverwriteMessage_XMSG, sfsUri.toString()),
 								IMessageProvider.WARNING);
 					else
-						setErrorMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_StoreExistsMessage, sfsUri.toString()));
+						setErrorMessage(NLS.bind(Messages.AddWebDAVResourceNameAndURLPage_StoreExistsMessage_XMSG, sfsUri.toString()));
 					forceOverwrite.setEnabled(true);
 
 					return;
@@ -224,7 +224,7 @@ public class AddWebDAVResourceNameAndURLPage extends WizardPage {
 			}
 
 			if (urlText.getText().length() == 0) {
-				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_ChooseURLMessage);
+				setErrorMessage(Messages.AddWebDAVResourceNameAndURLPage_ChooseURLMessage_XMSG);
 				return;
 			}
 

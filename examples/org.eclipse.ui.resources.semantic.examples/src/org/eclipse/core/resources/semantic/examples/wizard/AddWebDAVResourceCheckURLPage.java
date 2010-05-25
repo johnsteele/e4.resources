@@ -26,7 +26,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 
 	public AddWebDAVResourceCheckURLPage() {
 		super(AddWebDAVResourceNameAndURLPage.class.getName());
-		setTitle(Messages.AddWebDAVResourceCheckURLPage_PageTitle);
+		setTitle(Messages.AddWebDAVResourceCheckURLPage_PageTitle_XGRP);
 	}
 
 	public boolean isFolder() {
@@ -61,7 +61,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 		main.setLayout(new GridLayout(2, false));
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(main);
 
-		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceCheckURLPage_URLLabel);
+		new Label(main, SWT.NONE).setText(Messages.AddWebDAVResourceCheckURLPage_URLLabel_XFLD);
 		urlText = new Text(main, SWT.BORDER);
 		urlText.setEnabled(false);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(urlText);
@@ -69,7 +69,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 			urlText.setText(url);
 		asFolder = new Button(main, SWT.RADIO);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(asFolder);
-		asFolder.setText(Messages.AddWebDAVResourceCheckURLPage_FolderLabel);
+		asFolder.setText(Messages.AddWebDAVResourceCheckURLPage_FolderLabel_XFLD);
 		asFolder.setEnabled(false);
 		asFolder.addSelectionListener(new SelectionAdapter() {
 
@@ -81,7 +81,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 
 		asFile = new Button(main, SWT.RADIO);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(asFile);
-		asFile.setText(Messages.AddWebDAVResourceCheckURLPage_FileLabel);
+		asFile.setText(Messages.AddWebDAVResourceCheckURLPage_FileLabel_XFLD);
 		asFile.setEnabled(false);
 		asFile.addSelectionListener(new SelectionAdapter() {
 
@@ -93,7 +93,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 
 		ignoreCheckResults = new Button(main, SWT.CHECK);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(ignoreCheckResults);
-		ignoreCheckResults.setText(Messages.AddWebDAVResourceCheckURLPage_IgnoreButton);
+		ignoreCheckResults.setText(Messages.AddWebDAVResourceCheckURLPage_IgnoreButton_XFLD);
 		ignoreCheckResults.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -108,7 +108,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 		retrieveContent = new Button(main, SWT.CHECK);
 		retrieveContent.setSelection(true);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(retrieveContent);
-		retrieveContent.setText(Messages.AddWebDAVResourceCheckURLPage_RetrieveContentAfterFinish);
+		retrieveContent.setText(Messages.AddWebDAVResourceCheckURLPage_RetrieveContentAfterFinish_XFLD);
 
 		setPageComplete(false);
 
@@ -130,14 +130,14 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 
 		try {
 			if (url == null) {
-				setErrorMessage(Messages.AddWebDAVResourceCheckURLPage_NoURLMessage);
+				setErrorMessage(Messages.AddWebDAVResourceCheckURLPage_NoURLMessage_XMSG);
 				return;
 			}
 			final URI uri;
 			try {
 				uri = new URI(url);
 			} catch (URISyntaxException e) {
-				setErrorMessage(NLS.bind(Messages.AddWebDAVResourceCheckURLPage_InvalidUrlMessage, url));
+				setErrorMessage(NLS.bind(Messages.AddWebDAVResourceCheckURLPage_InvalidUrlMessage_XMSG, url));
 				return;
 			}
 
@@ -166,7 +166,7 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 				}
 
 				if (exception[0] != null) {
-					setErrorMessage(NLS.bind(Messages.AddWebDAVResourceCheckURLPage_InvalidURLWithCause, url, exception[0].getMessage()));
+					setErrorMessage(NLS.bind(Messages.AddWebDAVResourceCheckURLPage_InvalidURLWithCause_XMSG, url, exception[0].getMessage()));
 					return;
 				}
 				if (isFolder[0]) {
@@ -177,12 +177,12 @@ public class AddWebDAVResourceCheckURLPage extends WizardPage {
 			}
 
 			if (!asFile.getSelection() && !asFolder.getSelection())
-				setErrorMessage(Messages.AddWebDAVResourceCheckURLPage_MustBeFileOrFolderMessage);
+				setErrorMessage(Messages.AddWebDAVResourceCheckURLPage_MustBeFileOrFolderMessage_XMSG);
 
 		} finally {
 			boolean errorFound = getErrorMessage() != null;
 			if (!errorFound && ignoreCheckResults.getSelection()) {
-				setMessage(Messages.AddWebDAVResourceCheckURLPage_ChecksIgnoreMessage, IMessageProvider.WARNING);
+				setMessage(Messages.AddWebDAVResourceCheckURLPage_ChecksIgnoreMessage_XMSG, IMessageProvider.WARNING);
 			}
 			setPageComplete(getErrorMessage() == null);
 		}

@@ -17,7 +17,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.core.resources.semantic.examples.webdav.messages"; //$NON-NLS-1$
 	public static String UserCredentialsDialog_ConnectTo_XFLD;
 	public static String UserCredentialsDialog_Password_XFLD;
-	public static String UserCredentialsDialog_PasswordRequired;
+	public static String UserCredentialsDialog_PasswordRequired_XGRP;
 	public static String UserCredentialsDialog_UserName_XFLD;
 	static {
 		// initialize resource bundle

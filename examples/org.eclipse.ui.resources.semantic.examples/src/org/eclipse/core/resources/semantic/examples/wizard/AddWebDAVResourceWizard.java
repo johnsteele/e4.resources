@@ -52,7 +52,7 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 	AddWebDAVResourceCheckURLPage checkPage = new AddWebDAVResourceCheckURLPage();
 
 	public AddWebDAVResourceWizard() {
-		setWindowTitle(Messages.AddWebDAVResourceWizard_WizardTitle);
+		setWindowTitle(Messages.AddWebDAVResourceWizard_WizardTitle_XGRP);
 	}
 
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -126,7 +126,7 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 									if (parentResource.hasResource(nameAndUrlPage.getChildName())) {
 										if (!forceMode) {
 											throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID,
-													Messages.AddWebDAVResourceWizard_AlreadyExistsMessaage));
+													Messages.AddWebDAVResourceWizard_AlreadyExistsMessaage_XMSG));
 										}
 
 										parentResource.getResource(nameAndUrlPage.getChildName()).remove(
@@ -148,7 +148,7 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 										final ISemanticResource resource = parentResource.getResource(nameAndUrlPage.getChildName());
 
 										if (resource != null) {
-											WorkspaceJob job = new WorkspaceJob(Messages.AddWebDAVResourceWizard_RetrieveWebDAVContent) {
+											WorkspaceJob job = new WorkspaceJob(Messages.AddWebDAVResourceWizard_RetrieveWebDAVContent_XMSG) {
 
 												@Override
 												public IStatus runInWorkspace(IProgressMonitor monitor1) throws CoreException {
@@ -169,7 +169,7 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 									if (container.exists(childPath)) {
 										if (!forceMode) {
 											throw new CoreException(new Status(IStatus.ERROR, SemanticResourcesPluginExamples.PLUGIN_ID,
-													Messages.AddWebDAVResourceWizard_AlreadyExistsMessaage));
+													Messages.AddWebDAVResourceWizard_AlreadyExistsMessaage_XMSG));
 										}
 
 										IResource child = container.findMember(nameAndUrlPage.getChildName());
@@ -215,7 +215,7 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 												.getAdapter(ISemanticResource.class);
 
 										if (sResource != null) {
-											WorkspaceJob job = new WorkspaceJob(Messages.AddWebDAVResourceWizard_RetrieveWebDAVContent) {
+											WorkspaceJob job = new WorkspaceJob(Messages.AddWebDAVResourceWizard_RetrieveWebDAVContent_XMSG) {
 
 												@Override
 												public IStatus runInWorkspace(IProgressMonitor monitor1) throws CoreException {
@@ -239,10 +239,10 @@ public class AddWebDAVResourceWizard extends Wizard implements INewWizard {
 				}
 			});
 		} catch (InvocationTargetException e) {
-			SemanticResourcesPluginExamples.handleError(Messages.AddWebDAVResourceWizard_CreationFailedMessage, e.getCause(), true);
+			SemanticResourcesPluginExamples.handleError(Messages.AddWebDAVResourceWizard_CreationFailedMessage_XMSG, e.getCause(), true);
 			return false;
 		} catch (InterruptedException e) {
-			SemanticResourcesPluginExamples.handleError(Messages.AddWebDAVResourceWizard_ActionAbortedMessage, e, true);
+			SemanticResourcesPluginExamples.handleError(Messages.AddWebDAVResourceWizard_ActionAbortedMessage_XMSG, e, true);
 			return false;
 		}
 
