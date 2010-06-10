@@ -22,9 +22,9 @@ import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.spi.ContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
 import org.eclipse.core.resources.semantic.spi.SemanticSpiResourceInfo;
-import org.eclipse.core.resources.semantic.spi.ISemanticFileStore.ResourceType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,6 +45,9 @@ public class FederatingContentProvider extends ContentProvider implements ISeman
 		pathTemplatMap.put(new Path("A/B").makeRelative(), FederatedContentProvider.class.getName());
 		// TODO use another content provider
 		pathTemplatMap.put(new Path("A/C").makeRelative(), "org.eclipse.core.resources.semantic.provider.DefaultContentProvider");
+
+		// invalid ID
+		pathTemplatMap.put(new Path("A/D").makeRelative(), "invalid ID");
 	}
 
 	public String getFederatedProviderIDForPath(IPath path) {

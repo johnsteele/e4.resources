@@ -35,6 +35,7 @@ import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
 import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.resources.semantic.SyncDirection;
+import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderLocal;
@@ -43,6 +44,7 @@ import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderRemote;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.resources.semantic.spi.ISemanticSpiResourceInfo;
+import org.eclipse.core.resources.semantic.spi.MemoryCacheServiceFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -898,6 +900,23 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		effectiveProvider.removeResource(this, monitor);
 	}
 
+	public void forceRemoveFromWorkspace(int options, IProgressMonitor monitor) throws CoreException {
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		checkAccessible();
+
+		new FileCacheServiceFactory().getCacheService().removeContentRecursive(getPath(), monitor);
+		new MemoryCacheServiceFactory().getCacheService().removeContentRecursive(getPath(), monitor);
+
+		this.remove(monitor);
+	}
+
+	public void forceRemove(int options, IProgressMonitor monitor) throws CoreException {
+		forceRemoveFromWorkspace(options, monitor);
+	}
+
 	public void synchronizeContentWithRemote(SyncDirection direction, IProgressMonitor monitor) throws CoreException {
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
@@ -1726,4 +1745,5 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		}
 		return monitor;
 	}
+
 }

@@ -83,4 +83,11 @@
             id="org.eclipse.core.resources.semantic.provider.DefaultContentProvider">
       </contentProvider>
    </extension>
+   <extension
+         point="org.eclipse.core.resources.semantic.contentProvider">
+      <contentProvider
+            class="org.eclipse.core.internal.resources.semantic.provider.InvalidContentProvider"
+            id="org.eclipse.core.resources.semantic.provider.InvalidContentProvider">
+      </contentProvider>
+   </extension>
 </plugin>

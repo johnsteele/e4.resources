@@ -93,4 +93,6 @@ interface ISemanticFileStoreInternal extends ISemanticProperties {
 
 	public void setRemoteURI(URI uri, IProgressMonitor monitor) throws CoreException;
 
+	public void forceRemoveFromWorkspace(int options, IProgressMonitor monitor) throws CoreException;
+
 }

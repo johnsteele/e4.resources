@@ -24,4 +24,5 @@ Export-Package: org.eclipse.core.internal.resources.semantic.ui;x-internal:=true
  org.eclipse.core.internal.resources.semantic.ui.actions;x-internal:=true,
  org.eclipse.core.internal.resources.semantic.ui.sync;x-internal:=true,
  org.eclipse.core.internal.resources.semantic.ui.team;x-internal:=true,
- org.eclipse.core.internal.resources.semantic.ui.util;x-internal:=true
+ org.eclipse.core.internal.resources.semantic.ui.util;x-internal:=true,
+ org.eclipse.core.internal.resources.semantic.ui.wizard;x-internal:=true

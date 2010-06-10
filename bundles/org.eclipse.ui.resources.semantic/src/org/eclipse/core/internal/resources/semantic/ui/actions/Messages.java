@@ -25,6 +25,8 @@ public class Messages extends NLS {
 	public static String DiffAction_NoHistory_XMSG;
 	public static String EditAction_CouldNotOpenForEdit_XMSG;
 	public static String EditAction_Editing_XMSG;
+	public static String ForceRemoveAction_ConfirmForcefulResourceRemoval_XMSG;
+	public static String ForceRemoveAction_DoYouWantToContinue_YMSG;
 	public static String LockAction_CouldNotLockResource_XMSG;
 	public static String LockAction_LockingRes_XMSG;
 	public static String RemoveAction_ConfirmResourceRemoval_XGRP;

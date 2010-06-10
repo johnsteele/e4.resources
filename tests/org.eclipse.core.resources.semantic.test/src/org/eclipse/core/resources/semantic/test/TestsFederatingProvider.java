@@ -22,6 +22,7 @@ import junit.framework.Assert;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.provider.DefaultContentProvider;
+import org.eclipse.core.internal.resources.semantic.provider.InvalidContentProvider;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -232,9 +233,51 @@ public class TestsFederatingProvider extends TestsContentProviderUtil {
 
 				Assert.assertTrue("Resource should exist " + sfile.getAdaptedResource().getLocationURI(), sfile.getAdaptedResource()
 						.exists());
-				// Assert.assertTrue("Resource should exist " +
-				// restSFile.getResource().getLocationURI(),
-				// restSFile.getResource().exists());
+
+				Assert.assertTrue("Resource should exist " + restSFile.getAdaptedResource().getLocationURI(), restSFile
+						.getAdaptedResource().exists());
+
+				restSFolder.remove(ISemanticFileSystem.FORCE_REMOVE, monitor);
+
+				Assert.assertFalse("Resource should not exist " + restSFile.getAdaptedResource().getLocationURI(), restSFile
+						.getAdaptedResource().exists());
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testFederationAndInvalidContentProviderID() throws Exception {
+
+		final IFolder federatingFolder = testProject.getFolder(new Path("root/A/D"));
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder federatingSFolder = (ISemanticFolder) federatingFolder.getAdapter(ISemanticFolder.class);
+
+				try {
+					federatingSFolder.addFile("test", TestsFederatingProvider.this.options, null);
+					Assert.assertTrue("should have failed", false);
+				} catch (CoreException e) {
+					// Ignore
+				}
+
+				ISemanticFileStore sstore = (ISemanticFileStore) EFS.getStore(federatingSFolder.getAdaptedResource().getLocationURI());
+				ISemanticContentProvider cp = sstore.getEffectiveContentProvider();
+				// the folder should have the invalid content provider
+				Assert.assertEquals("Wrong content provider", InvalidContentProvider.class.getName(), cp.getClass().getName());
+
+				sstore = (ISemanticFileStore) sstore.getParent().getParent();
+				cp = sstore.getEffectiveContentProvider();
+				// the parent should still have the original one
+				Assert.assertEquals("Wrong content provider", FederatingContentProvider.class.getName(), cp.getClass().getName());
 
 			}
 		};
@@ -243,4 +286,41 @@ public class TestsFederatingProvider extends TestsContentProviderUtil {
 
 	}
 
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testFederationAndInvalidContentProviderID2() throws Exception {
+
+		final IFolder federatingFolder = testProject.getFolder(new Path("root/A/D/C"));
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder federatingSFolder = (ISemanticFolder) federatingFolder.getAdapter(ISemanticFolder.class);
+
+				try {
+					federatingSFolder.addFile("test", TestsFederatingProvider.this.options, null);
+					Assert.assertTrue("should have failed", false);
+				} catch (CoreException e) {
+					// Ignore
+				}
+
+				ISemanticFileStore sstore = (ISemanticFileStore) EFS.getStore(federatingSFolder.getAdaptedResource().getLocationURI());
+				ISemanticContentProvider cp = sstore.getEffectiveContentProvider();
+				// the folder should have the invalid content provider
+				Assert.assertEquals("Wrong content provider", InvalidContentProvider.class.getName(), cp.getClass().getName());
+
+				sstore = (ISemanticFileStore) sstore.getParent().getParent();
+				cp = sstore.getEffectiveContentProvider();
+				// the parent should still have the original one
+				Assert.assertEquals("Wrong content provider", FederatingContentProvider.class.getName(), cp.getClass().getName());
+
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+	}
 }

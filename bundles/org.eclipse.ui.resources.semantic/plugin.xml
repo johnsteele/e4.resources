@@ -84,6 +84,14 @@
                menubarPath="team.main/group4">
          </action>
          <action
+               class="org.eclipse.core.internal.resources.semantic.ui.actions.ShowSFSBrowserViewAction"
+               definitionId="org.eclipse.core.resources.semantic.ui.ShowSFSBrowserViewCommand"
+               enablesFor="1"
+               id="org.eclipse.core.internal.resources.semantic.ui.ShowSFSBrowserViewAction"
+               label="%action.label.ShowInSemanticContentView_XMEN"
+               menubarPath="team.main/group4">
+         </action>
+         <action
                class="org.eclipse.core.internal.resources.semantic.ui.actions.DiffAction"
                definitionId="org.eclipse.core.resources.semantic.ui.DiffCommand"
                enablesFor="1"
@@ -197,8 +205,16 @@
               name="%command.Remove_XGRP">
         </command>
         <command
+              id="org.eclipse.core.resources.semantic.ui.ForceRemoveCommand"
+              name="%command.ForceRemove_XGRP">
+        </command>
+        <command
               id="org.eclipse.core.resources.semantic.ui.RemoteHistoryCommand"
               name="%command.History_XGRP">
+        </command>
+        <command
+              id="org.eclipse.core.resources.semantic.ui.ShowSFSBrowserViewCommand"
+              name="%command.ShowInSFSBrowserView_XGRP">
         </command>
         <command
               id="org.eclipse.core.resources.semantic.ui.DiffCommand"

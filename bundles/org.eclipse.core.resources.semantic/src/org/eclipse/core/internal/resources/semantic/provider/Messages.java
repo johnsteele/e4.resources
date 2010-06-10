@@ -21,6 +21,7 @@ public class Messages extends NLS {
 	public static String DefaultContentProvider_RemotURINotSet_XMSG;
 	public static String DefaultContentProvider_UnknownHostError_XMSG;
 	public static String DefaultContentProvider_ValidateEditResult_XGRP;
+	public static String InvalidContentProvider_InvalidContentProviderIDforPath_XMSG;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

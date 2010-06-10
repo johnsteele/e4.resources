@@ -37,6 +37,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class SemanticFileSystemCore implements IRegistryChangeListener {
 
+	private static final String INVALID_CONTENT_PROVIDER = "org.eclipse.core.resources.semantic.provider.InvalidContentProvider"; //$NON-NLS-1$
 	private static final String PI_CONTENT_PROVIDER = "contentProvider"; //$NON-NLS-1$
 	private final static String EMPTY = ""; //$NON-NLS-1$
 
@@ -102,9 +103,12 @@ public class SemanticFileSystemCore implements IRegistryChangeListener {
 
 				IConfigurationElement element = registry.get(contentProviderID);
 				if (element == null) {
-					throw new SemanticResourceException(SemanticResourceStatusCode.UNKNOWN_CONTENT_PROVIDER_ID, new Path(
-							SemanticFileSystemCore.EMPTY), NLS.bind(Messages.SemanticFileSystemCore_TemplateIdNotFound_XMSG,
-							contentProviderID));
+					element = registry.get(INVALID_CONTENT_PROVIDER);
+					if (element == null) {
+						throw new SemanticResourceException(SemanticResourceStatusCode.UNKNOWN_CONTENT_PROVIDER_ID, new Path(
+								SemanticFileSystemCore.EMPTY), NLS.bind(Messages.SemanticFileSystemCore_TemplateIdNotFound_XMSG,
+								INVALID_CONTENT_PROVIDER));
+					}
 				}
 				return element;
 			}

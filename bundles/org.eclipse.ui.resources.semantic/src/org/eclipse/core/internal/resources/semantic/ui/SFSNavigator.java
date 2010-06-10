@@ -49,6 +49,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  */
 public class SFSNavigator extends CommonNavigator implements ITabbedPropertySheetPageContributor {
+	public static final String VIEW_ID = "org.eclipse.core.resources.semantic.resourceView"; //$NON-NLS-1$
 
 	private static final long AUTOREFREH_MILLI = 5000;
 	boolean autoRefreshActive = true;

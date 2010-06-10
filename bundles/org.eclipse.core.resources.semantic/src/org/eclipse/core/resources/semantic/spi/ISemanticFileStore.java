@@ -14,6 +14,7 @@ package org.eclipse.core.resources.semantic.spi;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticProperties;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -190,6 +191,24 @@ public interface ISemanticFileStore extends ISemanticProperties, IFileStore {
 	 *             in case of failure
 	 */
 	public void remove(IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Removes the file store and it's children forcefully without consulting
+	 * corresponding content providers.
+	 * <p>
+	 * Eventually available cached content for the removed resources is also
+	 * cleaned up.
+	 * 
+	 * @param options
+	 *            only {@link ISemanticFileSystem#NONE} is currently supported
+	 * @param monitor
+	 *            a progress monitor, or <code>null</code> if progress reporting
+	 *            is not desired
+	 * @throws CoreException
+	 *             in case of operation failure
+	 * @since 0.3
+	 */
+	public void forceRemove(int options, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Returns the "effective" content provider.

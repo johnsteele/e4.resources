@@ -51,6 +51,18 @@ public interface ISemanticFileSystem {
 	public static final int SUPPRESS_REFRESH = 1 << 1;
 
 	/**
+	 * Option flag constant (value 1&lt;&lt;2) indicating that a resource
+	 * hierarchy should be forcefully removed without consulting corresponding
+	 * content provider.
+	 * <p>
+	 * This option should only be used as last resort for cleanup of corrupted
+	 * content.
+	 * 
+	 * @since 0.3
+	 */
+	public static final int FORCE_REMOVE = 1 << 2;
+
+	/**
 	 * Option flag constant (value 1 &lt;&lt;0) indicating that content should
 	 * be appended to a resource.
 	 */

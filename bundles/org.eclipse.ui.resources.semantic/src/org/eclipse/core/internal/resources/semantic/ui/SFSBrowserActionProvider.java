@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeObject;
+import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -121,6 +122,74 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 		};
 
 		menu.add(deleteAction);
+
+		Action forceRemoveAction = new Action(Messages.SFSBrowserActionProvider_ForcefulDeleteOfCorruptedContent_XGRP) {
+
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void run() {
+
+				final boolean[] refresh = new boolean[] {false};
+
+				boolean dontAskAgain = false;
+
+				for (Object object : objects) {
+
+					final SFSBrowserTreeObject selected = (SFSBrowserTreeObject) object;
+
+					String question = NLS.bind(Messages.SFSBrowserActionProvider_DoYouWantToContinue_YMSG, selected.getPath().toString());
+
+					if (objects.length == 1) {
+						dontAskAgain = MessageDialog.openConfirm(shell, Messages.SFSBrowserActionProvider_ConfirmDelete_XGRP, question);
+						if (!dontAskAgain) {
+							return;
+						}
+					}
+
+					if (!dontAskAgain) {
+						MessageDialogWithToggle toggle = new MessageDialogWithToggle(shell,
+								Messages.SFSBrowserActionProvider_ConfirmDelete_XMSG, null, question, MessageDialog.WARNING, new String[] {
+										IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
+								Messages.SFSBrowserActionProvider_DontAskAgain_XMSG, false);
+						int result = toggle.open();
+						dontAskAgain = toggle.getToggleState();
+						if (result != 0) {
+							if (dontAskAgain) {
+								break;
+							}
+							continue;
+						}
+					}
+
+					IProgressService srv = PlatformUI.getWorkbench().getProgressService();
+
+					try {
+						srv.run(true, false, new IRunnableWithProgress() {
+
+							public void run(IProgressMonitor monitor) throws InvocationTargetException {
+								try {
+									ISemanticFileStore store = (ISemanticFileStore) selected.getStore();
+									store.forceRemove(ISemanticFileSystem.NONE, monitor);
+									refresh[0] = true;
+								} catch (CoreException ce) {
+									throw new InvocationTargetException(ce);
+								}
+							}
+						});
+					} catch (InvocationTargetException e1) {
+						SemanticResourcesUIPlugin.handleError(e1.getCause().getMessage(), e1.getCause(), true);
+					} catch (InterruptedException e1) {
+						// ignore
+					}
+				}
+
+				if (refresh[0]) {
+					getActionSite().getStructuredViewer().refresh();
+				}
+			}
+		};
+
+		menu.add(forceRemoveAction);
 
 		if (objects.length == 1) {
 			final SFSBrowserTreeObject ob = (SFSBrowserTreeObject) objects[0];

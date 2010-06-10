@@ -195,11 +195,16 @@ public interface ISemanticResource extends ISemanticProperties {
 	 * Unless {@link ISemanticFileSystem#SUPPRESS_REFRESH} is specified in the
 	 * options, the parent of this resource will be refreshed locally.
 	 * <p>
+	 * The resources and it's children will be forcefully removed without
+	 * consulting corresponding content providers if the option
+	 * {@link ISemanticFileSystem#FORCE_REMOVE} is specified.
+	 * <p>
 	 * This operation does <em>not</em> take resource state into account (e.g.
 	 * read only flag, lock state...).
 	 * 
 	 * @param options
-	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} is supported
+	 *            only {@link ISemanticFileSystem#SUPPRESS_REFRESH} and
+	 *            {@link ISemanticFileSystem#FORCE_REMOVE} are supported
 	 * @param monitor
 	 *            a progress monitor, or <code>null</code> if progress reporting
 	 *            is not desired

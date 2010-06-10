@@ -79,6 +79,8 @@ public class Messages extends NLS {
 	public static String SFSBrowserActionProvider_ConfirmDelete_XMSG;
 	public static String SFSBrowserActionProvider_Delete_XMIT;
 	public static String SFSBrowserActionProvider_DontAskAgain_XMSG;
+	public static String SFSBrowserActionProvider_DoYouWantToContinue_YMSG;
+	public static String SFSBrowserActionProvider_ForcefulDeleteOfCorruptedContent_XGRP;
 	public static String SFSBrowserActionProvider_OpenInProps_XMIT;
 	public static String SFSBrowserActionProvider_OpenInTextEditor_XMIT;
 	public static String SFSNavigator_AutoRefresh_XMIT;

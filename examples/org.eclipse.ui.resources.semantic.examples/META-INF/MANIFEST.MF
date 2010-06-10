@@ -17,4 +17,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Export-Package: org.eclipse.core.resources.semantic.examples,
- org.eclipse.core.resources.semantic.examples.remote
+ org.eclipse.core.resources.semantic.examples.remote,
+ org.eclipse.core.resources.semantic.examples.wizard

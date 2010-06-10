@@ -216,8 +216,11 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 		ISemanticFileStoreInternal store = getOwnStore();
 
-		store.removeFromWorkspace(monitor);
-
+		if ((options & ISemanticFileSystem.FORCE_REMOVE) != 0) {
+			store.forceRemoveFromWorkspace(options, monitor);
+		} else {
+			store.removeFromWorkspace(monitor);
+		}
 		refreshLocalIfNeeded(RuleType.DELETE, getRuleForType(RuleType.MODIFY, this.resource), options, monitor);
 
 	}
