@@ -28,8 +28,8 @@ public class ShowSFSBrowserViewAction extends ActionBase {
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		super.selectionChanged(action, selection);
-		// only single non-local object can show history
-		action.setEnabled(getSelection().size() == 1 && checkSelectionNonLocalOnly());
+
+		action.setEnabled(getSelection().size() == 1 && checkSelectionSemanticResource());
 	}
 
 	public void run(IAction action) {
