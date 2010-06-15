@@ -188,13 +188,22 @@ public interface SemanticResourceDBPackage extends EPackage {
 	int RESOURCE_TREE_NODE__REMOTE_URI = 11;
 
 	/**
+	 * The feature id for the '<em><b>Dynamic Content Provider ID</b></em>'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID = 12;
+
+	/**
 	 * The number of structural features of the '<em>Resource Tree Node</em>'
 	 * class. <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE_TREE_NODE_FEATURE_COUNT = 12;
+	int RESOURCE_TREE_NODE_FEATURE_COUNT = 13;
 
 	/**
 	 * The meta object id for the '
@@ -344,6 +353,15 @@ public interface SemanticResourceDBPackage extends EPackage {
 	 * @ordered
 	 */
 	int TREE_ROOT__REMOTE_URI = RESOURCE_TREE_NODE__REMOTE_URI;
+
+	/**
+	 * The feature id for the '<em><b>Dynamic Content Provider ID</b></em>'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int TREE_ROOT__DYNAMIC_CONTENT_PROVIDER_ID = RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID;
 
 	/**
 	 * The feature id for the '<em><b>Parent DB</b></em>' container reference.
@@ -563,6 +581,20 @@ public interface SemanticResourceDBPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getResourceTreeNode_RemoteURI();
+
+	/**
+	 * Returns the meta object for the attribute '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getDynamicContentProviderID
+	 * <em>Dynamic Content Provider ID</em>}'. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
+	 * @return the meta object for the attribute '
+	 *         <em>Dynamic Content Provider ID</em>'.
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getDynamicContentProviderID()
+	 * @see #getResourceTreeNode()
+	 * @generated
+	 */
+	EAttribute getResourceTreeNode_DynamicContentProviderID();
 
 	/**
 	 * Returns the meta object for class '
@@ -793,6 +825,15 @@ public interface SemanticResourceDBPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute RESOURCE_TREE_NODE__REMOTE_URI = eINSTANCE.getResourceTreeNode_RemoteURI();
+
+		/**
+		 * The meta object literal for the '
+		 * <em><b>Dynamic Content Provider ID</b></em>' attribute feature. <!--
+		 * begin-user-doc --> <!-- end-user-doc -->
+		 * 
+		 * @generated
+		 */
+		EAttribute RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID = eINSTANCE.getResourceTreeNode_DynamicContentProviderID();
 
 		/**
 		 * The meta object literal for the '

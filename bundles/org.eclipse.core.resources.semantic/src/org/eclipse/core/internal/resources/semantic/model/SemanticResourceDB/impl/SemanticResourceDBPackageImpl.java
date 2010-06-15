@@ -269,6 +269,15 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 	 * 
 	 * @generated
 	 */
+	public EAttribute getResourceTreeNode_DynamicContentProviderID() {
+		return (EAttribute) resourceTreeNodeEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public EClass getSemanticDB() {
 		return semanticDBEClass;
 	}
@@ -378,6 +387,7 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__PATH);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__QUERY_PART);
 		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__REMOTE_URI);
+		createEAttribute(resourceTreeNodeEClass, RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID);
 
 		semanticDBEClass = createEClass(SEMANTIC_DB);
 		createEReference(semanticDBEClass, SEMANTIC_DB__ROOTS);
@@ -478,6 +488,10 @@ public class SemanticResourceDBPackageImpl extends EPackageImpl implements Seman
 				getResourceTreeNode_RemoteURI(),
 				ecorePackage.getEString(),
 				"remoteURI", null, 0, 1, ResourceTreeNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEAttribute(
+				getResourceTreeNode_DynamicContentProviderID(),
+				ecorePackage.getEString(),
+				"dynamicContentProviderID", null, 0, 1, ResourceTreeNode.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(semanticDBEClass, SemanticDB.class, "SemanticDB", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(

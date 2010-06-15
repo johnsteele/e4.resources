@@ -38,6 +38,8 @@ import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
+import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation2;
+import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation2.FederatedProviderInfo;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderLocal;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderLocking;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
@@ -213,11 +215,6 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	}
 
 	public ISemanticContentProvider getEffectiveContentProvider() throws CoreException {
-		ISemanticFileStore parentStore;
-		String parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
-		ResourceTreeNode parent = null;
-		ResourceTreeNode cpRootParent;
-
 		try {
 			this.fs.lockForWrite();
 			// TODO 0.1: check if we can use more fine grained locks here
@@ -225,115 +222,189 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				return this.provider;
 			}
 
-			this.checkAndJoinTreeIfAnotherEntryExists();
+			ISemanticContentProvider effectiveProvider = getEffectiveContentProviderInternal();
 
-			if (this.node.getTemplateID() != null) {
-				String contentProviderID = this.node.getTemplateID();
-				// TODO move outside of lock
-				initProvider(contentProviderID, this);
+			if (effectiveProvider instanceof ISemanticContentProviderFederation2) {
+				IPath thisPath = this.getPath();
 
-				if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
-					SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
-				}
-
-				return this.provider;
+				return findFederatedContentProvider(thisPath, this.fs, this.node, effectiveProvider);
 			}
 
-			List<ResourceTreeNode> nodes;
+			return effectiveProvider;
+		} finally {
+			this.fs.unlockForWrite();
+		}
+	}
 
-			if (!this.node.isExists()) {
-				nodes = this.fs.getNodesByPath(this.node.getPath());
-				// go down to find a contentProviderID
-				cpRootParent = nodes.get(0);
-				int counter = 0;
+	private static ISemanticContentProvider findFederatedContentProvider(IPath path, SemanticFileSystem fs, ResourceTreeNode node,
+			ISemanticContentProvider parentProvider) throws CoreException {
 
-				// scan the existing part where CP IDs are already assigned
-				for (ResourceTreeNode resourceTreeNode : nodes) {
-					if (resourceTreeNode.isExists()) {
-						if (resourceTreeNode.getTemplateID() != null) {
-							parentContentProviderId = resourceTreeNode.getTemplateID();
-							cpRootParent = resourceTreeNode;
-						}
-						counter++;
-					} else {
-						break;
+		int relativePathLength = path.segmentCount() - parentProvider.getRootStore().getPath().segmentCount();
+
+		if (relativePathLength > 0) {
+			ISemanticContentProviderFederation2 federatingProvider = (ISemanticContentProviderFederation2) parentProvider;
+
+			FederatedProviderInfo info = federatingProvider.getFederatedProviderInfoForPath(path);
+			if (info != null) {
+				if (info.contentProviderID == null) {
+					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_EMPTY_FEDERATED_PROVIDER_ID, path, NLS.bind(
+							Messages.SemanticFileStore_FederatingContentProviderReturnedNull, parentProvider.getClass().getName(), path
+									.toString()));
+				}
+
+				if (info.rootNodePosition <= 0 && info.rootNodePosition > relativePathLength) {
+					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_INVALID_ROOT_NODE_POSITION, path, NLS.bind(
+							Messages.SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition, parentProvider.getClass()
+									.getName(), path.toString()));
+				}
+
+				ResourceTreeNode parent = node;
+
+				for (int i = 0; i < (relativePathLength - info.rootNodePosition); i++) {
+					if (parent != null) {
+						parent = parent.getParent();
 					}
 				}
 
-				// construct the root parent
-				parentStore = this.fs.getStore(cpRootParent);
+				if (parent != null) {
+					parent.setDynamicContentProviderID(info.contentProviderID);
+				} else {
+					String pathString = path.removeLastSegments(relativePathLength - info.rootNodePosition).toString();
+					parent = fs.getNodeByPath(pathString);
+				}
 
-				// TODO move outside of lock?
-				ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, parentStore);
+				ISemanticContentProvider nestedProvider = initProvider(info.contentProviderID, fs.getStore(parent));
 
-				// scan through non existing part
-				for (int i = counter; i < nodes.size(); i++) {
-					ResourceTreeNode resourceTreeNode = nodes.get(i);
+				if (nestedProvider instanceof ISemanticContentProviderFederation2) {
+					return findFederatedContentProvider(path, fs, node, nestedProvider);
+				}
+				return nestedProvider;
+			}
+		}
+		return parentProvider;
+	}
 
-					if (parentProvider instanceof ISemanticContentProviderFederation) {
-						String federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider)
-								.getFederatedProviderIDForPath(new Path(resourceTreeNode.getPath()));
+	private ISemanticContentProvider getEffectiveContentProviderInternal() throws CoreException {
+		ISemanticFileStore parentStore;
+		String parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
+		ResourceTreeNode parent = null;
+		ResourceTreeNode cpRootParent;
 
-						if (federatedContentProviderId != null) {
-							parentContentProviderId = federatedContentProviderId;
-							cpRootParent = resourceTreeNode;
-							parentStore = this.fs.getStore(cpRootParent);
-							// TODO move outside of lock?
-							parentProvider = initProvider(parentContentProviderId, parentStore);
-						}
+		this.checkAndJoinTreeIfAnotherEntryExists();
+
+		if (this.node.getTemplateID() != null) {
+			String contentProviderID = this.node.getTemplateID();
+			// TODO move outside of lock
+			initProvider(contentProviderID, this);
+
+			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
+			}
+
+			return this.provider;
+		}
+
+		if (this.node.getDynamicContentProviderID() != null) {
+			String contentProviderID = this.node.getDynamicContentProviderID();
+			// TODO move outside of lock
+			initProvider(contentProviderID, this);
+
+			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
+			}
+
+			return this.provider;
+		}
+
+		if (!this.node.isExists()) {
+			List<ResourceTreeNode> nodes = this.fs.getNodesByPath(this.node.getPath());
+			// go down to find a contentProviderID
+			cpRootParent = nodes.get(0);
+			int counter = 0;
+
+			// scan the existing part where CP IDs are already assigned
+			for (ResourceTreeNode resourceTreeNode : nodes) {
+				if (resourceTreeNode.isExists()) {
+					if (resourceTreeNode.getTemplateID() != null) {
+						parentContentProviderId = resourceTreeNode.getTemplateID();
+						cpRootParent = resourceTreeNode;
 					}
-				}
-
-				if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
-					SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
-				}
-
-				return parentProvider;
-			}
-
-			// walk up to find a contentProviderID
-			parent = this.node.getParent();
-
-			if (parent == null) {
-				// this is a root store with default content provider
-				ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, this);
-
-				return parentProvider;
-			}
-
-			ResourceTreeNode oldParent = this.node;
-
-			while (parent != null) {
-				parentContentProviderId = parent.getTemplateID();
-				if (parentContentProviderId != null) {
+					counter++;
+				} else {
 					break;
 				}
-				oldParent = parent;
-
-				parent = parent.getParent();
 			}
 
-			if (parentContentProviderId == null) {
-				parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
-				parent = oldParent;
-			}
-
-			// construct the parent
-			parentStore = this.fs.getStore(parent);
+			// construct the root parent
+			parentStore = this.fs.getStore(cpRootParent);
 
 			// TODO move outside of lock?
-			// the first parent with a provider ID
 			ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, parentStore);
+
+			// scan through non existing part
+			for (int i = counter; i < nodes.size(); i++) {
+				ResourceTreeNode resourceTreeNode = nodes.get(i);
+
+				if (parentProvider instanceof ISemanticContentProviderFederation) {
+					String federatedContentProviderId = ((ISemanticContentProviderFederation) parentProvider)
+							.getFederatedProviderIDForPath(new Path(resourceTreeNode.getPath()));
+
+					if (federatedContentProviderId != null) {
+						parentContentProviderId = federatedContentProviderId;
+						cpRootParent = resourceTreeNode;
+						parentStore = this.fs.getStore(cpRootParent);
+						// TODO move outside of lock?
+						parentProvider = initProvider(parentContentProviderId, parentStore);
+					}
+				}
+			}
 
 			if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
 			}
 
 			return parentProvider;
-		} finally {
-			this.fs.unlockForWrite();
 		}
 
+		// walk up to find a contentProviderID
+		parent = this.node.getParent();
+
+		if (parent == null) {
+			// this is a root store with default content provider
+			ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, this);
+
+			return parentProvider;
+		}
+
+		ResourceTreeNode oldParent = this.node;
+
+		while (parent != null) {
+			parentContentProviderId = parent.getTemplateID();
+			if (parentContentProviderId != null) {
+				break;
+			}
+			oldParent = parent;
+
+			parent = parent.getParent();
+		}
+
+		if (parentContentProviderId == null) {
+			parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
+			parent = oldParent;
+		}
+
+		// construct the parent
+		parentStore = this.fs.getStore(parent);
+
+		// TODO move outside of lock?
+		// the first parent with a provider ID
+		ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, parentStore);
+
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
+		}
+
+		return parentProvider;
 	}
 
 	@Override

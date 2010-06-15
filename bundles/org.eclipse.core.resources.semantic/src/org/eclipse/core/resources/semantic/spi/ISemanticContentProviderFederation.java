@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.QualifiedName;
  * create and delete rules (i.e. must not delegate back to the federated content
  * provider).
  * 
- * @since 4.0
- * 
  * @see ISemanticContentProvider#getRuleFactory()
  */
 public interface ISemanticContentProviderFederation {

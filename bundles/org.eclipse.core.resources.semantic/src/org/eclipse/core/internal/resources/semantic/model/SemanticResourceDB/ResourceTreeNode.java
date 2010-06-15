@@ -63,6 +63,9 @@ import org.eclipse.emf.ecore.EObject;
  * <li>
  * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getRemoteURI
  * <em>Remote URI</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getDynamicContentProviderID
+ * <em>Dynamic Content Provider ID</em>}</li>
  * </ul>
  * </p>
  * 
@@ -427,5 +430,37 @@ public interface ResourceTreeNode extends EObject {
 	 * @generated
 	 */
 	void setRemoteURI(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Dynamic Content Provider ID</b></em>'
+	 * attribute. <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Dynamic Content Provider ID</em>' attribute
+	 * isn't clear, there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * 
+	 * @return the value of the '<em>Dynamic Content Provider ID</em>'
+	 *         attribute.
+	 * @see #setDynamicContentProviderID(String)
+	 * @see org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBPackage#getResourceTreeNode_DynamicContentProviderID()
+	 * @model transient="true"
+	 * @generated
+	 */
+	String getDynamicContentProviderID();
+
+	/**
+	 * Sets the value of the '
+	 * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode#getDynamicContentProviderID
+	 * <em>Dynamic Content Provider ID</em>}' attribute. <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Dynamic Content Provider ID</em>'
+	 *            attribute.
+	 * @see #getDynamicContentProviderID()
+	 * @generated
+	 */
+	void setDynamicContentProviderID(String value);
 
 } // ResourceTreeNode

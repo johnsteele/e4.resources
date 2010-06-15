@@ -27,6 +27,14 @@
             id="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider">
       </contentProvider>
       <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider2"
+            id="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider2">
+      </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider3"
+            id="org.eclipse.core.resources.semantic.test.provider.FederatingContentProvider3">
+      </contentProvider>
+      <contentProvider
             class="org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider"
             id="org.eclipse.core.resources.semantic.test.provider.FederatedContentProvider">
       </contentProvider>

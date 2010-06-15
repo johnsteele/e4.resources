@@ -15,6 +15,7 @@ import org.eclipse.core.resources.semantic.test.TestCacheService;
 import org.eclipse.core.resources.semantic.test.TestsCachingProvider;
 import org.eclipse.core.resources.semantic.test.TestsDefaultContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsFederatingProvider;
+import org.eclipse.core.resources.semantic.test.TestsFederatingProvider2;
 import org.eclipse.core.resources.semantic.test.TestsLinkedResources;
 import org.eclipse.core.resources.semantic.test.TestsNullContentProvider;
 import org.eclipse.core.resources.semantic.test.TestsPlainProvider;
@@ -29,6 +30,7 @@ import org.junit.runners.Suite;
 		TestsPlainProvider.class, //
 		TestsCachingProvider.class,//
 		TestsFederatingProvider.class,//
+		TestsFederatingProvider2.class,//
 		TestsNullContentProvider.class,//
 		TestCacheService.class,//
 		TestsLinkedResources.class})

@@ -26,9 +26,13 @@ package org.eclipse.core.resources.semantic;
  * <li>Information Only [0-32]</li>
  * <li>Warnings [33-65]</li>
  * <li>Errors [66-98]</li>
+ * 
+ * <li>General constants [100-198]</li>
+ * <li>Information Only [100-132]</li>
+ * <li>Warnings [133-165]</li>
+ * <li>Errors [166-198]</li>
  * </ul>
  * 
- * @since 4.0
  * @see org.eclipse.core.runtime.IStatus
  */
 public enum SemanticResourceStatusCode {
@@ -200,14 +204,30 @@ public enum SemanticResourceStatusCode {
 	 * 
 	 * @since 0.2
 	 */
-	NOT_ACCESSIBLE(99);
+	NOT_ACCESSIBLE(99),
+
+	/**
+	 * Federating content provider returned <code>null</code> value for
+	 * federated content provider ID
+	 * 
+	 * @since 0.3
+	 */
+	FEDERATION_EMPTY_FEDERATED_PROVIDER_ID(166),
+
+	/**
+	 * Federating content provider returned invalid value for root node position
+	 * of federated content provider
+	 * 
+	 * @since 0.3
+	 */
+	FEDERATION_INVALID_ROOT_NODE_POSITION(167);
 
 	/**
 	 * The plug-in ID
 	 */
 	public static final String PLUGIN_ID = "org.eclipse.core.resources.semantic.shared"; //$NON-NLS-1$
 
-	private static final int MAXSIZE = 100;
+	private static final int MAXSIZE = 200;
 	private final static SemanticResourceStatusCode[] myIndexArray = new SemanticResourceStatusCode[MAXSIZE];
 	private static boolean initialized = false;
 

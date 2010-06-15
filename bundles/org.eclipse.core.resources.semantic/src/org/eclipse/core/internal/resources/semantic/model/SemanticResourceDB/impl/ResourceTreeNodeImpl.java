@@ -74,6 +74,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <li>
  * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getRemoteURI
  * <em>Remote URI</em>}</li>
+ * <li>
+ * {@link org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.impl.ResourceTreeNodeImpl#getDynamicContentProviderID
+ * <em>Dynamic Content Provider ID</em>}</li>
  * </ul>
  * </p>
  * 
@@ -272,6 +275,28 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * @ordered
 	 */
 	protected String remoteURI = REMOTE_URI_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getDynamicContentProviderID()
+	 * <em>Dynamic Content Provider ID</em>}' attribute. <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * 
+	 * @see #getDynamicContentProviderID()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String DYNAMIC_CONTENT_PROVIDER_ID_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getDynamicContentProviderID()
+	 * <em>Dynamic Content Provider ID</em>}' attribute. <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * 
+	 * @see #getDynamicContentProviderID()
+	 * @generated
+	 * @ordered
+	 */
+	protected String dynamicContentProviderID = DYNAMIC_CONTENT_PROVIDER_ID_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -571,6 +596,29 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 	 * 
 	 * @generated
 	 */
+	public String getDynamicContentProviderID() {
+		return dynamicContentProviderID;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setDynamicContentProviderID(String newDynamicContentProviderID) {
+		String oldDynamicContentProviderID = dynamicContentProviderID;
+		dynamicContentProviderID = newDynamicContentProviderID;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					SemanticResourceDBPackage.RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID, oldDynamicContentProviderID,
+					dynamicContentProviderID));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
@@ -648,6 +696,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return getQueryPart();
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
 				return getRemoteURI();
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID :
+				return getDynamicContentProviderID();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -698,6 +748,9 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
 				setRemoteURI((String) newValue);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID :
+				setDynamicContentProviderID((String) newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -746,6 +799,9 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
 				setRemoteURI(REMOTE_URI_EDEFAULT);
 				return;
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID :
+				setDynamicContentProviderID(DYNAMIC_CONTENT_PROVIDER_ID_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -782,6 +838,9 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 				return QUERY_PART_EDEFAULT == null ? queryPart != null : !QUERY_PART_EDEFAULT.equals(queryPart);
 			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__REMOTE_URI :
 				return REMOTE_URI_EDEFAULT == null ? remoteURI != null : !REMOTE_URI_EDEFAULT.equals(remoteURI);
+			case SemanticResourceDBPackage.RESOURCE_TREE_NODE__DYNAMIC_CONTENT_PROVIDER_ID :
+				return DYNAMIC_CONTENT_PROVIDER_ID_EDEFAULT == null ? dynamicContentProviderID != null
+						: !DYNAMIC_CONTENT_PROVIDER_ID_EDEFAULT.equals(dynamicContentProviderID);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -817,6 +876,8 @@ public class ResourceTreeNodeImpl extends EObjectImpl implements ResourceTreeNod
 		result.append(queryPart);
 		result.append(", remoteURI: "); //$NON-NLS-1$
 		result.append(remoteURI);
+		result.append(", dynamicContentProviderID: "); //$NON-NLS-1$
+		result.append(dynamicContentProviderID);
 		result.append(')');
 		return result.toString();
 	}
