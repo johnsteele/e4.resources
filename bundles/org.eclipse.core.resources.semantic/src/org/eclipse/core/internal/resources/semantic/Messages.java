@@ -28,8 +28,8 @@ public class Messages extends NLS {
 	public static String SemanticFileStore_CreateFileRemote_XMSG;
 	public static String SemanticFileStore_CreateResourceRemtoe_XMSG;
 	public static String SemanticFileStore_DeleteResourceRemote_XMSG;
-	public static String SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition;
-	public static String SemanticFileStore_FederatingContentProviderReturnedNull;
+	public static String SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition_XMSG;
+	public static String SemanticFileStore_FederatingContentProviderReturnedNull_XMSG;
 	public static String SemanticFileStore_IntefaceNotImplemented_XMSG;
 	public static String SemanticFileStore_InvalidURISyntax_XMSG;
 	public static String SemanticFileStore_Locking_XMSG;

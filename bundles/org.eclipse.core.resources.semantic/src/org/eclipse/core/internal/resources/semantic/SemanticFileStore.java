@@ -248,13 +248,13 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			if (info != null) {
 				if (info.contentProviderID == null) {
 					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_EMPTY_FEDERATED_PROVIDER_ID, path, NLS.bind(
-							Messages.SemanticFileStore_FederatingContentProviderReturnedNull, parentProvider.getClass().getName(), path
+							Messages.SemanticFileStore_FederatingContentProviderReturnedNull_XMSG, parentProvider.getClass().getName(), path
 									.toString()));
 				}
 
 				if (info.rootNodePosition <= 0 && info.rootNodePosition > relativePathLength) {
 					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_INVALID_ROOT_NODE_POSITION, path, NLS.bind(
-							Messages.SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition, parentProvider.getClass()
+							Messages.SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition_XMSG, parentProvider.getClass()
 									.getName(), path.toString()));
 				}
 
