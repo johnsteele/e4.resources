@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_NtA2AHlKEd-scPKZUqTcjQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_QRvckHlKEd-scPKZUqTcjQ" featurename="children" parentElementId="_AXU5YO8IEd6FC9cDb6iV7g">
+    <elements xsi:type="menu:HandledMenuItem" xmi:id="_VraP8HlKEd-scPKZUqTcjQ" label="Create Album on Semantic File System" command="_c0nHQHlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="menu:HandledMenuItem" xmi:id="_QjrrsHlLEd-scPKZUqTcjQ" label="Add Image from File" command="_qia7EHlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="menu:HandledMenuItem" xmi:id="_U-vhwHlLEd-scPKZUqTcjQ" label="Add Image from Internet" command="_unw_0HlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="menu:HandledMenuItem" xmi:id="_XfBtMHlLEd-scPKZUqTcjQ" label="Set Proxies" command="_IAx2gHlLEd-scPKZUqTcjQ"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ZYPuEHlKEd-scPKZUqTcjQ" featurename="commands" parentElementId="_AXU5UO8IEd6FC9cDb6iV7g">
+    <elements xsi:type="commands:Command" xmi:id="_c0nHQHlKEd-scPKZUqTcjQ" elementId="org.eclipse.e4.demo.e4photo.command.withsfs.createAlbum" commandName="Create Album Snippet"/>
+    <elements xsi:type="commands:Command" xmi:id="_lIqoIHlKEd-scPKZUqTcjQ" elementId="org.eclipse.e4.demo.e4photo.command.withsfs.refreshAlbum" commandName="Refresh Album Snippet"/>
+    <elements xsi:type="commands:Command" xmi:id="_qia7EHlKEd-scPKZUqTcjQ" elementId="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromFile" commandName="Add Image from File Snippet"/>
+    <elements xsi:type="commands:Command" xmi:id="_unw_0HlKEd-scPKZUqTcjQ" elementId="org.eclipse.e4.demo.e4photo.command.withsfs.addImageFromInternet" commandName="Add Image from Internet Snippet"/>
+    <elements xsi:type="commands:Command" xmi:id="_IAx2gHlLEd-scPKZUqTcjQ" elementId="org.eclipse.e4.demo.e4photo.command.withsfs.setProxies" commandName="Set Proxies Snippet"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_x5kHwHlKEd-scPKZUqTcjQ" featurename="handlers" parentElementId="_AXU5UO8IEd6FC9cDb6iV7g">
+    <elements xsi:type="commands:Handler" xmi:id="_0s81YHlKEd-scPKZUqTcjQ" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.NewProjectHandler" command="_c0nHQHlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_362UwHlKEd-scPKZUqTcjQ" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.AddImageFromFileDialogHandler" command="_qia7EHlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_BZtb4HlLEd-scPKZUqTcjQ" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.AddImageFromInternetDialogHandler" command="_unw_0HlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_F4rhkHlLEd-scPKZUqTcjQ" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.RefreshAlbumHandler" command="_lIqoIHlKEd-scPKZUqTcjQ"/>
+    <elements xsi:type="commands:Handler" xmi:id="_L3VRUHlLEd-scPKZUqTcjQ" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4photo.withSFS/org.eclipse.e4.demo.e4photo.withsfs.SetProxiesDialogHandler" command="_IAx2gHlLEd-scPKZUqTcjQ"/>
+  </fragments>
+</fragment:ModelFragments>
