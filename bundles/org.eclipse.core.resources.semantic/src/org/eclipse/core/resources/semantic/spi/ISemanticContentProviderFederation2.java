@@ -71,18 +71,18 @@ public interface ISemanticContentProviderFederation2 {
 	 * data may result in unpredictable failures.
 	 * <p>
 	 * Example: Given the root path of this provider at /a/b and the federated
-	 * providers "hugo" and "felix" that should be rooted at /a/b/c/d and
-	 * /a/b/c1 respectively , the method should return following values for
-	 * following inputs:
+	 * providers "foo" and "bar" that should be rooted at /a/b/c/d and /a/b/c1
+	 * respectively , the method should return following values for following
+	 * inputs:
 	 * 
 	 * <pre>
 	 *  /a/b		null
 	 *  /a/b/c 		null
-	 *  /a/b/c/d	{ "hugo", 2 }
-	 *  /a/b/c/d/e	{ "hugo", 2 }
-	 *  /a/b/c1 	{ "felix", 1 }
-	 *  /a/b/c1/d 	{ "felix", 1 }
-	 *  /a/b/c1/d/e	{ "felix", 1 }
+	 *  /a/b/c/d	{ "foo", 2 }
+	 *  /a/b/c/d/e	{ "foo", 2 }
+	 *  /a/b/c1 	{ "bar", 1 }
+	 *  /a/b/c1/d 	{ "bar", 1 }
+	 *  /a/b/c1/d/e	{ "bar", 1 }
 	 *  /a/b/c2 	null
 	 *  /a/b/c3 	null 
 	 *  ...		...
@@ -99,13 +99,13 @@ public interface ISemanticContentProviderFederation2 {
 	 * 	}
 	 * 
 	 * 	if (checkPath.segment(0).equals(&quot;c1&quot;)) {
-	 * 		return new FederatedProviderInfo(&quot;felix&quot;, 1);
+	 * 		return new FederatedProviderInfo(&quot;bar&quot;, 1);
 	 * 	}
 	 * 
 	 * 	if (checkPath.segmentCount() &gt;= 2) {
 	 * 		if (checkPath.segment(0).equals(&quot;c&quot;)) {
 	 * 			if (checkPath.segment(1).equals(&quot;d&quot;)) {
-	 * 				return new FederatedProviderInfo(&quot;hugo&quot;, 2);
+	 * 				return new FederatedProviderInfo(&quot;foo&quot;, 2);
 	 * 			}
 	 * 		}
 	 * 	}
