@@ -157,7 +157,7 @@ public class PropertiesContentProvider implements ITreeContentProvider {
 
 					return resultMap.toArray();
 
-				} catch (CoreException e) {
+				} catch (Exception e) {
 					return getChildExceptionMap();
 				}
 
