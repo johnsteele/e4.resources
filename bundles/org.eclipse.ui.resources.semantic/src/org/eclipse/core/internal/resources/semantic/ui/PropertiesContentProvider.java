@@ -65,6 +65,13 @@ public class PropertiesContentProvider implements ITreeContentProvider {
 
 		props.add(new KeyValuePair(Messages.PropertiesContentProvider_LastModified_XFLD, df.format(modified)));
 
+		try {
+			props.add(new KeyValuePair(Messages.PropertiesContentProvider_ProviderID_XFLD, nullToSpace(sfs.getEffectiveContentProviderID())));
+		} catch (CoreException e) {
+			props.add(new KeyValuePair(Messages.PropertiesContentProvider_ProviderID_XFLD,
+					Messages.PropertiesContentProvider_ExceptionGettingValue_XMSG));
+		}
+
 		String contentProvider;
 		try {
 			contentProvider = nullToSpace(sfs.getEffectiveContentProvider().getClass().getName());
@@ -72,7 +79,20 @@ public class PropertiesContentProvider implements ITreeContentProvider {
 			contentProvider = Messages.PropertiesContentProvider_ExceptionGettingValue_XMSG;
 		}
 		props.add(new KeyValuePair(Messages.PropertiesContentProvider_EffectiveContentProvider_XFLD, contentProvider));
-		props.add(new KeyValuePair(Messages.PropertiesContentProvider_ProviderID_XFLD, nullToSpace(sfs.getContentProviderID())));
+
+		props.add(new KeyValuePair(Messages.PropertiesContentProvider_PersistentContentProviderID_XFLD, nullToSpace(sfs.getContentProviderID())));
+
+		boolean isContentProviderRootNode = false;
+		try {
+			if (sfs.getEffectiveContentProvider().getRootStore().getPath().equals(sfs.getPath())) {
+				isContentProviderRootNode = true;
+			}
+			props.add(new KeyValuePair(Messages.PropertiesContentProvider_IsRootNode_XFLD, String.valueOf(isContentProviderRootNode)));
+		} catch (Exception e) {
+			props.add(new KeyValuePair(Messages.PropertiesContentProvider_IsRootNode_XFLD,
+					Messages.PropertiesContentProvider_ExceptionGettingValue_XMSG));
+		}
+
 		String remoteUri;
 		try {
 			remoteUri = nullToSpace(sfs.getRemoteURIString());

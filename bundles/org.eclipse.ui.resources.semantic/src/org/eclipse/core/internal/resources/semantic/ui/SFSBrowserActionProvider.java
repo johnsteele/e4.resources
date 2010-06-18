@@ -16,11 +16,16 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.ui.util.SFSBrowserTreeObject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -117,6 +122,17 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 
 				if (refresh[0]) {
 					getActionSite().getStructuredViewer().refresh();
+
+					WorkspaceJob job = new WorkspaceJob(Messages.SFSBrowserActionProvider_RefreshWorkspaceJobName_XMSG) {
+						@Override
+						public IStatus runInWorkspace(IProgressMonitor monitor1) throws CoreException {
+							ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, monitor1);
+							return Status.OK_STATUS;
+						}
+					};
+
+					job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+					job.schedule();
 				}
 			}
 		};
@@ -185,6 +201,17 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 
 				if (refresh[0]) {
 					getActionSite().getStructuredViewer().refresh();
+
+					WorkspaceJob job = new WorkspaceJob(Messages.SFSBrowserActionProvider_RefreshWorkspaceJobName_XMSG) {
+						@Override
+						public IStatus runInWorkspace(IProgressMonitor monitor1) throws CoreException {
+							ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, monitor1);
+							return Status.OK_STATUS;
+						}
+					};
+
+					job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+					job.schedule();
 				}
 			}
 		};

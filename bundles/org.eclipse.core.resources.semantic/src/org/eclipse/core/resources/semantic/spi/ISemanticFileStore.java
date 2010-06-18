@@ -235,6 +235,14 @@ public interface ISemanticFileStore extends ISemanticProperties, IFileStore {
 	public String getContentProviderID();
 
 	/**
+	 * Returns the ID of the effective content provider.
+	 * 
+	 * @return the ID string
+	 * @since 0.3
+	 */
+	public String getEffectiveContentProviderID() throws CoreException;
+
+	/**
 	 * Returns the exists flag.
 	 * <p>
 	 * TODO javadoc

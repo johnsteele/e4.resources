@@ -345,32 +345,44 @@ public class TestsFederatingProvider2 extends TestsContentProviderUtil {
 				ISemanticFileStore sstore = (ISemanticFileStore) EFS.getStore(sFile.getAdaptedResource().getLocationURI());
 				ISemanticContentProvider cp = sstore.getEffectiveContentProvider();
 				Assert.assertEquals("Wrong content provider", FederatedContentProvider.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatedContentProvider.class.getName(), sstore
+						.getEffectiveContentProviderID());
 
 				// root/A/E/X/B
 				sstore = (ISemanticFileStore) EFS.getStore(federatingSFolder.getAdaptedResource().getLocationURI());
 				cp = sstore.getEffectiveContentProvider();
 				Assert.assertEquals("Wrong content provider", FederatedContentProvider.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatedContentProvider.class.getName(), sstore
+						.getEffectiveContentProviderID());
 
 				// root/A/E/X
 				sstore = (ISemanticFileStore) sstore.getParent();
 				cp = sstore.getEffectiveContentProvider();
 				Assert.assertEquals("Wrong content provider", FederatingContentProvider3.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatingContentProvider3.class.getName(), sstore
+						.getEffectiveContentProviderID());
 
 				// root/A/E
 				sstore = (ISemanticFileStore) sstore.getParent();
 				cp = sstore.getEffectiveContentProvider();
 				Assert.assertEquals("Wrong content provider", FederatingContentProvider3.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatingContentProvider3.class.getName(), sstore
+						.getEffectiveContentProviderID());
 
 				// root/A
 				sstore = (ISemanticFileStore) sstore.getParent();
 				cp = sstore.getEffectiveContentProvider();
 				// the parent should still have the original one
 				Assert.assertEquals("Wrong content provider", FederatingContentProvider2.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatingContentProvider2.class.getName(), sstore
+						.getEffectiveContentProviderID());
 
 				// root
 				sstore = (ISemanticFileStore) sstore.getParent();
 				cp = sstore.getEffectiveContentProvider();
 				Assert.assertEquals("Wrong content provider", FederatingContentProvider2.class.getName(), cp.getClass().getName());
+				Assert.assertEquals("Wrong content provider ID", FederatingContentProvider2.class.getName(), sstore
+						.getEffectiveContentProviderID());
 			}
 		};
 

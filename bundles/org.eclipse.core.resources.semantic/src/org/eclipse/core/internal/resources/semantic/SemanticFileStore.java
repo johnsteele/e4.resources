@@ -214,6 +214,28 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		return actProvider;
 	}
 
+	public String getEffectiveContentProviderID() throws CoreException {
+		try {
+			this.fs.lockForWrite();
+
+			if (this.getContentProviderID() != null) {
+				return this.getContentProviderID();
+			}
+
+			ContentProviderData effectiveProviderData = getEffectiveContentProviderInternal();
+
+			if (effectiveProviderData.provider instanceof ISemanticContentProviderFederation2) {
+				IPath thisPath = this.getPath();
+
+				return findFederatedContentProvider(thisPath, this.fs, this.node, effectiveProviderData).providerID;
+			}
+
+			return effectiveProviderData.providerID;
+		} finally {
+			this.fs.unlockForWrite();
+		}
+	}
+
 	public ISemanticContentProvider getEffectiveContentProvider() throws CoreException {
 		try {
 			this.fs.lockForWrite();
@@ -222,39 +244,39 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				return this.provider;
 			}
 
-			ISemanticContentProvider effectiveProvider = getEffectiveContentProviderInternal();
+			ContentProviderData effectiveProviderData = getEffectiveContentProviderInternal();
 
-			if (effectiveProvider instanceof ISemanticContentProviderFederation2) {
+			if (effectiveProviderData.provider instanceof ISemanticContentProviderFederation2) {
 				IPath thisPath = this.getPath();
 
-				return findFederatedContentProvider(thisPath, this.fs, this.node, effectiveProvider);
+				return findFederatedContentProvider(thisPath, this.fs, this.node, effectiveProviderData).provider;
 			}
 
-			return effectiveProvider;
+			return effectiveProviderData.provider;
 		} finally {
 			this.fs.unlockForWrite();
 		}
 	}
 
-	private static ISemanticContentProvider findFederatedContentProvider(IPath path, SemanticFileSystem fs, ResourceTreeNode node,
-			ISemanticContentProvider parentProvider) throws CoreException {
+	private static ContentProviderData findFederatedContentProvider(IPath path, SemanticFileSystem fs, ResourceTreeNode node,
+			ContentProviderData parentProviderData) throws CoreException {
 
-		int relativePathLength = path.segmentCount() - parentProvider.getRootStore().getPath().segmentCount();
+		int relativePathLength = path.segmentCount() - parentProviderData.provider.getRootStore().getPath().segmentCount();
 
 		if (relativePathLength > 0) {
-			ISemanticContentProviderFederation2 federatingProvider = (ISemanticContentProviderFederation2) parentProvider;
+			ISemanticContentProviderFederation2 federatingProvider = (ISemanticContentProviderFederation2) parentProviderData.provider;
 
 			FederatedProviderInfo info = federatingProvider.getFederatedProviderInfoForPath(path);
 			if (info != null) {
 				if (info.contentProviderID == null) {
 					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_EMPTY_FEDERATED_PROVIDER_ID, path, NLS.bind(
-							Messages.SemanticFileStore_FederatingContentProviderReturnedNull_XMSG, parentProvider.getClass().getName(),
+							Messages.SemanticFileStore_FederatingContentProviderReturnedNull_XMSG, federatingProvider.getClass().getName(),
 							path.toString()));
 				}
 
 				if (info.rootNodePosition <= 0 || info.rootNodePosition > relativePathLength) {
 					throw new SemanticResourceException(SemanticResourceStatusCode.FEDERATION_INVALID_ROOT_NODE_POSITION, path, NLS.bind(
-							Messages.SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition_XMSG, parentProvider
+							Messages.SemanticFileStore_FederatingContentProviderReturnedInvalidRootNodePosition_XMSG, federatingProvider
 									.getClass().getName(), path.toString()));
 				}
 
@@ -275,16 +297,27 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 				ISemanticContentProvider nestedProvider = initProvider(info.contentProviderID, fs.getStore(parent));
 
+				ContentProviderData nestedProviderData = new ContentProviderData(nestedProvider, info.contentProviderID);
 				if (nestedProvider instanceof ISemanticContentProviderFederation2) {
-					return findFederatedContentProvider(path, fs, node, nestedProvider);
+					return findFederatedContentProvider(path, fs, node, nestedProviderData);
 				}
-				return nestedProvider;
+				return nestedProviderData;
 			}
 		}
-		return parentProvider;
+		return parentProviderData;
 	}
 
-	private ISemanticContentProvider getEffectiveContentProviderInternal() throws CoreException {
+	private static class ContentProviderData {
+		ContentProviderData(ISemanticContentProvider provider, String providerID) {
+			this.provider = provider;
+			this.providerID = providerID;
+		}
+
+		ISemanticContentProvider provider;
+		String providerID;
+	}
+
+	private ContentProviderData getEffectiveContentProviderInternal() throws CoreException {
 		ISemanticFileStore parentStore;
 		String parentContentProviderId = SemanticFileStore.DEFAULT_CONTENT_PROVIDER_ID;
 		ResourceTreeNode parent = null;
@@ -301,7 +334,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
 			}
 
-			return this.provider;
+			return new ContentProviderData(this.provider, contentProviderID);
 		}
 
 		if (this.node.getDynamicContentProviderID() != null) {
@@ -313,7 +346,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), contentProviderID);
 			}
 
-			return this.provider;
+			return new ContentProviderData(this.provider, contentProviderID);
 		}
 
 		if (!this.node.isExists()) {
@@ -363,7 +396,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 				SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
 			}
 
-			return parentProvider;
+			return new ContentProviderData(parentProvider, parentContentProviderId);
 		}
 
 		// walk up to find a contentProviderID
@@ -373,7 +406,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			// this is a root store with default content provider
 			ISemanticContentProvider parentProvider = initProvider(parentContentProviderId, this);
 
-			return parentProvider;
+			return new ContentProviderData(parentProvider, parentContentProviderId);
 		}
 
 		ResourceTreeNode oldParent = this.node;
@@ -404,7 +437,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			SfsTraceLocation.getTrace().traceExit(SfsTraceLocation.CORE_VERBOSE.getLocation(), parentContentProviderId);
 		}
 
-		return parentProvider;
+		return new ContentProviderData(parentProvider, parentContentProviderId);
 	}
 
 	@Override
