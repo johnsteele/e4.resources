@@ -12,10 +12,12 @@
 package org.eclipse.e4.demo.e4photo.withsfs;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("restriction")
 public class SetProxiesDialogHandler {
 
 	private final static class SetProxiesWizard extends Wizard {
@@ -35,6 +37,7 @@ public class SetProxiesDialogHandler {
 		}
 	}
 
+	@Execute
 	public void execute(Shell shell, IEclipseContext context) {
 		SetProxiesWizard wizard = new SetProxiesWizard(context);
 

@@ -13,6 +13,8 @@ package org.eclipse.e4.demo.e4photo.withsfs;
 
 import java.net.URI;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -23,13 +25,15 @@ import org.eclipse.core.resources.semantic.ISemanticFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("restriction")
 public class AddImageFromInternetDialogHandler {
 
 	private final static class AddImageFromInternetWizard extends Wizard {
@@ -82,10 +86,14 @@ public class AddImageFromInternetDialogHandler {
 
 	}
 
-	public void execute(Shell shell, IEclipseContext context) {
-		Object sel = context.get(IServiceConstants.SELECTION);
-		IResource res = null;
+	@Inject
+	private IEclipseContext context;
 
+	@Execute
+	public void execute(Shell shell, ESelectionService selectionService) {
+		Object sel = selectionService.getSelection();
+
+		IResource res = null;
 		if (sel != null && sel instanceof IResource) {
 			res = (IResource) sel;
 		} else {

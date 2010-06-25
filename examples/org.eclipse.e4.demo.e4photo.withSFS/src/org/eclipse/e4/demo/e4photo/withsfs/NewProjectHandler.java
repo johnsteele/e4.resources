@@ -21,15 +21,18 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.team.core.RepositoryProvider;
 
+@SuppressWarnings("restriction")
 public class NewProjectHandler {
 
 	private int counter;
 
+	@Execute
 	public void execute(IWorkspace workspace, IProgressMonitor monitor) {
 
-		String projectName = "Album " + (++counter);
+		String projectName = findUnsusedProjectName(workspace);
 		final IProject project = workspace.getRoot().getProject(projectName);
 		final IProjectDescription pd = workspace.newProjectDescription(projectName);
 
@@ -61,4 +64,14 @@ public class NewProjectHandler {
 
 	}
 
+	String findUnsusedProjectName(IWorkspace workspace) {
+		String projectName = "Album " + (++counter);
+		IProject project = workspace.getRoot().getProject(projectName);
+
+		while (project.exists()) {
+			projectName = "Album " + (++counter);
+			project = workspace.getRoot().getProject(projectName);
+		}
+		return projectName;
+	}
 }

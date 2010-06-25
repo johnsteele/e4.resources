@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
@@ -34,6 +34,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("restriction")
 public class AddImageFromFileDialogHandler {
 
 	private final static class AddImageFromFileWizard extends Wizard {
@@ -44,7 +45,7 @@ public class AddImageFromFileDialogHandler {
 		 * @param folder
 		 *            the folder
 		 */
-		AddImageFromFileWizard(IEclipseContext context, ISemanticFolder folder) {
+		AddImageFromFileWizard(ISemanticFolder folder) {
 			this.myFolder = folder;
 		}
 
@@ -164,10 +165,11 @@ public class AddImageFromFileDialogHandler {
 		}
 	}
 
-	public void execute(Shell shell, IEclipseContext context) {
-		Object sel = context.get(IServiceConstants.SELECTION);
-		IResource res = null;
+	@Execute
+	public void execute(Shell shell, ESelectionService selectionService) {
+		Object sel = selectionService.getSelection();
 
+		IResource res = null;
 		if (sel != null && sel instanceof IResource) {
 			res = (IResource) sel;
 		} else {
@@ -187,7 +189,7 @@ public class AddImageFromFileDialogHandler {
 			ISemanticFolder sfolder = (ISemanticFolder) res.getAdapter(ISemanticFolder.class);
 
 			if (sfolder != null) {
-				AddImageFromFileWizard wizard = new AddImageFromFileWizard(context, sfolder);
+				AddImageFromFileWizard wizard = new AddImageFromFileWizard(sfolder);
 
 				new WizardDialog(shell, wizard).open();
 			}

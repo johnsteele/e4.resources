@@ -23,18 +23,20 @@ import org.eclipse.core.resources.semantic.ISemanticProject;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("restriction")
 public class RefreshAlbumHandler {
 
-	public void execute(Shell shell, IEclipseContext context) {
-		Object sel = context.get(IServiceConstants.SELECTION);
-		IResource res = null;
+	@Execute
+	public void execute(Shell shell, ESelectionService selectionService) {
+		Object sel = selectionService.getSelection();
 
+		IResource res = null;
 		if (sel != null && sel instanceof IResource) {
 			res = (IResource) sel;
 		} else {
