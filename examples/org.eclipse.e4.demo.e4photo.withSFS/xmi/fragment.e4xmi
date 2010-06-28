@@ -24,7 +24,10 @@
       <children xsi:type="menu:HandledMenuItem" xmi:id="_Jpk_8IBUEd-g6O-Z5GM-fw" label="Refresh Selected Project" command="_lIqoIHlKEd-scPKZUqTcjQ"/>
     </elements>
   </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_OPAnEIBhEd-g6O-Z5GM-fw" featurename="children" parentElementId="org.eclipse.e4.ide.app.menu.file">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_OPAnEIBhEd-g6O-Z5GM-fw" featurename="children" parentElementId="org.eclipse.e4.ide.app.menu.file" positionInList="after:_IHQXsEjUEd-v7fhjaiz65w">
     <elements xsi:type="menu:HandledMenuItem" xmi:id="_VraP8HlKEd-scPKZUqTcjQ" label="Create Album on Semantic File System" command="_c0nHQHlKEd-scPKZUqTcjQ"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_OS3u0IKPEd-g6O-Z5GM-fw" featurename="bindings" parentElementId="_ofif4EjPEd-XR9_8rlW1bQ">
+    <elements xsi:type="commands:KeyBinding" xmi:id="_ajNfEIKPEd-g6O-Z5GM-fw" keySequence="Ctrl+Shift+N" command="_c0nHQHlKEd-scPKZUqTcjQ"/>
   </fragments>
 </fragment:ModelFragments>
