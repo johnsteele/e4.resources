@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String RemoveAction_Removing_XMSG;
 	public static String RevertAction_RevertFailed_XMSG;
 	public static String RevertAction_Reverting_XMSG;
+	public static String ShowSFSBrowserViewAction_CouldNotOpenView_XMSG;
 	public static String SynchronizeAction_SyncFailedForResource_XMSG;
 	public static String SynchronizeAction_Synchronizing_XMSG;
 	public static String UnlockAction_UnlockFailed_XMSG;

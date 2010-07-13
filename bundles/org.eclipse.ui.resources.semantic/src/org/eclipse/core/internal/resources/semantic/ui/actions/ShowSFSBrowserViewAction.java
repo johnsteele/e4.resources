@@ -11,12 +11,18 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.ui.actions;
 
-import org.eclipse.core.internal.resources.semantic.ui.SFSNavigator;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IParameter;
+import org.eclipse.core.commands.Parameterization;
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.internal.resources.semantic.ui.NavigateToContentViewHandler;
+import org.eclipse.core.resources.semantic.ISemanticResource;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * Show Remote History
@@ -34,21 +40,19 @@ public class ShowSFSBrowserViewAction extends ActionBase {
 
 	public void run(IAction action) {
 
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		// ((ISemanticFile) getSelection().getFirstElement()).getAdaptedFile();
+		ISemanticResource res = (ISemanticResource) getSelection().getFirstElement();
 
+		ICommandService srv = (ICommandService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ICommandService.class);
+		Command cmd = srv.getCommand(NavigateToContentViewHandler.NAV_COMMAND_ID);
+		IHandlerService hsrv = (IHandlerService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IHandlerService.class);
 		try {
-			SFSNavigator view = (SFSNavigator) page.findView(SFSNavigator.VIEW_ID);
-			if (view == null) {
-				page.showView(SFSNavigator.VIEW_ID);
-				view = (SFSNavigator) page.findView(SFSNavigator.VIEW_ID);
-			}
-
-			page.activate(view);
-
-			// TODO locate the selected file store in viewer
-		} catch (PartInitException e) {
-			// Ignore
+			IParameter parameter = cmd.getParameter(NavigateToContentViewHandler.NAV_PATH_PARAMETER_ID);
+			Parameterization parm = new Parameterization(parameter, res.getAdaptedResource().getFullPath().toString());
+			ParameterizedCommand pcmd = new ParameterizedCommand(cmd, new Parameterization[] {parm});
+			cmd.executeWithChecks(hsrv.createExecutionEvent(pcmd, null));
+		} catch (Exception e) {
+			MessageDialog.openError(getShell(), Messages.ShowSFSBrowserViewAction_CouldNotOpenView_XMSG, e.getMessage());
 		}
+
 	}
 }

@@ -360,6 +360,21 @@
             name="%wizcat_XGRP">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.eclipse.ui.resources.semantic.navigateToSemanticContent"
+            name="Open Semantic Content view">
+         <defaultHandler
+               class="org.eclipse.core.internal.resources.semantic.ui.NavigateToContentViewHandler">
+         </defaultHandler>
+         <commandParameter
+               id="org.eclipse.ui.resources.semantic.path"
+               name="Path (relative to SFS root)"
+               optional="true">
+         </commandParameter>
+      </command>
+   </extension>
 
 
 </plugin>

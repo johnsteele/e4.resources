@@ -67,6 +67,10 @@ public class Messages extends NLS {
 	public static String PropertiesContentProvider_ResInfoAttributes_XGRP;
 	public static String PropertiesContentProvider_SessionProps_XGRP;
 	public static String PropertiesContentProvider_Value_XGRP;
+	public static String PropertyActionProvider_Refresh_XBUT;
+	public static String PropertySection_CopyKeyAndValue_XMIT;
+	public static String PropertySection_CopyValue_XMIT;
+	public static String PropertySection_Refresh_XMIT;
 	public static String PropertySection_RefreshSemanticPropertiesViewJob_XMSG;
 	public static String SemanticFileSystemPreferencePage_Confirm_XGRP;
 	public static String SemanticFileSystemPreferencePage_Confirm_XMSG;
@@ -78,8 +82,10 @@ public class Messages extends NLS {
 	public static String SemanticFileSystemPreferencePage_PathToDb_XFLD;
 	public static String SemanticFileSystemPreferencePage_Restart_XGRP;
 	public static String SemanticFileSystemPreferencePage_Restart_XMSG;
+	public static String SemanticResourcePropertyPage_CopySelection_XMIT;
 	public static String SFSBrowserActionProvider_ConfirmDelete_XGRP;
 	public static String SFSBrowserActionProvider_ConfirmDelete_XMSG;
+	public static String SFSBrowserActionProvider_CopyLocation_XMIT;
 	public static String SFSBrowserActionProvider_Delete_XMIT;
 	public static String SFSBrowserActionProvider_DontAskAgain_XMSG;
 	public static String SFSBrowserActionProvider_DoYouWantToContinue_YMSG;

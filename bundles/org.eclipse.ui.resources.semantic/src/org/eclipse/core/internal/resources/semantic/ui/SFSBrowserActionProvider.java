@@ -22,6 +22,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -34,6 +35,10 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPageLayout;
@@ -266,6 +271,27 @@ public class SFSBrowserActionProvider extends CommonActionProvider {
 
 			};
 			menu.add(openPropsAction);
+
+			Action copyPathAction = new Action(Messages.SFSBrowserActionProvider_CopyLocation_XMIT) {
+
+				@Override
+				public void run() {
+
+					IPath path = ob.getPath();
+					Clipboard clip = null;
+					try {
+						clip = new Clipboard(Display.getCurrent());
+						clip.setContents(new String[] {path.toString()}, new Transfer[] {TextTransfer.getInstance()});
+					} finally {
+						if (clip != null) {
+							clip.dispose();
+						}
+					}
+
+				}
+
+			};
+			menu.add(copyPathAction);
 
 		}
 	}
