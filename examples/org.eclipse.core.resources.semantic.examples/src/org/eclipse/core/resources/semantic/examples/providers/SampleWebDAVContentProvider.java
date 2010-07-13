@@ -78,8 +78,8 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 			childStore.setPersistentProperty(LOCAL_CHANGE, TRUE);
 			childStore.setPersistentProperty(RESOURCE_ETAG, null);
 		} catch (CoreException e) {
-			SemanticResourcesPluginExamplesCore.getDefault().getLog().log(
-					new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, e.getMessage(), e));
+			SemanticResourcesPluginExamplesCore.getDefault().getLog()
+					.log(new Status(IStatus.ERROR, SemanticResourcesPluginExamplesCore.PLUGIN_ID, e.getMessage(), e));
 		}
 	}
 
@@ -183,7 +183,7 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 											}
 
 											public void setContentType(String contentType) {
-												// 
+												//
 											}
 										};
 										try {
@@ -295,7 +295,7 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 	}
 
 	public void addFileFromRemoteByURI(ISemanticFileStore parentStore, String name, URI uri, IProgressMonitor monitor) throws CoreException {
-		parentStore.addChildFolder(name);
+		parentStore.addChildFile(name);
 
 		ISemanticFileStore newChild = (ISemanticFileStore) parentStore.getChild(name);
 
@@ -369,8 +369,8 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 				} catch (WebDAVResourceNotFoundException e) {
 					store.remove(monitor);
 				} catch (IOException e) {
-					throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, store.getPath(), e
-							.getMessage(), e);
+					throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, store.getPath(),
+							e.getMessage(), e);
 				}
 				return;
 			}
@@ -637,8 +637,8 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 			}
 
 		}
-		return new SemanticSpiResourceInfo(options, locked, supportsLocking, readOnly, existsRemotely, uriString, this
-				.getContentTypeInternal(semanticFileStore));
+		return new SemanticSpiResourceInfo(options, locked, supportsLocking, readOnly, existsRemotely, uriString,
+				this.getContentTypeInternal(semanticFileStore));
 	}
 
 	@Override
