@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_YUxlUTajEd-kXtA_eMccFg" elementId="org.eclipse.e4.ide.application">
+  <children xsi:type="basic:Window" xmi:id="_YewnwDajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.mainWindow" label="e4 Demo Twitter Client" width="500" height="400">
+    <children xsi:type="advanced:PerspectiveStack" xmi:id="_YewnyDajEd-kXtA_eMccFg" elementId="_YewnyDajEd-kXtA_eMccFg">
+      <children xsi:type="advanced:Perspective" xmi:id="_YewnyTajEd-kXtA_eMccFg" elementId="_YewnyTajEd-kXtA_eMccFg">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_YewnyjajEd-kXtA_eMccFg" elementId="_YewnyjajEd-kXtA_eMccFg" horizontal="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_6qHXgDhIEd-s6ra3eZBotw" elementId="_6qHXgDhIEd-s6ra3eZBotw">
+            <children xsi:type="basic:PartStack" xmi:id="_XZOAQDhJEd-s6ra3eZBotw" elementId="_XZOAQDhJEd-s6ra3eZBotw">
+              <children xsi:type="basic:Part" xmi:id="_2YyOsDanEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.TwittersPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.MyPart" label="Twitters"/>
+            </children>
+            <children xsi:type="basic:PartStack" xmi:id="_YkxNYDhJEd-s6ra3eZBotw" elementId="_YkxNYDhJEd-s6ra3eZBotw">
+              <children xsi:type="basic:Part" xmi:id="_d_1mcDduEd-s6ra3eZBotw" elementId="org.eclipse.e4.demo.e4twitterclient.SFSVieverPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.SFSViewer" label="SFS Viewer"/>
+            </children>
+          </children>
+          <children xsi:type="basic:PartSashContainer" xmi:id="_KcU74DawEd-kXtA_eMccFg" elementId="_KcU74DawEd-kXtA_eMccFg">
+            <children xsi:type="basic:PartStack" xmi:id="_Pn5-IDebEd-s6ra3eZBotw" elementId="_Pn5-IDebEd-s6ra3eZBotw">
+              <children xsi:type="basic:Part" xmi:id="_VY23kDg0Ed-s6ra3eZBotw" elementId="org.eclipse.e4.demo.e4twitterclient.InfoPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.UserInfoPart" label="Info" iconURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/icons/i.gif"/>
+            </children>
+            <children xsi:type="basic:PartStack" xmi:id="_lt_9UDawEd-kXtA_eMccFg" elementId="_lt_9UDawEd-kXtA_eMccFg">
+              <children xsi:type="basic:Part" xmi:id="_WLrboDg0Ed-s6ra3eZBotw" elementId="org.eclipse.e4.demo.e4twitterclient.TweetsPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.TweetsPart" label="Tweets" iconURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/icons/twitter.gif"/>
+            </children>
+            <children xsi:type="basic:PartSashContainer" xmi:id="_wlVpwIUREd-oIvJFd0FA_A" horizontal="true">
+              <children xsi:type="basic:PartStack" xmi:id="_CmOcUIUSEd-oIvJFd0FA_A">
+                <children xsi:type="basic:Part" xmi:id="_G5mWAIUSEd-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.FollowingPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.FollowingPart" label="Following" iconURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/icons/r.gif"/>
+              </children>
+              <children xsi:type="basic:PartStack" xmi:id="_DYXD4IUSEd-oIvJFd0FA_A">
+                <children xsi:type="basic:Part" xmi:id="_JLGekIUSEd-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.FollowersPart" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.parts.FollowersPart" label="Followers" iconURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/icons/r.gif"/>
+              </children>
+            </children>
+          </children>
+        </children>
+      </children>
+    </children>
+    <mainMenu xmi:id="_YewnwTajEd-kXtA_eMccFg" elementId="menu:org.eclipse.ui.main.menu">
+      <children xsi:type="menu:Menu" xmi:id="_YewnwjajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.FileMenu" label="File">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_YewnwzajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.Open" label="Open" iconURI="" command="_Yem2xDajEd-kXtA_eMccFg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_OgeJoIPGEd-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.Refresh" label="Refresh" command="_Tl1g8IPGEd-oIvJFd0FA_A"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_YewnxDajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.Remove" label="Remove" iconURI="" command="_Yem2xzajEd-kXtA_eMccFg"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_9370oIPGEd-oIvJFd0FA_A"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_gQBbgIQ9Ed-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.SetProxyData" label="Set Proxy Data" command="_UQWkgIQ9Ed-oIvJFd0FA_A"/>
+        <children xsi:type="menu:MenuSeparator" xmi:id="_fwME4IQ9Ed-oIvJFd0FA_A"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_YewnxTajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.Quit" label="Quit" command="_Yem2wDajEd-kXtA_eMccFg"/>
+      </children>
+      <children xsi:type="menu:Menu" xmi:id="_YewnxjajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.HelpMenu" label="Help">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_YewnxzajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.About" label="About" command="_Yem2yjajEd-kXtA_eMccFg"/>
+      </children>
+    </mainMenu>
+  </children>
+  <handlers xmi:id="_Yem2wTajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.quitCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.QuitHandler" command="_Yem2wDajEd-kXtA_eMccFg"/>
+  <handlers xmi:id="_Yem2xTajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.openCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.OpenHandler" command="_Yem2xDajEd-kXtA_eMccFg"/>
+  <handlers xmi:id="_Yem2yDajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.removeCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.RemoveHandler" command="_Yem2xzajEd-kXtA_eMccFg"/>
+  <handlers xmi:id="_Yem2yzajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.aboutCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.AboutHandler" command="_Yem2yjajEd-kXtA_eMccFg"/>
+  <handlers xmi:id="_Rd3H0IPGEd-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.refreshCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.RefreshHandler" command="_Tl1g8IPGEd-oIvJFd0FA_A"/>
+  <handlers xmi:id="_YjSZUIQ9Ed-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.setProxyDataCommandHandler" contributionURI="platform:/plugin/org.eclipse.e4.demo.e4twitterclient/org.eclipse.e4.demo.e4twitterclient.handlers.SetProxiesDialogHandler" command="_UQWkgIQ9Ed-oIvJFd0FA_A"/>
+  <bindingTables xmi:id="_Yem2wjajEd-kXtA_eMccFg" elementId="_Yem2wjajEd-kXtA_eMccFg" bindingContextId="org.eclipse.ui.contexts.dialogAndWindow">
+    <bindings xmi:id="_Yem2wzajEd-kXtA_eMccFg" keySequence="Ctrl+Q" elementId="org.eclipse.e4.demo.e4twitterclient.quitCommandBinding" command="_Yem2wDajEd-kXtA_eMccFg"/>
+    <bindings xmi:id="_Yem2xjajEd-kXtA_eMccFg" keySequence="Ctrl+O" elementId="org.eclipse.e4.demo.e4twitterclient.openCommandBinding" command="_Yem2xDajEd-kXtA_eMccFg"/>
+    <bindings xmi:id="_Yem2yTajEd-kXtA_eMccFg" keySequence="Ctrl+S" elementId="org.eclipse.e4.demo.e4twitterclient.saveCommandBinding" command="_Yem2xzajEd-kXtA_eMccFg"/>
+    <bindings xmi:id="_Yem2zDajEd-kXtA_eMccFg" keySequence="Ctrl+A" elementId="org.eclipse.e4.demo.e4twitterclient.aboutCommandBinding" command="_Yem2yjajEd-kXtA_eMccFg"/>
+  </bindingTables>
+  <rootContext xmi:id="_Yeds0DajEd-kXtA_eMccFg" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
+    <children xmi:id="_Yeds0TajEd-kXtA_eMccFg" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
+    <children xmi:id="_Yeds0jajEd-kXtA_eMccFg" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
+  </rootContext>
+  <bindingContexts>org.eclipse.ui.contexts.dialogAndWindow</bindingContexts>
+  <commands xmi:id="_Yem2wDajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.quitCommand" commandName="quitCommand"/>
+  <commands xmi:id="_Yem2xDajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.openCommand" commandName="openCommand"/>
+  <commands xmi:id="_Yem2xzajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.removeCommand" commandName="removeCommand"/>
+  <commands xmi:id="_Yem2yjajEd-kXtA_eMccFg" elementId="org.eclipse.e4.demo.e4twitterclient.aboutCommand" commandName="aboutCommand"/>
+  <commands xmi:id="_Tl1g8IPGEd-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.refreshCommand" commandName="refreshCommand"/>
+  <commands xmi:id="_UQWkgIQ9Ed-oIvJFd0FA_A" elementId="org.eclipse.e4.demo.e4twitterclient.setProxyDataCommand" commandName="setProxyDataCommand"/>
+</application:Application>
