@@ -58,7 +58,7 @@ public interface ISemanticFileSystem {
 	 * This option should only be used as last resort for cleanup of corrupted
 	 * content.
 	 * 
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	public static final int FORCE_REMOVE = 1 << 2;
 

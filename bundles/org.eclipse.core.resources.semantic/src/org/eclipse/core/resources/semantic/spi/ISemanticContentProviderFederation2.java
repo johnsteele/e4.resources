@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IPath;
  * provide a dynamic assignment of child stores to federated content providers.
  * <p>
  * 
- * @since 0.3
+ * @since 0.4
  * @noextend This interface is not intended to be extended by clients.
  */
 public interface ISemanticContentProviderFederation2 {

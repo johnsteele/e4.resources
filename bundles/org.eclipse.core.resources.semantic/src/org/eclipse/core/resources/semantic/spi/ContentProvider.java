@@ -173,7 +173,7 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 	}
 
 	/**
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	public void onRootStoreCreate(ISemanticFileStore newStore) {
 		// by default, we do nothing

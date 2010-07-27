@@ -210,7 +210,7 @@ public enum SemanticResourceStatusCode {
 	 * Federating content provider returned <code>null</code> value for
 	 * federated content provider ID
 	 * 
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	FEDERATION_EMPTY_FEDERATED_PROVIDER_ID(166),
 
@@ -218,7 +218,7 @@ public enum SemanticResourceStatusCode {
 	 * Federating content provider returned invalid value for root node position
 	 * of federated content provider
 	 * 
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	FEDERATION_INVALID_ROOT_NODE_POSITION(167);
 
