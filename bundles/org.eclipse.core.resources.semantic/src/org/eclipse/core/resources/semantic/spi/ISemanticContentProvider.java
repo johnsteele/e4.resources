@@ -318,7 +318,7 @@ public interface ISemanticContentProvider extends ISemanticContentProviderBase, 
 	 * 
 	 * @param newStore
 	 *            the new store
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	public void onRootStoreCreate(ISemanticFileStore newStore);
 

@@ -206,7 +206,7 @@ public interface ISemanticFileStore extends ISemanticProperties, IFileStore {
 	 *            is not desired
 	 * @throws CoreException
 	 *             in case of operation failure
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	public void forceRemove(int options, IProgressMonitor monitor) throws CoreException;
 
@@ -238,7 +238,7 @@ public interface ISemanticFileStore extends ISemanticProperties, IFileStore {
 	 * Returns the ID of the effective content provider.
 	 * 
 	 * @return the ID string
-	 * @since 0.3
+	 * @since 0.4
 	 */
 	public String getEffectiveContentProviderID() throws CoreException;
 
