@@ -25,6 +25,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileInfo;
+import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.ResourceTreeNode;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.SemanticResourceDBFactory;
 import org.eclipse.core.internal.resources.semantic.model.SemanticResourceDB.TreeNodeType;
@@ -460,8 +461,55 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 			return null;
 
 		}
-		return super.toLocalFile(options, monitor);
 
+		IFileStore store = new FileStore() {
+
+			@Override
+			public URI toURI() {
+				return SemanticFileStore.this.toURI();
+			}
+
+			@Override
+			public InputStream openInputStream(int options1, IProgressMonitor monitor1) throws CoreException {
+				return SemanticFileStore.this.openInputStream(options1, monitor1);
+			}
+
+			@Override
+			public IFileStore getParent() {
+				return SemanticFileStore.this.getParent();
+			}
+
+			@Override
+			public String getName() {
+				return SemanticFileStore.this.getName();
+			}
+
+			@Override
+			public IFileStore getChild(String name) {
+				return SemanticFileStore.this.getChild(name);
+			}
+
+			@Override
+			public IFileInfo fetchInfo(int options1, IProgressMonitor monitor1) throws CoreException {
+				IFileInfo info = SemanticFileStore.this.fetchInfo(options1, monitor1);
+
+				if (info != null && info.exists()) {
+					// clear the read-only flag in order to temporarily fix the
+					// bug 323833 on MacOS
+					if (info.getAttribute(EFS.ATTRIBUTE_READ_ONLY)) {
+						info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, false);
+					}
+				}
+				return info;
+			}
+
+			@Override
+			public String[] childNames(int options1, IProgressMonitor monitor1) throws CoreException {
+				return SemanticFileStore.this.childNames(options1, monitor1);
+			}
+		};
+
+		return store.toLocalFile(options, monitor);
 	}
 
 	@Override
@@ -595,8 +643,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 		if (SfsTraceLocation.CONTENTPROVIDER.isActive()) {
 
 			SfsTraceLocation.getTrace()
-					.trace(
-							SfsTraceLocation.CONTENTPROVIDER.getLocation(),
+					.trace(SfsTraceLocation.CONTENTPROVIDER.getLocation(),
 							NLS.bind(Messages.SemanticFileStore_OpeningInputInfo_XMSG, effectiveProvider.getClass().getName(), getPath()
 									.toString()));
 
@@ -1502,7 +1549,7 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 
 	//
 	// private section
-	// 
+	//
 	/**
 	 * @param name
 	 */
