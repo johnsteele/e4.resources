@@ -11,9 +11,11 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.ui.wizard;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -102,10 +104,12 @@ public class AddUrlResourceWizard extends Wizard implements INewWizard {
 							IPath newPath = nameAndUrlPage.getResourceContainer().getFullPath().append(nameAndUrlPage.getChildName());
 							uri = new URI(ISemanticFileSystem.SCHEME, null, newPath.toString(), "type=" + fileOrFolder //$NON-NLS-1$
 									+ ";create=true;provider=" + DEFAULT_CP_ID //$NON-NLS-1$
-									+ ";uri=" + nameAndUrlPage.getUrl(), null); //$NON-NLS-1$
+									+ ";uri=" + URLEncoder.encode(nameAndUrlPage.getUrl(), "UTF-8"), null); //$NON-NLS-1$ //$NON-NLS-2$
 
 						}
 					} catch (URISyntaxException e1) {
+						throw new InvocationTargetException(e1);
+					} catch (UnsupportedEncodingException e1) {
 						throw new InvocationTargetException(e1);
 					}
 
@@ -146,8 +150,8 @@ public class AddUrlResourceWizard extends Wizard implements INewWizard {
 													return Status.OK_STATUS;
 												}
 											};
-											job.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().refreshRule(
-													resource.getAdaptedResource()));
+											job.setRule(ResourcesPlugin.getWorkspace().getRuleFactory()
+													.refreshRule(resource.getAdaptedResource()));
 											job.schedule();
 										}
 									}

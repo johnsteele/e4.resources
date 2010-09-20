@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +94,11 @@ public class SemanticQueryParser {
 						this.type = TreeNodeType.FILE;
 					}
 				} else if (param.name.equals("uri")) { //$NON-NLS-1$
-					uri = param.value;
+					try {
+						uri = URLDecoder.decode(param.value, "UTF-8"); //$NON-NLS-1$
+					} catch (UnsupportedEncodingException e) {
+						// ignore
+					}
 				} else if (param.name.equals("create")) { //$NON-NLS-1$
 					if (param.value.equals("true")) { //$NON-NLS-1$
 						shouldCreate = true;

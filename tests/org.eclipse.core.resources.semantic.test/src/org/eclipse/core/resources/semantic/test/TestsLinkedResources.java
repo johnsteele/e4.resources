@@ -13,8 +13,10 @@ package org.eclipse.core.resources.semantic.test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -45,6 +47,7 @@ import org.junit.Test;
 
 public class TestsLinkedResources extends TestsContentProviderUtil {
 	private static final String HTTP_TEST_URL = "http://www.eclipse.org";
+	private static final String HTTP_TEST_URL2 = "http://www.example.com/?test=test test&x=a&b=a%20b";
 	private static final String DEFAULT_PROVIDER_ID = "org.eclipse.core.resources.semantic.provider.DefaultContentProvider";
 	final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
@@ -255,6 +258,32 @@ public class TestsLinkedResources extends TestsContentProviderUtil {
 
 					Assert.assertEquals(HTTP_TEST_URL, info.getRemoteURIString());
 				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+
+		workspace.run(runnable, workspace.getRuleFactory().refreshRule(file), 0, new NullProgressMonitor());
+	}
+
+	@Test
+	public void testAddFileLinkWithURL2ToSFS() throws Exception {
+		final IFile file = this.testProject.getFile("querytest");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					URI uri = new URI("semanticfs", null, "/filetest/test2.html", "type=file;uri="
+							+ URLEncoder.encode(HTTP_TEST_URL2, "UTF-8"), null);
+					file.createLink(uri, IResource.ALLOW_MISSING_LOCAL, monitor);
+					ISemanticFile sFile = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+
+					ISemanticResourceInfo info = sFile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_URI_STRING, monitor);
+
+					Assert.assertEquals(HTTP_TEST_URL2, info.getRemoteURIString());
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (UnsupportedEncodingException e) {
 					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
 				}
 			}
