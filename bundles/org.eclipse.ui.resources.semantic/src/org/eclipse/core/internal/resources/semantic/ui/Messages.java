@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String AddUrlResourceNameAndURLPage_SelectChildName_XMSG;
 	public static String AddUrlResourceNameAndURLPage_SelectFolder_XGRP;
 	public static String AddUrlResourceNameAndURLPage_SelectFolder_XMSG;
+	public static String AddUrlResourceNameAndURLPage_SelectFolderNameURL_XMSG;
 	public static String AddUrlResourceNameAndURLPage_SemanticParent_XMSG;
 	public static String AddUrlResourceNameAndURLPage_StoreExists_XMSG;
 	public static String AddUrlResourceNameAndURLPage_Url_XFLD;

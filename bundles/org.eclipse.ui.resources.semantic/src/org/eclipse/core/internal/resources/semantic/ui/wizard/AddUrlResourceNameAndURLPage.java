@@ -86,6 +86,8 @@ public class AddUrlResourceNameAndURLPage extends WizardPage {
 	}
 
 	public void createControl(Composite parent) {
+		setMessage(Messages.AddUrlResourceNameAndURLPage_SelectFolderNameURL_XMSG);
+
 		Composite main = new Composite(parent, SWT.NONE);
 
 		main.setLayout(new GridLayout(3, false));
