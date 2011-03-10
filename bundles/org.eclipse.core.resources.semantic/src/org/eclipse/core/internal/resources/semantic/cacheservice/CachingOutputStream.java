@@ -27,6 +27,7 @@ class CachingOutputStream extends OutputStream {
 	private final ITemporaryContentHandle fileHandle;
 	private final ICacheUpdateCallback callback;
 	private final boolean appendMode;
+	private boolean closed;
 
 	protected CachingOutputStream(CacheService service, ITemporaryContentHandle tempHandle, boolean append, ICacheUpdateCallback callback) {
 
@@ -34,15 +35,21 @@ class CachingOutputStream extends OutputStream {
 		this.fileHandle = tempHandle;
 		this.appendMode = append;
 		this.callback = callback;
-
+		this.closed = false;
 	}
 
 	@Override
 	@SuppressWarnings("boxing")
 	public void close() throws IOException {
+		if (closed) {
+			return;
+		}
+
 		InputStream stream = null;
 		try {
 			long timestamp = System.currentTimeMillis();
+
+			closed = true;
 
 			this.cacheService.addFromTempHandle(this.fileHandle);
 
