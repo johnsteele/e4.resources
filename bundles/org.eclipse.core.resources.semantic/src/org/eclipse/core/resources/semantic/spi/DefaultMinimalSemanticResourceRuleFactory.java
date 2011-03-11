@@ -65,9 +65,9 @@ public class DefaultMinimalSemanticResourceRuleFactory implements ISemanticResou
 
 	public ISemanticFileStore validateEditRule(ISemanticFileStore[] stores) {
 		if (stores.length == 1) {
-			return stores[0];
+			return getParent(stores[0]);
 		}
-		return this.rootStore;
+		return getParent(this.rootStore);
 	}
 
 	private ISemanticFileStore getParent(ISemanticFileStore store) {

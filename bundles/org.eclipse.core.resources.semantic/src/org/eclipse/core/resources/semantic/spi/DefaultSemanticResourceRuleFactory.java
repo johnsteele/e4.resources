@@ -69,7 +69,7 @@ public class DefaultSemanticResourceRuleFactory implements ISemanticResourceRule
 	}
 
 	public ISemanticFileStore validateEditRule(ISemanticFileStore[] resources) {
-		return this.rootStore;
+		return (ISemanticFileStore) this.rootStore.getParent();
 	}
 
 }

@@ -40,7 +40,13 @@ public class SemanticFileAdapterImpl extends SemanticResourceAdapterImpl impleme
 			checkCurrentRule(RuleType.VALIDATE_EDIT);
 			ISemanticFileStoreInternal store = getOwnStore();
 
-			return store.validateEdit(shell);
+			IStatus result = store.validateEdit(shell);
+
+			if (result.isOK()) {
+				refreshLocalIfNeeded(RuleType.MODIFY, getRuleForType(RuleType.MODIFY, this.file), 0, null);
+			}
+
+			return result;
 		} catch (CoreException e) {
 			if (SfsTraceLocation.TEAM.isActive()) {
 				SfsTraceLocation.getTrace().trace(SfsTraceLocation.TEAM.getLocation(), e.getMessage(), e);

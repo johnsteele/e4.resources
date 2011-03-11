@@ -370,6 +370,7 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 			try {
 				lockResource(store, null);
 				setReadOnly(store, false, null);
+				setResourceTimestamp(store, System.currentTimeMillis(), null);
 			} catch (CoreException e) {
 				// $JL-EXC$
 				multi.add(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, "Exception while locking resource"));
