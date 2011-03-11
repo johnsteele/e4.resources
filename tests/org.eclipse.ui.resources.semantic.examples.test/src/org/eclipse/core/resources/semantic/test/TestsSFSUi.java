@@ -41,6 +41,7 @@ import org.eclipse.core.resources.semantic.examples.remote.RemoteFile;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
 import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProvider;
+import org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderWithHistoryPage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -136,6 +137,9 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 				spr.addFolder("root", TestsSFSUi.this.providerName, properties, TestsSFSUi.this.options, monitor);
 
+				spr.addFolder("root2", CachingTestContentProviderWithHistoryPage.class.getName(), properties, TestsSFSUi.this.options,
+						monitor);
+
 				TestsSFSUi.this.testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
 			}
@@ -191,8 +195,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -246,8 +250,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	@Test
 	public void testBrowser() throws CoreException {
 
-		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-				"org.eclipse.core.resources.semantic.resourceView");
+		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.showView("org.eclipse.core.resources.semantic.resourceView");
 		Assert.assertNotNull("View should not be null", part);
 
 	}
@@ -262,8 +266,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		FileSystemContributor contributor = null;
 		FileSystemConfiguration[] configs = FileSystemSupportRegistry.getInstance().getConfigurations();
 		for (FileSystemConfiguration config : configs) {
-			if (config.getContributor().getClass().getName().equals(
-					"org.eclipse.core.internal.resources.semantic.ui.SemanticFileSystemContributor")) {
+			if (config.getContributor().getClass().getName()
+					.equals("org.eclipse.core.internal.resources.semantic.ui.SemanticFileSystemContributor")) {
 				contributor = config.getContributor();
 			}
 		}
@@ -302,8 +306,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -337,8 +341,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -369,8 +373,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -444,6 +448,88 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 	 * @throws Exception
 	 */
 	@Test
+	public void testHistoryAction2() throws Exception {
+
+		// org.eclipse.core.internal.resources.semantic.ui.HistoryAction
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root2").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
+				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, null);
+
+		ISemanticFile sFile = (ISemanticFile) this.testProject.getFile(new Path("root2/Folder1/File1")).getAdapter(ISemanticFile.class);
+
+		// make sure to hide the history view
+		IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(IHistoryView.VIEW_ID);
+
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(part);
+
+		final List<String> partIds = new ArrayList<String>();
+
+		IPartListener2 listener = new IPartListener2() {
+
+			public void partVisible(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partOpened(IWorkbenchPartReference partRef) {
+				partIds.add(partRef.getId());
+
+			}
+
+			public void partInputChanged(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partHidden(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partClosed(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+
+			public void partActivated(IWorkbenchPartReference partRef) {
+				// nothing
+
+			}
+		};
+
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().addPartListener(listener);
+
+		runCommandByAction("RemoteHistoryCommand", sFile);
+
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().removePartListener(listener);
+
+		Assert.assertTrue("History part should have been opened", partIds.contains(IHistoryView.VIEW_ID));
+
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
 	public void testSynchronizeAction() throws Exception {
 
 		// org.eclipse.core.internal.resources.semantic.ui.SynchronizeAction
@@ -451,8 +537,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -523,8 +609,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -556,8 +642,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -625,8 +711,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
 			public void run(IProgressMonitor monitor) throws CoreException {
-				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1").getAdapter(
-						ISemanticFolder.class);
+				ISemanticFolder f1 = (ISemanticFolder) TestsSFSUi.this.testProject.getFolder("root").getFolder("Folder1")
+						.getAdapter(ISemanticFolder.class);
 				f1.addFile("File1", ISemanticFileSystem.NONE, monitor);
 			}
 		};
@@ -673,8 +759,8 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 		// make sure project explorer is selected
 		// Project Explorer view id is hard-coded for 3.4 compatibility
-		final IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-				"org.eclipse.ui.navigator.ProjectExplorer");
+		final IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.showView("org.eclipse.ui.navigator.ProjectExplorer");
 
 		final String id = "org.eclipse.core.resources.semantic.ui." + actionName;
 		final IObjectActionDelegate delegate = findDelegate(id);

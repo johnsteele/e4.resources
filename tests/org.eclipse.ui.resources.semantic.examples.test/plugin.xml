@@ -7,6 +7,17 @@
             class="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider"
             id="org.eclipse.core.resources.semantic.test.provider.RestTestContentProvider">
       </contentProvider>
+      <contentProvider
+            class="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderWithHistoryPage"
+            id="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderWithHistoryPage">
+      </contentProvider>
    </extension>
 
+   <extension
+         point="org.eclipse.core.resources.semantic.pathContentProviderMapping">
+      <mapping
+            contentProviderId="org.eclipse.core.resources.semantic.test.provider.CachingTestContentProviderWithHistoryPage"
+            path="CachingTestContentProviderWithHistoryPage">
+      </mapping>
+   </extension>
 </plugin>

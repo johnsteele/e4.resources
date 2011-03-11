@@ -232,9 +232,9 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 
 	public ISemanticSpiResourceInfo fetchResourceInfo(ISemanticFileStore semanticFileStore, int options, IProgressMonitor monitor)
 			throws CoreException {
-		return new SemanticSpiResourceInfo(options, semanticFileStore.getSessionProperty(LOCKHANDLE) != null, true, semanticFileStore
-				.getPersistentProperty(READONLY) != null,
-				getStore().getItemByPath(semanticFileStore.getPath().removeFirstSegments(2)) != null, null, null);
+		return new SemanticSpiResourceInfo(options, semanticFileStore.getSessionProperty(LOCKHANDLE) != null, true,
+				semanticFileStore.getPersistentProperty(READONLY) != null, getStore().getItemByPath(
+						semanticFileStore.getPath().removeFirstSegments(2)) != null, null, null);
 	}
 
 	@Override
@@ -402,7 +402,7 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 		return new Status(IStatus.OK, TestPlugin.PLUGIN_ID, "");
 	}
 
-	protected RemoteStoreTransient getStore() {
+	public RemoteStoreTransient getStore() {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().findMember(getRootStore().getPath()).getProject();
 
 		RemoteStoreTransient store = (RemoteStoreTransient) project.getAdapter(RemoteStoreTransient.class);
