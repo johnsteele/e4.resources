@@ -55,8 +55,6 @@ import org.eclipse.osgi.util.NLS;
  * <p>
  * This class is intended to be subclassed.
  * 
- * @since 4.0
- * 
  */
 public abstract class CachingContentProvider extends ContentProvider {
 
@@ -171,6 +169,10 @@ public abstract class CachingContentProvider extends ContentProvider {
 
 			public void cacheUpdated(InputStream newContent, long timestamp, boolean append) {
 				onCacheUpdate(childStore, newContent, timestamp, append, monitor);
+			}
+
+			public void beforeCacheUpdate(InputStream newContent, long timestamp, boolean append) throws CoreException {
+				CachingContentProvider.this.beforeCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 		};
 		return cacheService.wrapOutputStream(path, appendMode, callback, monitor);
@@ -419,6 +421,36 @@ public abstract class CachingContentProvider extends ContentProvider {
 		} catch (CoreException e) {
 			// TODO logging
 		}
+	}
+
+	/**
+	 * Notification before cache content should be updated.
+	 * <p>
+	 * This method will be called when the output stream is closed. Content
+	 * providers may override this method to update the remote repository.
+	 * <p>
+	 * The cache will not be changed if this method throws an exception.
+	 * 
+	 * @param childStore
+	 *            the semantic file store
+	 * @param newContent
+	 *            the new cache content
+	 * @param timestamp
+	 *            the timestamp of the change
+	 * @param append
+	 *            <code>true</code> to indicate that the cache was updated in
+	 *            append mode; in this case, only the appended data will be
+	 *            provided as new content
+	 * @param monitor
+	 *            may be null
+	 * @throws CoreException
+	 *             if update of remote repository has failed
+	 * 
+	 * @since 0.5
+	 */
+	public void beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
+			IProgressMonitor monitor) throws CoreException {
+		// do nothing as default
 	}
 
 	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {

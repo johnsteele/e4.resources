@@ -78,6 +78,18 @@ public class TestCacheService {
 		removeFromCache(service, path2);
 
 		manipulateTimestamp(service, path);
+
+		String content5 = "test5";
+		writeToCacheAndUseBeforeCacheUpdate(service, path, content5);
+
+		readFromCache(service, path, content5);
+
+		// this call must leave cache content unchanged
+		String content6 = "test6";
+		writeToCacheAndThrowExceptionInBeforeCacheUpdate(service, path, content6);
+
+		// we must still read content5 from cache
+		readFromCache(service, path, content5);
 	}
 
 	/**
@@ -429,6 +441,10 @@ public class TestCacheService {
 				}
 
 			}
+
+			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) {
+				// do nothing
+			}
 		};
 
 		OutputStream os = service.wrapOutputStream(path, false, callback, null);
@@ -444,6 +460,64 @@ public class TestCacheService {
 			throw new CoreException(new Status(IStatus.ERROR, "test", 0, content, e));
 		}
 
+	}
+
+	public void writeToCacheAndUseBeforeCacheUpdate(ICacheService service, IPath path, String content) throws CoreException {
+
+		final ByteArrayOutputStream remoteOs = new ByteArrayOutputStream();
+
+		ICacheUpdateCallback callback = new ICacheUpdateCallback() {
+
+			public void cacheUpdated(InputStream newContent, long cacheTimestamp, boolean append) {
+				// do nothing
+			}
+
+			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
+				Util.transferStreams(newContent, remoteOs, null);
+			}
+		};
+
+		OutputStream os = service.wrapOutputStream(path, false, callback, null);
+
+		try {
+			os.write(content.getBytes());
+
+			os.close();
+
+			compareByteArrayWithContent(content, remoteOs.toByteArray());
+		} catch (IOException e) {
+			// $JL-EXC$
+			throw new CoreException(new Status(IStatus.ERROR, "test", 0, content, e));
+		}
+
+	}
+
+	public void writeToCacheAndThrowExceptionInBeforeCacheUpdate(ICacheService service, IPath path, String content) throws CoreException {
+
+		ICacheUpdateCallback callback = new ICacheUpdateCallback() {
+
+			public void cacheUpdated(InputStream newContent, long cacheTimestamp, boolean append) {
+				// do nothing
+			}
+
+			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
+				throw new CoreException(new Status(IStatus.ERROR, "test", "test"));
+			}
+		};
+
+		OutputStream os = service.wrapOutputStream(path, false, callback, null);
+
+		try {
+			os.write(content.getBytes());
+
+			os.close();
+
+			Assert.assertTrue("os.close() must fail", false);
+		} catch (IOException e) {
+			// ignore and continue
+			String msg = e.getMessage();
+			msg.getClass();
+		}
 	}
 
 	/**

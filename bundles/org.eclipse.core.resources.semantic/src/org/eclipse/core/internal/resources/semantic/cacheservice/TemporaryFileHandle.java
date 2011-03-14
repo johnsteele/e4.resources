@@ -12,6 +12,8 @@
 package org.eclipse.core.internal.resources.semantic.cacheservice;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,7 +79,24 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 	}
 
 	public void commit() throws CoreException {
+		if (!this.appendMode) {
+			this.factory.doRename(this.getFile(), this.cacheFile);
+		}
+	}
 
+	public InputStream closeAndGetContents() throws CoreException {
+		close();
+
+		try {
+			return new FileInputStream(getFile());
+		} catch (FileNotFoundException e) {
+			throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_CACHEFILE_READ_TEMPFILE_FAILED, new Path(
+					this.file.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_FailureOpeningCacheTempFile_XMSG,
+					this.file.getAbsolutePath()), e);
+		}
+	}
+
+	private void close() throws SemanticResourceException {
 		try {
 			this.outputStream.flush();
 			this.outputStream.close();
@@ -91,13 +110,9 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 				this.factory.tryDelete(this.file);
 			}
 
-			throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_CONTENT, new Path(this.file
-					.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_OsCloseErrorOnCommit_XMSG, this.file
-					.getAbsolutePath()), e);
-		}
-
-		if (!this.appendMode) {
-			this.factory.doRename(this.getFile(), this.cacheFile);
+			throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_ERROR_WRITING_CONTENT, new Path(
+					this.file.getAbsolutePath()), MessageFormat.format(Messages.TemporaryFileHandle_OsCloseErrorOnCommit_XMSG,
+					this.file.getAbsolutePath()), e);
 		}
 	}
 

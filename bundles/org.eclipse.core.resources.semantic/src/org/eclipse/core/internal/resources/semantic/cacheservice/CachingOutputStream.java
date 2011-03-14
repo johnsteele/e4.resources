@@ -51,29 +51,45 @@ class CachingOutputStream extends OutputStream {
 
 			closed = true;
 
+			try {
+				stream = this.fileHandle.closeAndGetContents();
+
+				long appendPosition = this.fileHandle.getAppendPosition();
+				skipUntilAppendPosition(stream, appendPosition);
+
+				this.callback.beforeCacheUpdate(stream, timestamp, this.appendMode);
+			} finally {
+				Util.safeClose(stream);
+				stream = null;
+			}
+
 			this.cacheService.addFromTempHandle(this.fileHandle);
 
 			IPath path = this.fileHandle.getKey();
 
 			stream = this.cacheService.getContent(path);
 			long appendPosition = this.fileHandle.getAppendPosition();
-			long skipped = 0l;
 
-			if (appendPosition > 0) {
-				skipped = stream.skip(appendPosition);
-			}
-
-			if (skipped < appendPosition) {
-				throw new IOException(MessageFormat.format(Messages.CachingOutputStream_CouldNotSkip_XMSG, appendPosition, skipped));
-			}
+			skipUntilAppendPosition(stream, appendPosition);
 
 			this.callback.cacheUpdated(stream, timestamp, this.appendMode);
 
 		} catch (CoreException e) {
-			// $JL-EXC$ ignore
-			throw new IOException(e.getMessage());
+			throw new IOException(e.getMessage(), e);
 		} finally {
 			Util.safeClose(stream);
+		}
+	}
+
+	private void skipUntilAppendPosition(InputStream stream, long appendPosition) throws IOException {
+		long skipped = 0l;
+
+		if (appendPosition > 0) {
+			skipped = stream.skip(appendPosition);
+		}
+
+		if (skipped < appendPosition) {
+			throw new IOException(MessageFormat.format(Messages.CachingOutputStream_CouldNotSkip_XMSG, appendPosition, skipped));
 		}
 	}
 

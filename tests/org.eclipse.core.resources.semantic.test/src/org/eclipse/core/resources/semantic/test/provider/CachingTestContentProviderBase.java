@@ -63,12 +63,96 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 	 */
 	public static final QualifiedName WRITE_THROUGH = new QualifiedName(TestPlugin.PLUGIN_ID, "WriteThrough");
 
+	/**
+	 * If set to any value, this indicates that beforeCacheUpdate method should
+	 * be used
+	 */
+	public static final QualifiedName USE_BEFORE_CACHE_UPDATE = new QualifiedName(TestPlugin.PLUGIN_ID, "UseBeforeCacheUpdate");
+
 	private static final QualifiedName LOCKHANDLE = new QualifiedName(TestPlugin.PLUGIN_ID, "LockHandle");
 	private static final QualifiedName READONLY = new QualifiedName(TestPlugin.PLUGIN_ID, "ReadOnly");
+
+	/**
+	 * If set to any value, this indicates that beforeCacheUpdate method should
+	 * throw an exception
+	 */
+	public static final QualifiedName EXCEPTION_IN_BEFORE_CACHE_UPDATE = new QualifiedName(TestPlugin.PLUGIN_ID,
+			"ExceptionInBeforeCacheUpdate");
 
 	@Override
 	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long cacheTimestamp, boolean append,
 			IProgressMonitor monitor) {
+		boolean useBeforeCacheUpdate = shouldUseBeforeCacheUpdate(semanticFileStore);
+		if (!useBeforeCacheUpdate) {
+			boolean writeThrough = shouldUseWriteThrough(semanticFileStore);
+			if (writeThrough) {
+				RemoteItem parentItem = getStore().getItemByPath(semanticFileStore.getPath().removeFirstSegments(2));
+				if (parentItem.getType() == Type.FILE) {
+					OutputStream os = ((RemoteFile) parentItem).getOutputStream(append);
+					try {
+						Util.transferStreams(newContent, os, monitor);
+					} catch (CoreException e) {
+						// $JL-EXC$ TODO proper error handling
+					}
+				}
+			} else {
+				super.onCacheUpdate(semanticFileStore, newContent, cacheTimestamp, append, monitor);
+			}
+		}
+	}
+
+	@Override
+	public void beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
+			IProgressMonitor monitor) throws CoreException {
+		boolean useBeforeCacheUpdate = shouldUseBeforeCacheUpdate(childStore);
+		if (useBeforeCacheUpdate) {
+			if (shouldThrowExceptionInBeforeCacheUpdate(childStore)) {
+				throw new CoreException(new Status(IStatus.ERROR, "test", "test exception"));
+			}
+			boolean writeThrough = shouldUseWriteThrough(childStore);
+			if (writeThrough) {
+				RemoteItem parentItem = getStore().getItemByPath(childStore.getPath().removeFirstSegments(2));
+				if (parentItem.getType() == Type.FILE) {
+					OutputStream os = ((RemoteFile) parentItem).getOutputStream(append);
+					try {
+						Util.transferStreams(newContent, os, monitor);
+					} catch (CoreException e) {
+						// $JL-EXC$ TODO proper error handling
+					}
+				}
+			} else {
+				try {
+					setResourceTimestamp(childStore, timestamp, monitor);
+				} catch (CoreException e) {
+					// TODO logging
+				}
+			}
+		}
+	}
+
+	private boolean shouldUseBeforeCacheUpdate(ISemanticFileStore childStore) {
+		boolean useBeforeCacheUpdate;
+		try {
+			useBeforeCacheUpdate = childStore.getSessionProperty(USE_BEFORE_CACHE_UPDATE) != null;
+		} catch (CoreException e) {
+			// $JL-EXC$ ignore here
+			useBeforeCacheUpdate = false;
+		}
+		return useBeforeCacheUpdate;
+	}
+
+	private boolean shouldThrowExceptionInBeforeCacheUpdate(ISemanticFileStore childStore) {
+		boolean exceptionInBeforeCacheUpdate;
+		try {
+			exceptionInBeforeCacheUpdate = childStore.getSessionProperty(EXCEPTION_IN_BEFORE_CACHE_UPDATE) != null;
+		} catch (CoreException e) {
+			// $JL-EXC$ ignore here
+			exceptionInBeforeCacheUpdate = false;
+		}
+		return exceptionInBeforeCacheUpdate;
+	}
+
+	private boolean shouldUseWriteThrough(ISemanticFileStore semanticFileStore) {
 		boolean writeThrough;
 		try {
 			writeThrough = semanticFileStore.getSessionProperty(WRITE_THROUGH) != null;
@@ -76,19 +160,7 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 			// $JL-EXC$ ignore here
 			writeThrough = false;
 		}
-		if (writeThrough) {
-			RemoteItem parentItem = getStore().getItemByPath(semanticFileStore.getPath().removeFirstSegments(2));
-			if (parentItem.getType() == Type.FILE) {
-				OutputStream os = ((RemoteFile) parentItem).getOutputStream(append);
-				try {
-					Util.transferStreams(newContent, os, monitor);
-				} catch (CoreException e) {
-					// $JL-EXC$ TODO proper error handling
-				}
-			}
-		} else {
-			super.onCacheUpdate(semanticFileStore, newContent, cacheTimestamp, append, monitor);
-		}
+		return writeThrough;
 	}
 
 	public void addResource(ISemanticFileStore parentStore, String name, ResourceType resourceType, IProgressMonitor monitor)

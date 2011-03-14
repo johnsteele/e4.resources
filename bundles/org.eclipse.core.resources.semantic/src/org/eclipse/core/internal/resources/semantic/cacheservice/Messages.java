@@ -29,6 +29,7 @@ public class Messages extends NLS {
 	public static String FileHandleFactory_FileHandleFactory_FileHandleFactory_SaveError_XMSG;
 	public static String FileHandleFactory_FileHandleFactory_LoadError_XMSG;
 	public static String FileHandleFactory_TempFileNotRenamed_XMSG;
+	public static String TemporaryFileHandle_FailureOpeningCacheTempFile_XMSG;
 	public static String TemporaryFileHandle_OsCloseErrorOnCommit_XMSG;
 	public static String TemporaryFileHandle_TimstampSetOnCommit_XMSG;
 }

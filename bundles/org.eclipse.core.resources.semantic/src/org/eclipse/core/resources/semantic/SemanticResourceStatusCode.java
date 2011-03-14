@@ -220,7 +220,14 @@ public enum SemanticResourceStatusCode {
 	 * 
 	 * @since 0.4
 	 */
-	FEDERATION_INVALID_ROOT_NODE_POSITION(167);
+	FEDERATION_INVALID_ROOT_NODE_POSITION(167),
+
+	/**
+	 * Error reading temporary file from cache
+	 * 
+	 * @since 0.5
+	 */
+	FILECACHE_CACHEFILE_READ_TEMPFILE_FAILED(168);
 
 	/**
 	 * The plug-in ID

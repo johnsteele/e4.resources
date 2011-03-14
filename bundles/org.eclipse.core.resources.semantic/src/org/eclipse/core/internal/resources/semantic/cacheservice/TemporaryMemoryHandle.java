@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.cacheservice;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,11 +38,14 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 	 */
 	public void commit() throws CoreException {
 		CachedMemoryHandle handle = MemoryCache.getInstance().getOrCreateMemoryStore(this.path.toString());
-		byte[] content;
-
-		Util.safeClose(this.bos);
-		content = this.bos.toByteArray();
+		byte[] content = this.bos.toByteArray();
 		handle.setContents(content, this.appendMode);
+	}
+
+	public InputStream closeAndGetContents() {
+		Util.safeClose(this.bos);
+		byte[] content = this.bos.toByteArray();
+		return new ByteArrayInputStream(content);
 	}
 
 	public IPath getKey() {

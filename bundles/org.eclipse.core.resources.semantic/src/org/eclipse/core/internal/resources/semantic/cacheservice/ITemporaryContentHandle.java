@@ -108,4 +108,12 @@ public interface ITemporaryContentHandle {
 	 *             upon failure
 	 */
 	public void setContents(InputStream input, IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Used by the cache service when content is added to the cache
+	 * 
+	 * @throws CoreException
+	 *             upon failure
+	 */
+	public InputStream closeAndGetContents() throws CoreException;
 }
