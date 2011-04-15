@@ -75,7 +75,7 @@ class CachingOutputStream extends OutputStream {
 			this.callback.cacheUpdated(stream, timestamp, this.appendMode);
 
 		} catch (CoreException e) {
-			throw new IOException(e.getMessage(), e);
+			throw new IOException(e.getMessage());
 		} finally {
 			Util.safeClose(stream);
 		}
