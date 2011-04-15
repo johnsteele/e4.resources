@@ -227,6 +227,10 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 							public boolean exists() {
 								return false;
 							}
+
+							public ITag[] getBranches() {
+								return new ITag[0];
+							}
 						};
 						return new IFileRevision[] {null, remote};
 					}

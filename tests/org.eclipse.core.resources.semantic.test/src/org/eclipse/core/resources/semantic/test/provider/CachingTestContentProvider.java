@@ -133,6 +133,10 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 						public boolean exists() {
 							return true;
 						}
+
+						public ITag[] getBranches() {
+							return new ITag[0];
+						}
 					};
 
 					return new IFileRevision[] {null, remote};

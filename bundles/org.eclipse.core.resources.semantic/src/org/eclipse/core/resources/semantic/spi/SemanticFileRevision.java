@@ -99,4 +99,7 @@ public abstract class SemanticFileRevision implements IFileRevision {
 		return this;
 	}
 
+	public ITag[] getBranches() {
+		return new ITag[0];
+	}
 }
