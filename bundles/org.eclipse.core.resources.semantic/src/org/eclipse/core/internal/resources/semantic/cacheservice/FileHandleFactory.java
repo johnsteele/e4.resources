@@ -200,8 +200,8 @@ public class FileHandleFactory implements IContentHandleFactory {
 			if (!source.renameTo(target)) {
 				// should never happen
 				IPath path = new Path(target.getAbsolutePath());
-				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_CACHEFILE_RENAME_FAILED, path, MessageFormat
-						.format(Messages.FileHandleFactory_TempFileNotRenamed_XMSG, target.getAbsolutePath()));
+				throw new SemanticResourceException(SemanticResourceStatusCode.FILECACHE_CACHEFILE_RENAME_FAILED, path,
+						MessageFormat.format(Messages.FileHandleFactory_TempFileNotRenamed_XMSG, target.getAbsolutePath()));
 			}
 		} finally {
 			unlockForWrite();
@@ -343,6 +343,9 @@ public class FileHandleFactory implements IContentHandleFactory {
 					parent.delete();
 				}
 			}
+		}
+		if (!parent.equals(this.cacheRoot)) {
+			compactFileSystem(parent);
 		}
 	}
 

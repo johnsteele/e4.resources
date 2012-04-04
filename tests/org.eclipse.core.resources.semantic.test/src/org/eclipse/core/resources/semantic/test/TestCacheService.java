@@ -190,6 +190,40 @@ public class TestCacheService {
 	 * @throws Exception
 	 */
 	@Test
+	public void testRecursiveContentDeletionDeepHierarchy() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath rootPath = new Path("/testrecursive/testroot/");
+
+		IPath path = rootPath.append("/test2/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		IPath path2 = rootPath.append("/test2/test3/file.txt");
+		String content2 = "test";
+		InputStream input2 = new ByteArrayInputStream(content2.getBytes("UTF-8"));
+		File cacheFile2 = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		appendToCache(service, path, input);
+
+		appendToCache(service, path2, input2);
+
+		removeFromCacheRecursive(service, rootPath);
+
+		Assert.assertTrue(!service.hasContent(path));
+		Assert.assertTrue(!service.hasContent(path2));
+		Assert.assertTrue(!cacheFile.exists());
+		Assert.assertTrue(!cacheFile.getParentFile().exists());
+		Assert.assertTrue(!cacheFile2.exists());
+		Assert.assertTrue(!cacheFile2.getParentFile().exists());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
 	public void testRecursiveContentDeletion2() throws Exception {
 		ICacheService service = new FileCacheServiceFactory().getCacheService();
 
