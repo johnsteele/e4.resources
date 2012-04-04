@@ -79,6 +79,13 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 	public static final QualifiedName EXCEPTION_IN_BEFORE_CACHE_UPDATE = new QualifiedName(TestPlugin.PLUGIN_ID,
 			"ExceptionInBeforeCacheUpdate");
 
+	/**
+	 * If set to any value, this indicates that beforeCacheUpdate method should
+	 * return false
+	 */
+	public static final QualifiedName RETURN_FALSE_IN_BEFORE_CACHE_UPDATE = new QualifiedName(TestPlugin.PLUGIN_ID,
+			"ReturnFalseInBeforeCacheUpdate");
+
 	@Override
 	public void onCacheUpdate(ISemanticFileStore semanticFileStore, InputStream newContent, long cacheTimestamp, boolean append,
 			IProgressMonitor monitor) {
@@ -108,6 +115,9 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 		if (useBeforeCacheUpdate) {
 			if (shouldThrowExceptionInBeforeCacheUpdate(childStore)) {
 				throw new CoreException(new Status(IStatus.ERROR, "test", "test exception"));
+			}
+			if (shouldReturnFalseInBeforeCacheUpdate(childStore)) {
+				return false;
 			}
 			boolean writeThrough = shouldUseWriteThrough(childStore);
 			if (writeThrough) {
@@ -151,6 +161,17 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 			exceptionInBeforeCacheUpdate = false;
 		}
 		return exceptionInBeforeCacheUpdate;
+	}
+
+	private boolean shouldReturnFalseInBeforeCacheUpdate(ISemanticFileStore childStore) {
+		boolean returnFalseInBeforeCacheUpdate;
+		try {
+			returnFalseInBeforeCacheUpdate = childStore.getSessionProperty(RETURN_FALSE_IN_BEFORE_CACHE_UPDATE) != null;
+		} catch (CoreException e) {
+			// $JL-EXC$ ignore here
+			returnFalseInBeforeCacheUpdate = false;
+		}
+		return returnFalseInBeforeCacheUpdate;
 	}
 
 	private boolean shouldUseWriteThrough(ISemanticFileStore semanticFileStore) {

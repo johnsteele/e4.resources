@@ -439,6 +439,70 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 
 	}
 
+	@Test
+	public void testReturnFalseInBeforeCacheUpdate() throws Exception {
+
+		final IFolder root = this.testProject.getFolder("root");
+		final IFolder parent = root.getFolder("Folder1");
+
+		final IFile file = parent.getFile("File1");
+		Assert.assertFalse("File should not exist", file.exists());
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFolder sfr = (ISemanticFolder) parent.getAdapter(ISemanticFolder.class);
+				sfr.addFile("File1", ISemanticFileSystem.NONE, monitor);
+				Assert.assertEquals("File existence", true, file.exists());
+				ISemanticFile sf = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+				sf.setSessionProperty(CachingTestContentProviderBase.USE_BEFORE_CACHE_UPDATE, "x");
+				sf.setSessionProperty(CachingTestContentProviderBase.RETURN_FALSE_IN_BEFORE_CACHE_UPDATE, "x");
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+		assertContentsEqual(file, "Hello");
+		Assert.assertEquals("Wrong remote content", "Hello", new String(this.file1.getContent(), "UTF-8"));
+
+		// setcontent without remote update
+		runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					ISemanticFile sf = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+					IStatus stat = sf.validateEdit(null);
+
+					Assert.assertTrue("ValidateEdit should have returned OK", stat.isOK());
+
+					file.setContents(new ByteArrayInputStream("NewString".getBytes("UTF-8")), IResource.KEEP_HISTORY, monitor);
+				} catch (UnsupportedEncodingException e) {
+					// $JL-EXC$
+					Assert.fail(e.getMessage());
+				}
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+		// cached file content must remain unchanged
+		assertContentsEqual(file, "Hello");
+		Assert.assertEquals("Wrong remote content", "Hello", new String(this.file1.getContent(), "UTF-8"));
+
+		runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				ISemanticFile sf = (ISemanticFile) file.getAdapter(ISemanticFile.class);
+				sf.remove(ISemanticFileSystem.NONE, null);
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+
+		Assert.assertEquals("File existence", false, file.exists());
+
+	}
+
 	/**
 	 * 
 	 * @throws Exception
