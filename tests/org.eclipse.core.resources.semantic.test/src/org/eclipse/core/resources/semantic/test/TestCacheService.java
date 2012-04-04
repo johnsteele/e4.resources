@@ -442,8 +442,9 @@ public class TestCacheService {
 
 			}
 
-			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) {
+			public boolean beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) {
 				// do nothing
+				return true;
 			}
 		};
 
@@ -472,8 +473,9 @@ public class TestCacheService {
 				// do nothing
 			}
 
-			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
+			public boolean beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
 				Util.transferStreams(newContent, remoteOs, null);
+				return true;
 			}
 		};
 
@@ -500,7 +502,7 @@ public class TestCacheService {
 				// do nothing
 			}
 
-			public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
+			public boolean beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException {
 				throw new CoreException(new Status(IStatus.ERROR, "test", "test"));
 			}
 		};

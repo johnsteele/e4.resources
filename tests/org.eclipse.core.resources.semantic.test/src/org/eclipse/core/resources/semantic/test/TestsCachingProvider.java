@@ -409,6 +409,9 @@ public class TestsCachingProvider extends TestsContentProviderBase {
 					Assert.assertTrue("ValidateEdit should have returned OK", stat.isOK());
 
 					file.setContents(new ByteArrayInputStream("NewString".getBytes("UTF-8")), IResource.KEEP_HISTORY, monitor);
+					Assert.fail("Should throw an exception");
+				} catch (CoreException e) {
+					// OK
 				} catch (UnsupportedEncodingException e) {
 					// $JL-EXC$
 					Assert.fail(e.getMessage());

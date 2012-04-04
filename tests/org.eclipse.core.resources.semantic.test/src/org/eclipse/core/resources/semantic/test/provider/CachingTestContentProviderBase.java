@@ -102,7 +102,7 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 	}
 
 	@Override
-	public void beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
+	public boolean beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
 			IProgressMonitor monitor) throws CoreException {
 		boolean useBeforeCacheUpdate = shouldUseBeforeCacheUpdate(childStore);
 		if (useBeforeCacheUpdate) {
@@ -128,6 +128,7 @@ public abstract class CachingTestContentProviderBase extends CachingContentProvi
 				}
 			}
 		}
+		return true;
 	}
 
 	private boolean shouldUseBeforeCacheUpdate(ISemanticFileStore childStore) {
