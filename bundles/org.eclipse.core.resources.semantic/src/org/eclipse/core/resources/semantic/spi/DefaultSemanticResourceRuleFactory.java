@@ -16,8 +16,9 @@ import org.eclipse.core.runtime.IPath;
 /**
  * The default implementation for the {@link ISemanticResourceRuleFactory}.
  * <p>
- * This will return the root store of the relevant content provider for any
- * requested rule. Content providers may chose to override
+ * This will return the root store (or the parent of the root store whenever
+ * appropriate) of the relevant content provider for any requested rule. Content
+ * providers may chose to override
  * {@link ISemanticContentProvider#getRuleFactory()} by returning a subclass of
  * this class to achieve a different behavior.
  * <p>
