@@ -17,12 +17,14 @@ import java.util.Iterator;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.ui.SemanticResourcesUIPlugin;
 import org.eclipse.core.internal.resources.semantic.util.ISemanticFileSystemLog;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticResource;
 import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -36,6 +38,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
 abstract class ActionBase implements IObjectActionDelegate {
+
+	static final QualifiedName DISABLE_ALL_SFS_ACTIONS = new QualifiedName(SemanticResourcesUIPlugin.PLUGIN_ID, "DisableAllSFSActions"); //$NON-NLS-1$
 
 	private IStructuredSelection mySelection;
 	private IWorkbenchPart myActivePart;
@@ -61,8 +65,54 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return this.mySelection;
 	}
 
-	@SuppressWarnings( {"rawtypes"})
+	protected boolean checkSelectionEnabled() {
+		boolean shouldEnable = true;
+
+		// we check for all object that they are semantic resources and there is
+		// no veto property set
+
+		for (Iterator<?> it = getSelection().iterator(); it.hasNext();) {
+
+			Object nextObject = it.next();
+
+			if (!(nextObject instanceof ISemanticResource)) {
+				shouldEnable = false;
+				break;
+			}
+			ISemanticResource sResource = (ISemanticResource) nextObject;
+			IResource resource = sResource.getAdaptedResource();
+
+			while (resource != null) {
+				ISemanticResource sRes = (ISemanticResource) resource.getAdapter(ISemanticResource.class);
+
+				if (sRes != null) {
+					try {
+						if (sRes.getPersistentProperty(DISABLE_ALL_SFS_ACTIONS) != null) {
+							shouldEnable = false;
+							break;
+						}
+					} catch (CoreException e) {
+						shouldEnable = false;
+						break;
+					}
+				} else {
+					break;
+				}
+				resource = resource.getParent();
+			}
+			if (!shouldEnable) {
+				break;
+			}
+		}
+
+		return shouldEnable;
+	}
+
+	@SuppressWarnings({"rawtypes"})
 	protected boolean checkSelectionNonLocalOnly() {
+		if (!checkSelectionEnabled()) {
+			return false;
+		}
 
 		boolean shouldEnable = true;
 
@@ -100,14 +150,16 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkSelectionSemanticResource() {
+		if (!checkSelectionEnabled()) {
+			return false;
+		}
 
 		boolean shouldEnable = true;
 
 		// we check for all object that they are semantic resources
 
-		for (Iterator it = getSelection().iterator(); it.hasNext();) {
+		for (Iterator<?> it = getSelection().iterator(); it.hasNext();) {
 
 			Object nextObject = it.next();
 
@@ -120,14 +172,16 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkFilesWithReadOnlyFlagOnly(boolean readOnly) {
+		if (!checkSelectionEnabled()) {
+			return false;
+		}
 
 		boolean shouldEnable = true;
 
 		// we check for all object that they are read-only semantic resources
 
-		for (Iterator it = getSelection().iterator(); it.hasNext();) {
+		for (Iterator<?> it = getSelection().iterator(); it.hasNext();) {
 
 			Object nextObject = it.next();
 
@@ -156,15 +210,17 @@ abstract class ActionBase implements IObjectActionDelegate {
 		return shouldEnable;
 	}
 
-	@SuppressWarnings( {"rawtypes"})
 	protected boolean checkSelectionLockingSupportedOnly() {
+		if (!checkSelectionEnabled()) {
+			return false;
+		}
 
 		boolean shouldEnable = true;
 
 		// we check for all object that they are semantic resources and support
 		// locking
 		// we don't check the lock state intentionally
-		for (Iterator it = getSelection().iterator(); it.hasNext();) {
+		for (Iterator<?> it = getSelection().iterator(); it.hasNext();) {
 
 			Object nextObject = it.next();
 

@@ -24,6 +24,7 @@ import java.util.Map;
 import org.eclipse.compare.CompareEditorInput;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.resources.semantic.Util;
+import org.eclipse.core.internal.resources.semantic.ui.SemanticResourcesUIPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -755,7 +756,27 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 
 	}
 
+	private void setDisableStateOfSFSActions(final ISemanticResource resource, final boolean disabled) throws Exception {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+
+				if (disabled) {
+					resource.setPersistentProperty(new QualifiedName(SemanticResourcesUIPlugin.PLUGIN_ID, "DisableAllSFSActions"), "true");
+				} else {
+					resource.setPersistentProperty(new QualifiedName(SemanticResourcesUIPlugin.PLUGIN_ID, "DisableAllSFSActions"), null);
+				}
+			}
+		};
+		ResourcesPlugin.getWorkspace().run(runnable, new NullProgressMonitor());
+	}
+
 	private void runCommandByAction(final String actionName, final ISemanticResource resource) throws Exception {
+
+		setDisableStateOfSFSActions(resource, true);
+		Assert.assertFalse(retrieveCommandEnablementByAction(actionName, resource));
+
+		setDisableStateOfSFSActions(resource, false);
+		Assert.assertTrue(retrieveCommandEnablementByAction(actionName, resource));
 
 		// make sure project explorer is selected
 		// Project Explorer view id is hard-coded for 3.4 compatibility
@@ -773,6 +794,36 @@ public class TestsSFSUi extends TestsContentProviderUtil {
 		delegate.run(action);
 
 		return;
+	}
+
+	private boolean retrieveCommandEnablementByAction(final String actionName, final ISemanticResource resource) throws Exception {
+
+		// make sure project explorer is selected
+		// Project Explorer view id is hard-coded for 3.4 compatibility
+		final IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.showView("org.eclipse.ui.navigator.ProjectExplorer");
+		final boolean[] isEnabled = new boolean[] {false};
+		final boolean[] isEnabledCalled = new boolean[] {false};
+
+		final String id = "org.eclipse.core.resources.semantic.ui." + actionName;
+		final IObjectActionDelegate delegate = findDelegate(id);
+		final IAction action = new Action() {
+			//
+			@Override
+			public void setEnabled(boolean enabled) {
+				super.setEnabled(enabled);
+				isEnabled[0] = enabled;
+				isEnabledCalled[0] = true;
+			}
+		};
+
+		delegate.setActivePart(action, part);
+		delegate.selectionChanged(action, new StructuredSelection(resource));
+
+		if (!isEnabledCalled[0]) {
+			throw new IllegalStateException("setEnabled not called for action " + actionName);
+		}
+		return isEnabled[0];
 	}
 
 	IObjectActionDelegate findDelegate(String delegateID) throws CoreException {

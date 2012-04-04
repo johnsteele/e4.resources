@@ -46,7 +46,15 @@ public class UnmapAction extends ActionBase {
 
 		if (resource != null && resource instanceof ISemanticProject) {
 			IProject project = (IProject) resource.getAdaptedResource();
-			action.setEnabled(RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER) != null);
+			try {
+				if (resource.getPersistentProperty(DISABLE_ALL_SFS_ACTIONS) != null) {
+					action.setEnabled(false);
+				} else {
+					action.setEnabled(RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER) != null);
+				}
+			} catch (CoreException e) {
+				action.setEnabled(false);
+			}
 		} else {
 			action.setEnabled(false);
 		}
