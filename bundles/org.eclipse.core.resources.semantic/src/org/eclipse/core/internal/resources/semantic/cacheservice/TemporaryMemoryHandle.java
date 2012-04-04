@@ -86,4 +86,8 @@ class TemporaryMemoryHandle implements ITemporaryContentHandle {
 		this.bos.write(b);
 	}
 
+	public void rollback() {
+		// do nothing
+	}
+
 }

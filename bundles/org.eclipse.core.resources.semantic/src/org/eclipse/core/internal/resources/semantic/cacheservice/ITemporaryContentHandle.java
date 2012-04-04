@@ -116,4 +116,9 @@ public interface ITemporaryContentHandle {
 	 *             upon failure
 	 */
 	public InputStream closeAndGetContents() throws CoreException;
+
+	/**
+	 * Cleanups temporary content without writing to cache
+	 */
+	public void rollback();
 }

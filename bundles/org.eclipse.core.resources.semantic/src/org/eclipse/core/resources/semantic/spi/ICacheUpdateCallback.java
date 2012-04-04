@@ -44,9 +44,10 @@ public interface ICacheUpdateCallback {
 	 * @param append
 	 *            if <code>true</code>, the content only represents the appended
 	 *            portion of the cache
+	 * @return true if cache should be updated
 	 * @throws CoreException
 	 * 
 	 * @since 0.5
 	 */
-	public void beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException;
+	public boolean beforeCacheUpdate(InputStream newContent, long cacheTimestamp, boolean append) throws CoreException;
 }

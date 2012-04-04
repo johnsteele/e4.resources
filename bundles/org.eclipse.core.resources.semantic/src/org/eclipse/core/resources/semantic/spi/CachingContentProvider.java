@@ -171,8 +171,8 @@ public abstract class CachingContentProvider extends ContentProvider {
 				onCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 
-			public void beforeCacheUpdate(InputStream newContent, long timestamp, boolean append) throws CoreException {
-				CachingContentProvider.this.beforeCacheUpdate(childStore, newContent, timestamp, append, monitor);
+			public boolean beforeCacheUpdate(InputStream newContent, long timestamp, boolean append) throws CoreException {
+				return CachingContentProvider.this.beforeCacheUpdate(childStore, newContent, timestamp, append, monitor);
 			}
 		};
 		return cacheService.wrapOutputStream(path, appendMode, callback, monitor);
@@ -443,14 +443,16 @@ public abstract class CachingContentProvider extends ContentProvider {
 	 *            provided as new content
 	 * @param monitor
 	 *            may be null
+	 * @return true if cache should be updated
 	 * @throws CoreException
 	 *             if update of remote repository has failed
 	 * 
 	 * @since 0.5
 	 */
-	public void beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
+	public boolean beforeCacheUpdate(ISemanticFileStore childStore, InputStream newContent, long timestamp, boolean append,
 			IProgressMonitor monitor) throws CoreException {
 		// do nothing as default
+		return true;
 	}
 
 	public long getResourceTimestamp(ISemanticFileStore semanticFileStore, IProgressMonitor monitor) throws CoreException {

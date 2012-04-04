@@ -84,6 +84,12 @@ class TemporaryFileHandle implements ITemporaryContentHandle {
 		}
 	}
 
+	public void rollback() {
+		if (!this.appendMode) {
+			this.factory.tryDelete(this.file);
+		}
+	}
+
 	public InputStream closeAndGetContents() throws CoreException {
 		close();
 

@@ -45,11 +45,12 @@ class CachingOutputStream extends OutputStream {
 			return;
 		}
 
-		InputStream stream = null;
 		try {
+			InputStream stream = null;
 			long timestamp = System.currentTimeMillis();
 
 			closed = true;
+			boolean shouldupdate;
 
 			try {
 				stream = this.fileHandle.closeAndGetContents();
@@ -57,27 +58,32 @@ class CachingOutputStream extends OutputStream {
 				long appendPosition = this.fileHandle.getAppendPosition();
 				skipUntilAppendPosition(stream, appendPosition);
 
-				this.callback.beforeCacheUpdate(stream, timestamp, this.appendMode);
+				shouldupdate = this.callback.beforeCacheUpdate(stream, timestamp, this.appendMode);
 			} finally {
 				Util.safeClose(stream);
 				stream = null;
 			}
 
-			this.cacheService.addFromTempHandle(this.fileHandle);
+			if (shouldupdate) {
+				this.cacheService.addFromTempHandle(this.fileHandle);
 
-			IPath path = this.fileHandle.getKey();
+				IPath path = this.fileHandle.getKey();
+				try {
+					stream = this.cacheService.getContent(path);
+					long appendPosition = this.fileHandle.getAppendPosition();
 
-			stream = this.cacheService.getContent(path);
-			long appendPosition = this.fileHandle.getAppendPosition();
+					skipUntilAppendPosition(stream, appendPosition);
 
-			skipUntilAppendPosition(stream, appendPosition);
-
-			this.callback.cacheUpdated(stream, timestamp, this.appendMode);
-
+					this.callback.cacheUpdated(stream, timestamp, this.appendMode);
+				} finally {
+					Util.safeClose(stream);
+				}
+			} else {
+				this.fileHandle.rollback();
+			}
 		} catch (CoreException e) {
-			throw new IOException(e.getMessage());
-		} finally {
-			Util.safeClose(stream);
+			this.fileHandle.rollback();
+			throw new IOException(e.getMessage(), e);
 		}
 	}
 
