@@ -18,6 +18,7 @@ import org.eclipse.core.resources.semantic.ISemanticResource;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProvider;
 import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.team.ui.history.HistoryPageSource;
 import org.eclipse.team.ui.history.IHistoryPageSource;
 import org.eclipse.ui.part.Page;
@@ -40,6 +41,10 @@ public class SemanticHistoryPageSource extends HistoryPageSource {
 					if (hps != null) {
 						return hps.canShowHistoryFor(object);
 					}
+					hps = (IHistoryPageSource) Platform.getAdapterManager().getAdapter(provider, IHistoryPageSource.class);
+					if (hps != null) {
+						return hps.canShowHistoryFor(object);
+					}
 				}
 			} catch (CoreException e) {
 				// $JL-EXC$ ignore and fallback to default behavior
@@ -59,6 +64,10 @@ public class SemanticHistoryPageSource extends HistoryPageSource {
 				ISemanticFileStore sstore = (ISemanticFileStore) store;
 				ISemanticContentProvider provider = sstore.getEffectiveContentProvider();
 				IHistoryPageSource hps = (IHistoryPageSource) provider.getAdapter(IHistoryPageSource.class);
+				if (hps != null) {
+					return hps.createPage(object);
+				}
+				hps = (IHistoryPageSource) Platform.getAdapterManager().getAdapter(provider, IHistoryPageSource.class);
 				if (hps != null) {
 					return hps.createPage(object);
 				}
