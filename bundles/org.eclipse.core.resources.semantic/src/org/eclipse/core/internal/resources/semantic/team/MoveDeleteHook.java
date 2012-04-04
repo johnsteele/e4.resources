@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.core.internal.resources.semantic.team;
 
+import org.eclipse.core.internal.resources.semantic.SemanticFileAdapterImpl;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -118,9 +119,23 @@ public class MoveDeleteHook implements IMoveDeleteHook {
 		}
 
 		if (!localOnly) {
+			ISemanticFolder targetParent = (ISemanticFolder) destination.getParent().getAdapter(ISemanticFolder.class);
+
+			if (targetParent != null) {
+				try {
+					SemanticFileAdapterImpl sFileImpl = (SemanticFileAdapterImpl) sFile;
+					if (sFileImpl.supportsMoveInternal(targetParent, destination.getName(), monitor)) {
+						sFileImpl.moveToInternal(targetParent, destination.getName(), ISemanticFileSystem.SUPPRESS_REFRESH, monitor);
+						tree.movedFile(source, destination);
+						return true;
+					}
+				} catch (CoreException e) {
+					// Fall back to exception
+				}
+			}
 			// TODO 0.1: no file move for the time being
-			SemanticResourceException ex = new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, source
-					.getFullPath(), Messages.MoveDeleteHook_MoveRenameNotSupported_XMSG);
+			SemanticResourceException ex = new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED,
+					source.getFullPath(), Messages.MoveDeleteHook_MoveRenameNotSupported_XMSG);
 			this.sfs.getLog().log(ex);
 			// the message is not transported to the client anyway, so we leave
 			// it empty
@@ -150,8 +165,8 @@ public class MoveDeleteHook implements IMoveDeleteHook {
 			IProgressMonitor monitor) {
 		// TODO 0.1: no project move for the time being
 		if (source.getAdapter(ISemanticProject.class) != null) {
-			SemanticResourceException ex = new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, source
-					.getFullPath(), Messages.MoveDeleteHook_MoveRenameNotSupported_XMSG);
+			SemanticResourceException ex = new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED,
+					source.getFullPath(), Messages.MoveDeleteHook_MoveRenameNotSupported_XMSG);
 			this.sfs.getLog().log(ex);
 			// the message is not transported to the client anyway, so we leave
 			// it empty

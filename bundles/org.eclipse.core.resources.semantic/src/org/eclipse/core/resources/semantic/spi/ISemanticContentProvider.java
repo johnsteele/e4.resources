@@ -470,4 +470,51 @@ public interface ISemanticContentProvider extends ISemanticContentProviderBase, 
 	 */
 	public ISemanticResourceRuleFactory getRuleFactory();
 
+	/**
+	 * Notifies the source content provider the store is about to be moved.
+	 * 
+	 * @param semanticFileStore
+	 * @param targetParent
+	 * @param targetName
+	 * @param monitor
+	 * @throws CoreException
+	 *             in case an error happened during detach
+	 * 
+	 */
+	public void detachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Notifies the target content provider that the store has been moved.
+	 * 
+	 * The content provider is not allowed to throw any exception in this
+	 * method.
+	 * 
+	 * @param semanticFileStore
+	 * @param targetParent
+	 * @param targetName
+	 * @param monitor
+	 */
+	public void attachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor);
+
+	/**
+	 * Checks whether the content providers that are source and target of the
+	 * move are capable of doing the move.
+	 * 
+	 * The method is called on both content providers with the same parameters.
+	 * 
+	 * The move is only executed if both content providers return
+	 * <code>true</code>.
+	 * 
+	 * @param semanticFileStore
+	 * @param targetParent
+	 * @param targetName
+	 * @param monitor
+	 * @return true if move is supported/allowed
+	 * @throws CoreException
+	 */
+	public boolean isMoveSupportedForStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException;
+
 }

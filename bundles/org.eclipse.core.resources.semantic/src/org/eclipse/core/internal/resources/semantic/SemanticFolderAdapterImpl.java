@@ -213,6 +213,13 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 
 	}
 
+	public boolean supportsMove(ISemanticFolder targetFolder, String targetName, IProgressMonitor monitor) throws CoreException {
+		ISemanticFileStoreInternal store = getOwnStore();
+		ISemanticFileStore targetParent = (ISemanticFileStore) getStoreForResource(targetFolder.getAdaptedResource());
+
+		return store.supportsMove(targetParent, targetName, monitor);
+	}
+
 	/**
 	 * @param name
 	 * @param childStore
@@ -263,8 +270,8 @@ public class SemanticFolderAdapterImpl extends SemanticResourceAdapterImpl imple
 	private void validateName(String name, int type) throws CoreException {
 		IStatus test = this.container.getWorkspace().validateName(name, type);
 		if (!test.isOK()) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.INVALID_RESOURCE_NAME, this.container.getFullPath(), test
-					.getMessage());
+			throw new SemanticResourceException(SemanticResourceStatusCode.INVALID_RESOURCE_NAME, this.container.getFullPath(),
+					test.getMessage());
 		}
 
 	}

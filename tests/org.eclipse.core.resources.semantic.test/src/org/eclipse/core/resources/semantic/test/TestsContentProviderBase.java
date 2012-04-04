@@ -641,8 +641,8 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 						.existsRemotely());
 
 				sf = (ISemanticFile) nofile.getAdapter(ISemanticFile.class);
-				Assert.assertFalse("Should not exist remotely", sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY,
-						monitor).existsRemotely());
+				Assert.assertFalse("Should not exist remotely",
+						sf.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_EXISTS_REMOTELY, monitor).existsRemotely());
 			}
 		};
 
@@ -1189,8 +1189,8 @@ public abstract class TestsContentProviderBase extends TestsContentProviderUtil 
 				info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, false);
 				store.putInfo(info, EFS.SET_ATTRIBUTES, null);
 
-				Assert.assertFalse("File should not be read-only", sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY,
-						null).isReadOnly());
+				Assert.assertFalse("File should not be read-only",
+						sfile.fetchResourceInfo(ISemanticFileSystem.RESOURCE_INFO_READ_ONLY, null).isReadOnly());
 
 			}
 		};

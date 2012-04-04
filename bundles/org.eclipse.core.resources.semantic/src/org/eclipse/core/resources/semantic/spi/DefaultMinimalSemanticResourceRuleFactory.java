@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.spi;
 
+import org.eclipse.core.runtime.IPath;
+
 /**
  * The default implementation for the {@link ISemanticResourceRuleFactory} that
  * provides fine-grained locks.
@@ -48,7 +50,33 @@ public class DefaultMinimalSemanticResourceRuleFactory implements ISemanticResou
 	}
 
 	public ISemanticFileStore moveRule(ISemanticFileStore source, ISemanticFileStore destination) {
-		return null;
+		IPath sourcePath = source.getPath();
+		IPath destinationPath = destination.getPath();
+		IPath rootPath = rootStore.getPath();
+
+		if (rootPath.equals(sourcePath)) {
+			return getParent(rootStore);
+		} else if (rootPath.equals(destinationPath)) {
+			return getParent(rootStore);
+		} else {
+			int matchingSegments = sourcePath.matchingFirstSegments(destinationPath);
+			if (matchingSegments < rootPath.segmentCount()) {
+				// either source or destination is outside of this content
+				// provider
+				return null;
+			}
+			if (matchingSegments == rootPath.segmentCount()) {
+				return rootStore;
+			}
+			// find common parent
+			int segmentsToRemove = sourcePath.segmentCount() - matchingSegments;
+			ISemanticFileStore store = source;
+
+			for (int i = 0; i < segmentsToRemove; i++) {
+				store = (ISemanticFileStore) store.getParent();
+			}
+			return store;
+		}
 	}
 
 	public ISemanticFileStore refreshRule(ISemanticFileStore store) {

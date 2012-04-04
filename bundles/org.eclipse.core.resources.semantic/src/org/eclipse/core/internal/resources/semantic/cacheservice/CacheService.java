@@ -124,6 +124,40 @@ public class CacheService implements ICacheService {
 		}
 	}
 
+	public void moveContent(IPath path, IPath targetPath, IProgressMonitor monitor) throws CoreException {
+		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {
+			SfsSpiTraceLocation.getTrace().traceEntry(SfsSpiTraceLocation.CACHESERVICE.getLocation(), path.toString());
+		}
+
+		try {
+			lockForWrite();
+
+			InputStream input = getContent(path);
+
+			if (input != null) {
+				try {
+					addContent(targetPath, input, 0, monitor);
+				} finally {
+					if (input != null) {
+						try {
+							input.close();
+						} catch (IOException e) {
+							// ignore
+						}
+					}
+				}
+			}
+
+			ICachedContentHandle cacheFile = createCacheContentHandle(path);
+
+			if (cacheFile.exists()) {
+				cacheFile.delete();
+			}
+		} finally {
+			unlockForWrite();
+		}
+	}
+
 	public boolean hasContent(IPath path) throws CoreException {
 
 		if (SfsSpiTraceLocation.CACHESERVICE.isActive()) {

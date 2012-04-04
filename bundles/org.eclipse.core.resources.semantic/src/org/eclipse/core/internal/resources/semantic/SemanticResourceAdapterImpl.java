@@ -92,6 +92,35 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 		}
 	}
 
+	/**
+	 * 
+	 * @return store instance
+	 * @throws CoreException
+	 *             if store can not be determined
+	 */
+	protected static ISemanticFileStoreInternal getStoreForResource(IResource someResource) throws CoreException {
+		// TODO trace
+		URI uri = someResource.getLocationURI();
+
+		try {
+			IFileStore store = EFS.getStore(uri);
+
+			if (store instanceof ISemanticFileStoreInternal) {
+				return (ISemanticFileStoreInternal) store;
+			} else if (store.getFileSystem() == EFS.getNullFileSystem()) {
+				throw new SemanticResourceException(SemanticResourceStatusCode.STORE_NOT_FOUND, someResource.getFullPath(),
+						Messages.SemanticResourceAdapterImpl_NullFile_XMSG);
+			} else {
+				// quite unlikely (the URI was changed on the resource, e.g. on
+				// a project or symbolic link)
+				throw new SemanticResourceException(SemanticResourceStatusCode.STORE_NOT_FOUND, someResource.getFullPath(), NLS.bind(
+						Messages.SemanticResourceAdapterImpl_NoSemanticStore_XMSG, uri.toString()));
+			}
+		} catch (CoreException e) {
+			throw new SemanticResourceException(SemanticResourceStatusCode.STORE_NOT_FOUND, someResource.getFullPath(), null, e);
+		}
+	}
+
 	protected ISchedulingRule checkCurrentRule(RuleType ruleType) throws CoreException {
 		Job job = Job.getJobManager().currentJob();
 
@@ -99,24 +128,7 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 			ISchedulingRule checkRule = getRuleForType(ruleType, this.resource);
 
-			ISchedulingRule rule = job.getRule();
-			if (rule != null) {
-
-				if (!rule.contains(checkRule)) {
-					throw new SemanticResourceException(SemanticResourceStatusCode.LOCK_CONFLICT, this.resource.getFullPath(),
-							Messages.SemanticResourceAdapterImpl_OperationNotCoveredByRule_XMSG);
-				}
-			} else {
-				// TODO 0.1: we need to investigate again what to do when rule
-				// is null
-				if (SfsTraceLocation.CORE.isActive()) {
-					SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(),
-							Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG);
-					SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE.getLocation());
-				}
-
-			}
-			return checkRule;
+			return validateCurrentRule(job, checkRule);
 
 		}
 
@@ -125,37 +137,83 @@ public abstract class SemanticResourceAdapterImpl implements ISemanticResource {
 
 	}
 
-	ISchedulingRule getRuleForType(RuleType ruleType, IResource actResource) throws SemanticResourceException {
+	protected ISchedulingRule checkCurrentMoveRule(IResource destination) throws CoreException {
+		Job job = Job.getJobManager().currentJob();
 
-		if (actResource instanceof IWorkspaceRoot) {
-			return actResource;
+		if (job != null) {
+
+			ISchedulingRule checkRule = getMoveRule(this.resource, destination);
+
+			return validateCurrentRule(job, checkRule);
+
 		}
+
+		throw new SemanticResourceException(SemanticResourceStatusCode.CALLED_OUTSIDE_OF_SCHEDULING_RULE, this.resource.getFullPath(),
+				Messages.SemanticResourceAdapterImpl_CalledOutsideRule_XMSG);
+
+	}
+
+	ISchedulingRule getMoveRule(IResource source, IResource destination) throws SemanticResourceException {
+		IResourceRuleFactory rf = getResourceRuleFactory(source);
+		return rf.moveRule(source, destination);
+	}
+
+	private ISchedulingRule validateCurrentRule(Job job, ISchedulingRule checkRule) throws SemanticResourceException {
+		ISchedulingRule rule = job.getRule();
+		if (rule != null) {
+
+			if (!rule.contains(checkRule)) {
+				throw new SemanticResourceException(SemanticResourceStatusCode.LOCK_CONFLICT, this.resource.getFullPath(),
+						Messages.SemanticResourceAdapterImpl_OperationNotCoveredByRule_XMSG);
+			}
+		} else {
+			// TODO 0.1: we need to investigate again what to do when rule
+			// is null
+			if (SfsTraceLocation.CORE.isActive()) {
+				SfsTraceLocation.getTrace().trace(SfsTraceLocation.CORE.getLocation(), Messages.SemanticResourceAdapterImpl_JobNoRule_XMSG);
+				SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE.getLocation());
+			}
+
+		}
+		return checkRule;
+	}
+
+	private IResourceRuleFactory getResourceRuleFactory(IResource source) throws SemanticResourceException {
 		// TODO 0.1: check life cycle issues with project close/delete
-		IProject project = actResource.getProject();
+		IProject project = source.getProject();
 		if (!project.isAccessible()) {
 			// project closed or deleted
-			throw new SemanticResourceException(SemanticResourceStatusCode.PROJECT_NOT_ACCESSIBLE, actResource.getFullPath(), NLS.bind(
+			throw new SemanticResourceException(SemanticResourceStatusCode.PROJECT_NOT_ACCESSIBLE, source.getFullPath(), NLS.bind(
 					Messages.SemanticResourceAdapterImpl_ProjectNotAccessible_XMSG, project.getName()));
 		}
 
 		IResourceRuleFactory rf;
 
-		if (actResource.isLinked()) {
+		if (source.isLinked()) {
 			// fallback to default factory
-			rf = actResource.getWorkspace().getRuleFactory();
+			rf = source.getWorkspace().getRuleFactory();
 		} else {
 			// we obtain the "expected" rule from the content provider
 			RepositoryProvider provider = RepositoryProvider.getProvider(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
 			if (provider != null) {
 				rf = provider.getRuleFactory();
 			} else {
-				if (actResource.getType() == IResource.PROJECT) {
-					rf = actResource.getWorkspace().getRuleFactory();
+				if (source.getType() == IResource.PROJECT) {
+					rf = source.getWorkspace().getRuleFactory();
 				} else {
 					rf = new DelegatingResourceRuleFactory(this.fs);
 				}
 			}
 		}
+		return rf;
+	}
+
+	ISchedulingRule getRuleForType(RuleType ruleType, IResource actResource) throws SemanticResourceException {
+
+		if (actResource instanceof IWorkspaceRoot) {
+			return actResource;
+		}
+		IResourceRuleFactory rf = getResourceRuleFactory(actResource);
 
 		ISchedulingRule checkRule;
 

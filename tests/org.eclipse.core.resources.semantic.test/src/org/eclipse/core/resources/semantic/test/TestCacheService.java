@@ -361,6 +361,56 @@ public class TestCacheService {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testFileMoveSameFolder() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath path = new Path("/test3/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		writeToCache(service, path, input);
+
+		IPath targetPath = new Path("/test3/file2.txt");
+
+		service.moveContent(path, targetPath, null);
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		Assert.assertFalse(cacheFile.exists());
+		Assert.assertTrue(service.hasContent(targetPath));
+
+		readFromCache(service, targetPath, content);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testFileMoveAnotherFolder() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath path = new Path("/test3/folder1/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		writeToCache(service, path, input);
+
+		IPath targetPath = new Path("/test3/folder2/file2.txt");
+
+		service.moveContent(path, targetPath, null);
+
+		File cacheFile = new File(SemanticFileCache.getCache().getCacheDir(), path.toString());
+
+		Assert.assertFalse(cacheFile.exists());
+		Assert.assertTrue(service.hasContent(targetPath));
+
+		readFromCache(service, targetPath, content);
+	}
+
+	/**
 	 * @param service
 	 * @param path
 	 * @throws CoreException

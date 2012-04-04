@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.spi;
 
+import org.eclipse.core.runtime.IPath;
+
 /**
  * The default implementation for the {@link ISemanticResourceRuleFactory}.
  * <p>
@@ -61,6 +63,15 @@ public class DefaultSemanticResourceRuleFactory implements ISemanticResourceRule
 	}
 
 	public ISemanticFileStore moveRule(ISemanticFileStore source, ISemanticFileStore destination) {
+		IPath sourcePath = source.getPath();
+		IPath destinationPath = destination.getPath();
+
+		int matchingSegments = sourcePath.matchingFirstSegments(destinationPath);
+		if (matchingSegments < rootStore.getPath().segmentCount()) {
+			// either source or destination is outside of this content
+			// provider
+			return null;
+		}
 		return (ISemanticFileStore) this.rootStore.getParent();
 	}
 

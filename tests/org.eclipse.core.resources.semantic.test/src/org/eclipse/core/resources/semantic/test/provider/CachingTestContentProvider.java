@@ -135,7 +135,7 @@ public class CachingTestContentProvider extends CachingTestContentProviderBase i
 						}
 
 						public ITag[] getBranches() {
-							return new ITag[0];
+							return null;
 						}
 					};
 

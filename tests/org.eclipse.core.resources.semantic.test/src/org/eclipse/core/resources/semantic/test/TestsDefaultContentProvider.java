@@ -35,6 +35,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.semantic.ISemanticFile;
 import org.eclipse.core.resources.semantic.ISemanticFileSystem;
 import org.eclipse.core.resources.semantic.ISemanticFolder;
+import org.eclipse.core.resources.semantic.SemanticResourceException;
 import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteFolder;
 import org.eclipse.core.resources.semantic.examples.remote.RemoteStoreTransient;
@@ -356,6 +357,167 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 				file.move(targetFolder.getFile(file.getName()).getFullPath(), false, monitor);
 				file.delete(false, monitor);
 
+			}
+		};
+		workspace.run(runnable, TestsDefaultContentProvider.this.testProject, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddRemoteFileAndMove() throws Exception {
+		final IFolder parent = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+		final IFolder folder = parent.getFolder("someChild1");
+		final IFolder targetFolder = parent.getFolder("someChild2");
+		parent.create(true, false, null);
+		folder.create(true, false, null);
+		targetFolder.create(true, false, null);
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+
+					File testfile = createTestFile("test.txt");
+					boolean created = testfile.createNewFile();
+					if (!created) {
+						new FileOutputStream(testfile).close();
+					}
+
+					writeContentsToFile(testfile, "Hello World", "UTF-8");
+
+					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+							monitor);
+					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
+						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					}
+
+					IFile file = sfile.getAdaptedFile();
+
+					IFile targetFile = targetFolder.getFile(file.getName());
+
+					file.move(targetFolder.getFile(file.getName()).getFullPath(), false, monitor);
+
+					Assert.assertEquals("File existence", false, file.exists());
+					Assert.assertEquals("File existence", true, targetFile.exists());
+
+					assertContentsEqual(targetFile, "Hello World");
+
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+		workspace.run(runnable, parent, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+	}
+
+	@Test(expected = SemanticResourceException.class)
+	public void testAddRemoteFileAndMoveWithWrongSchedulingRule() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder/someChild1");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+
+					File testfile = createTestFile("test.txt");
+					boolean created = testfile.createNewFile();
+					if (!created) {
+						new FileOutputStream(testfile).close();
+					}
+
+					writeContentsToFile(testfile, "Hello World", "UTF-8");
+
+					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+							monitor);
+					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
+						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					}
+
+					IFile file = sfile.getAdaptedFile();
+
+					IFolder targetFolder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder/someChild2");
+					targetFolder.create(false, false, monitor);
+
+					IFile targetFile = targetFolder.getFile(file.getName());
+
+					file.move(targetFolder.getFile(file.getName()).getFullPath(), false, monitor);
+
+					Assert.assertEquals("File existence", false, file.exists());
+					Assert.assertEquals("File existence", true, targetFile.exists());
+
+					assertContentsEqual(targetFile, "Hello World");
+
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+		};
+		workspace.run(runnable, folder, IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
+	}
+
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test(expected = CoreException.class)
+	public void testAddRemoteFileAndMoveToExistingLocation() throws Exception {
+		final IFolder folder = TestsDefaultContentProvider.this.testProject.getFolder("someFolder");
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+
+			public void run(IProgressMonitor monitor) throws CoreException {
+				try {
+					ISemanticFolder sFolder = (ISemanticFolder) folder.getAdapter(ISemanticFolder.class);
+
+					File testfile = createTestFile("test.txt");
+					boolean created = testfile.createNewFile();
+					if (!created) {
+						new FileOutputStream(testfile).close();
+					}
+
+					writeContentsToFile(testfile, "Hello World", "UTF-8");
+
+					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+							monitor);
+					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
+						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+					}
+
+					IFile file = sfile.getAdaptedFile();
+
+					IFolder targetFolder = TestsDefaultContentProvider.this.testProject.getFolder("target");
+					targetFolder.create(false, false, monitor);
+
+					IFile targetFile = targetFolder.getFile(file.getName());
+
+					Assert.assertEquals("File existence", false, targetFile.exists());
+					ByteArrayInputStream is;
+					try {
+						is = new ByteArrayInputStream("Hello World".getBytes("UTF-8"));
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+					targetFile.create(is, false, monitor);
+					Util.safeClose(targetFile.getContents());
+					Assert.assertEquals("File existence", true, targetFile.exists());
+
+					file.move(targetFolder.getFile(file.getName()).getFullPath(), false, monitor);
+
+					Assert.assertTrue("file.move() should have failed.", false);
+				} catch (URISyntaxException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				} catch (IOException e) {
+					throw new CoreException(new Status(IStatus.ERROR, TestPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
 			}
 		};
 		workspace.run(runnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());

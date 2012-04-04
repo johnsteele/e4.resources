@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.core.resources.semantic.ISemanticProperties;
 import org.eclipse.core.resources.semantic.ISemanticResourceInfo;
 import org.eclipse.core.resources.semantic.SyncDirection;
+import org.eclipse.core.resources.semantic.spi.ISemanticFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -94,5 +95,9 @@ interface ISemanticFileStoreInternal extends ISemanticProperties {
 	public void setRemoteURI(URI uri, IProgressMonitor monitor) throws CoreException;
 
 	public void forceRemoveFromWorkspace(int options, IProgressMonitor monitor) throws CoreException;
+
+	public boolean supportsMove(ISemanticFileStore targetParent, String targetName, IProgressMonitor monitor) throws CoreException;
+
+	public void moveTo(ISemanticFileStore targetParent, String targetName, IProgressMonitor monitor) throws CoreException;
 
 }

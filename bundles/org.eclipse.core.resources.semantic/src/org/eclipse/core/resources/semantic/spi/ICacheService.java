@@ -105,4 +105,20 @@ public interface ICacheService {
 	public OutputStream wrapOutputStream(IPath path, boolean append, ICacheUpdateCallback callback, IProgressMonitor monitor)
 			throws CoreException;
 
+	/**
+	 * Moves content of a file specified by <code>path</code> to a location
+	 * specified by <code>targetPath<code>
+	 * 
+	 * @param path
+	 *            must point to a file
+	 * @param targetPath
+	 *            must point to a non-existing file
+	 * @param monitor
+	 *            may be null
+	 * @throws CoreException
+	 * 
+	 * @since 0.6.0
+	 */
+	public void moveContent(IPath path, IPath targetPath, IProgressMonitor monitor) throws CoreException;
+
 }

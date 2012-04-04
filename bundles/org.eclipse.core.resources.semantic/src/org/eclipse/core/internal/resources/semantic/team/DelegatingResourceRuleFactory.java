@@ -223,8 +223,8 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 			if (sres != null) {
 				ISemanticFileStore sfs = (ISemanticFileStore) EFS.getStore(resource.getLocationURI());
 
-				result = toRule(new IResource[] {resource}, RuleType.MODIFY, sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(
-						sfs));
+				result = toRule(new IResource[] {resource}, RuleType.MODIFY,
+						sfs.getEffectiveContentProvider().getRuleFactory().modifyRule(sfs));
 			} else {
 				if (SfsTraceLocation.RULEFACTORY.isActive()) {
 					SfsTraceLocation.getTrace().trace(SfsTraceLocation.RULEFACTORY.getLocation(),
@@ -264,6 +264,12 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 					new Object[] {source.getFullPath().toString(), destination.getFullPath().toString()});
 		}
 
+		// when a resource is moved across project, the projects are locked as a
+		// whole
+		if (!source.getFullPath().segment(0).equals(destination.getFullPath().segment(0))) {
+			return new MultiRule(new ISchedulingRule[] {modifyRule(source.getProject()), modifyRule(destination.getProject())});
+		}
+
 		ISchedulingRule result;
 		try {
 			ISemanticResource sourceres = (ISemanticResource) source.getAdapter(ISemanticResource.class);
@@ -274,8 +280,8 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 				ISemanticFileStore destinationStore = (ISemanticFileStore) EFS.getStore(destination.getLocationURI());
 				// if source and target come from different providers, return
 				// root
-				if (sourceStore.getEffectiveContentProvider().getClass().getName().equals(
-						destinationStore.getEffectiveContentProvider().getClass().getName())) {
+				if (sourceStore.getEffectiveContentProvider().getClass().getName()
+						.equals(destinationStore.getEffectiveContentProvider().getClass().getName())) {
 					result = toRule(new IResource[] {source}, RuleType.MOVE, sourceStore.getEffectiveContentProvider().getRuleFactory()
 							.moveRule(sourceStore, destinationStore));
 				} else {
@@ -392,8 +398,8 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 						IFileStore fs = EFS.getStore(res.getLocationURI());
 						if (fs instanceof ISemanticFileStore) {
 							ISemanticFileStore sfs = (ISemanticFileStore) fs;
-							ISemanticFileStore ruleStore = sfs.getEffectiveContentProvider().getRuleFactory().validateEditRule(
-									new ISemanticFileStore[] {sfs});
+							ISemanticFileStore ruleStore = sfs.getEffectiveContentProvider().getRuleFactory()
+									.validateEditRule(new ISemanticFileStore[] {sfs});
 							if (ruleStore != null) {
 								ruleStores.add(ruleStore);
 							} else {
@@ -476,8 +482,9 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 				rule = this.root.findMember(path);
 			}
 			if (rule == null || !rule.exists()) {
-				throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_FOR_STORE_NOT_FOUND, store.getPath(), MessageFormat
-						.format(Messages.DelegatingResourceRuleFactory_NoExistingParentFound_XMSG, stores[0].getPath().toString()));
+				throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_FOR_STORE_NOT_FOUND, store.getPath(),
+						MessageFormat.format(Messages.DelegatingResourceRuleFactory_NoExistingParentFound_XMSG, stores[0].getPath()
+								.toString()));
 			}
 			rules[i] = rule;
 		}
@@ -511,6 +518,7 @@ public class DelegatingResourceRuleFactory extends ResourceRuleFactory {
 				case REFRESH :
 				case CREATE :
 				case DELETE :
+				case MOVE :
 					rule = resource.getParent();
 					break;
 				case MODIFY :

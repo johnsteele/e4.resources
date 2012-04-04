@@ -15,6 +15,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.core.internal.resources.semantic.provider.messages"; //$NON-NLS-1$
+	public static String ContentProvider_NotSupported_XMSG;
 	public static String DefaultContentProvider_CacheFillError_XMSG;
 	public static String DefaultContentProvider_NoRemoteEdit_XMSG;
 	public static String DefaultContentProvider_NotSupported_XMSG;

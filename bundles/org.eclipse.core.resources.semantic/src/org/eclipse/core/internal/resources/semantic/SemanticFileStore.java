@@ -788,6 +788,63 @@ public class SemanticFileStore extends SemanticProperties implements ISemanticFi
 	//
 	// ISemantiFileStoreInternal
 	//
+	public boolean supportsMove(ISemanticFileStore targetParent, String targetName, IProgressMonitor monitor) throws CoreException {
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
+
+		checkAccessible();
+
+		if (targetParent.hasChild(targetName)) {
+			return false;
+		}
+
+		if (effectiveProvider.isMoveSupportedForStore(this, targetParent, targetName, monitor)) {
+			final ISemanticContentProvider targetProvider = targetParent.getEffectiveContentProvider();
+			if (targetProvider.isMoveSupportedForStore(this, targetParent, targetName, monitor)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void moveTo(ISemanticFileStore targetParent, String targetName, IProgressMonitor monitor) throws CoreException {
+		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {
+			SfsTraceLocation.getTrace().traceDumpStack(SfsTraceLocation.CORE_VERBOSE.getLocation());
+		}
+
+		final ISemanticContentProvider effectiveProvider = getEffectiveContentProvider();
+		final ISemanticContentProvider targetProvider = targetParent.getEffectiveContentProvider();
+
+		checkAccessible();
+
+		if (targetParent.hasChild(targetName)) {
+			IPath newPath = targetParent.getPath().append(targetName);
+			throw new SemanticResourceException(SemanticResourceStatusCode.RESOURCE_ALREADY_EXISTS, newPath, NLS.bind(
+					Messages.SemanticFileStore_ResourceWithPathExists_XMSG, newPath.toString()));
+		}
+
+		targetParent.mkdir(0, monitor);
+
+		effectiveProvider.detachMovingStore(this, targetParent, targetName, monitor);
+
+		try {
+			this.fs.lockForWrite();
+
+			checkAccessible();
+			((SemanticFileStore) targetParent).checkAccessible();
+
+			this.node.setParent(((SemanticFileStore) targetParent).node);
+			this.node.setName(targetName);
+		} finally {
+			this.fs.unlockForWrite();
+		}
+
+		targetProvider.attachMovingStore(this, targetParent, targetName, monitor);
+	}
+
 	public void createFileRemotely(String name, InputStream source, Object context, IProgressMonitor monitor) throws CoreException {
 
 		if (SfsTraceLocation.CORE_VERBOSE.isActive()) {

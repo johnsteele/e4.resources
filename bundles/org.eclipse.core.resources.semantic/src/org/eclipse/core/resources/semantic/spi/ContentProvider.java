@@ -12,11 +12,15 @@
 package org.eclipse.core.resources.semantic.spi;
 
 import org.eclipse.core.internal.resources.semantic.SemanticResourcesPlugin;
+import org.eclipse.core.internal.resources.semantic.provider.Messages;
+import org.eclipse.core.resources.semantic.SemanticResourceException;
+import org.eclipse.core.resources.semantic.SemanticResourceStatusCode;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * This class implements the base class for SPI contract of
@@ -191,4 +195,22 @@ public abstract class ContentProvider implements ISemanticContentProvider {
 		return new Status(IStatus.OK, SemanticResourcesPlugin.PLUGIN_ID, ""); //$NON-NLS-1$
 	}
 
+	/**
+	 * @throws CoreException
+	 */
+	public boolean isMoveSupportedForStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException {
+		return false;
+	}
+
+	public void detachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException {
+		throw new SemanticResourceException(SemanticResourceStatusCode.METHOD_NOT_SUPPORTED, semanticFileStore.getPath(), NLS.bind(
+				Messages.ContentProvider_NotSupported_XMSG, this.getClass().getName()));
+	}
+
+	public void attachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) {
+		// do nothing
+	}
 }

@@ -32,6 +32,7 @@ import org.eclipse.core.resources.semantic.SyncDirection;
 import org.eclipse.core.resources.semantic.spi.CachingContentProvider;
 import org.eclipse.core.resources.semantic.spi.DefaultMinimalSemanticResourceRuleFactory;
 import org.eclipse.core.resources.semantic.spi.FileCacheServiceFactory;
+import org.eclipse.core.resources.semantic.spi.ICacheService;
 import org.eclipse.core.resources.semantic.spi.ICacheServiceFactory;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderFederation;
 import org.eclipse.core.resources.semantic.spi.ISemanticContentProviderREST;
@@ -62,6 +63,10 @@ import org.eclipse.osgi.util.NLS;
 public class DefaultContentProvider extends CachingContentProvider implements ISemanticContentProviderFederation,
 		ISemanticContentProviderREST {
 
+	/**
+	 * 
+	 */
+	private static final String DEFAULT_CONTENT_PROVIDER_ID = "org.eclipse.core.resources.semantic.provider.DefaultContentProvider"; //$NON-NLS-1$
 	private static final String TRUE = "true"; //$NON-NLS-1$
 	private static final QualifiedName RESOURCE_NOT_ACCESSIBLE = new QualifiedName(SemanticResourcesPlugin.PLUGIN_ID,
 			"ResourceNotAccessible"); //$NON-NLS-1$
@@ -194,8 +199,8 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		String remoteURI = this.getURIString(childStore);
 
 		if (childStore.getPersistentProperty(RESOURCE_NOT_ACCESSIBLE) != null) {
-			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(), childStore
-					.getPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE));
+			throw new SemanticResourceException(SemanticResourceStatusCode.REMOTE_CONNECT_EXCEPTION, childStore.getPath(),
+					childStore.getPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE));
 		}
 
 		if (remoteURI == null) {
@@ -418,12 +423,42 @@ public class DefaultContentProvider extends CachingContentProvider implements IS
 		}
 	}
 
+	@Override
+	public boolean isMoveSupportedForStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException {
+		if (semanticFileStore.getEffectiveContentProviderID().equals(DEFAULT_CONTENT_PROVIDER_ID)) {
+			if (targetParent.getEffectiveContentProviderID().equals(DEFAULT_CONTENT_PROVIDER_ID)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void detachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) throws CoreException {
+		ICacheService cacheService = this.getCacheService();
+		IPath path = semanticFileStore.getPath();
+
+		if (cacheService.hasContent(path)) {
+			IPath targetPath = targetParent.getPath().append(targetName);
+
+			cacheService.moveContent(path, targetPath, monitor);
+		}
+	}
+
+	@Override
+	public void attachMovingStore(ISemanticFileStore semanticFileStore, ISemanticFileStore targetParent, String targetName,
+			IProgressMonitor monitor) {
+		// nothing to do
+	}
+
 	private void setStateResourceNotAccessible(ISemanticFileStore childStore, Exception e) throws CoreException {
 		childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE, TRUE);
 
 		if (e instanceof UnknownHostException) {
-			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, NLS.bind(Messages.DefaultContentProvider_UnknownHostError_XMSG, e
-					.getMessage()));
+			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE,
+					NLS.bind(Messages.DefaultContentProvider_UnknownHostError_XMSG, e.getMessage()));
 		} else {
 			childStore.setPersistentProperty(RESOURCE_NOT_ACCESSIBLE_MESSAGE, e.getMessage());
 		}
