@@ -151,7 +151,7 @@ public class CachingTestContentProviderWithHistoryPage extends CachingTestConten
 						}
 
 						public ITag[] getBranches() {
-							return new ITag[0];
+							return null;
 						}
 					};
 
