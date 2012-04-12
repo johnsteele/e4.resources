@@ -445,6 +445,28 @@ public class TestCacheService {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testEmptyContentFile() throws Exception {
+		ICacheService service = new FileCacheServiceFactory().getCacheService();
+
+		IPath path = new Path("/test4/file.txt");
+		String content = "test";
+		InputStream input = new ByteArrayInputStream(content.getBytes("UTF-8"));
+
+		writeToCache(service, path, input);
+
+		readFromCache(service, path, content);
+
+		InputStream input2 = new ByteArrayInputStream(new byte[0]);
+
+		writeToCache(service, path, input2);
+
+		readFromCache(service, path, "");
+	}
+
+	/**
 	 * @param service
 	 * @param path
 	 * @throws CoreException
@@ -633,6 +655,9 @@ public class TestCacheService {
 		byte b[] = new byte[content.length() + 2];
 		int size = is.read(b);
 
+		if (size == -1 && content.length() == 0) {
+			return;
+		}
 		Assert.assertEquals(content.length(), size);
 
 		for (int i = 0; i < size; i++) {

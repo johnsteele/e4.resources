@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -39,7 +40,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.team.core.RepositoryProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -290,6 +293,50 @@ public class TestsLinkedResources extends TestsContentProviderUtil {
 		};
 
 		workspace.run(runnable, workspace.getRuleFactory().refreshRule(file), 0, new NullProgressMonitor());
+	}
+
+	@Test
+	public void testAddProjectQueryLinkWithProviderToSFS() throws Exception {
+		final IProject project = workspace.getRoot().getProject("LinkedProject");
+
+		if (project.exists()) {
+			throw new IllegalStateException("Project exists");
+		}
+
+		IWorkspaceRunnable myRunnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				IProject project = workspace.getRoot().getProject("LinkedProject");
+
+				IProjectDescription description = workspace.newProjectDescription("LinkedProject");
+
+				try {
+					URI uri = new URI(ISemanticFileSystem.SCHEME, null, "/LinkedProject", "type=project;create=true;provider="
+							+ "org.eclipse.core.resources.semantic.test.provider.MemoryCachingTestContentProvider", null);
+					description.setLocationURI(uri);
+				} catch (URISyntaxException e) {
+					// really not likely, though
+					throw new RuntimeException(e);
+				}
+				project.create(description, monitor);
+				project.open(monitor);
+
+				// for SFS, we map this to the team provider
+				RepositoryProvider.map(project, ISemanticFileSystem.SFS_REPOSITORY_PROVIDER);
+
+				ISemanticProject spr = (ISemanticProject) project.getAdapter(ISemanticProject.class);
+
+				Map<QualifiedName, String> props = spr.getPersistentProperties();
+
+				props.size();
+
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+			}
+
+		};
+
+		workspace.run(myRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+
 	}
 
 	@Test
