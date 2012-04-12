@@ -57,7 +57,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
-import org.eclipse.team.core.history.ITag;
+import org.eclipse.team.core.history.provider.FileRevision;
 
 public class SampleWebDAVContentProvider extends CachingContentProvider implements ISemanticContentProviderREST,
 		ISemanticContentProviderLocking {
@@ -121,7 +121,7 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 
 				public IFileRevision[] getResourceVariants(final ISemanticFileStore store, IProgressMonitor monitor) {
 					if (store.getType() == ISemanticFileStore.FILE && !store.fetchInfo().getAttribute(EFS.ATTRIBUTE_READ_ONLY)) {
-						IFileRevision remote = new IFileRevision() {
+						IFileRevision remote = new FileRevision() {
 
 							public IFileRevision withAllProperties(IProgressMonitor monitor1) {
 								return this;
@@ -131,6 +131,7 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 								return false;
 							}
 
+							@Override
 							public URI getURI() {
 								try {
 									return new URI(store.getRemoteURIString());
@@ -142,12 +143,9 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 								return null;
 							}
 
+							@Override
 							public long getTimestamp() {
 								return -1;
-							}
-
-							public ITag[] getTags() {
-								return new ITag[0];
 							}
 
 							public IStorage getStorage(IProgressMonitor monitor1) {
@@ -201,6 +199,7 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 								return store.getName();
 							}
 
+							@Override
 							public String getContentIdentifier() {
 								try {
 									URI uri = getWebDAVURIForStore(store);
@@ -216,21 +215,21 @@ public class SampleWebDAVContentProvider extends CachingContentProvider implemen
 								return "unknown"; //$NON-NLS-1$
 							}
 
+							@Override
 							public String getComment() {
 								return null;
 							}
 
+							@Override
 							public String getAuthor() {
 								return null;
 							}
 
+							@Override
 							public boolean exists() {
 								return false;
 							}
 
-							public ITag[] getBranches() {
-								return new ITag[0];
-							}
 						};
 						return new IFileRevision[] {null, remote};
 					}

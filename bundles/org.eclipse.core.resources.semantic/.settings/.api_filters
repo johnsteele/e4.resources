@@ -24,12 +24,4 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/eclipse/core/resources/semantic/spi/SemanticFileRevision.java" type="org.eclipse.core.resources.semantic.spi.SemanticFileRevision">
-        <filter id="574619656">
-            <message_arguments>
-                <message_argument value="IFileRevision"/>
-                <message_argument value="SemanticFileRevision"/>
-            </message_arguments>
-        </filter>
-    </resource>
 </component>

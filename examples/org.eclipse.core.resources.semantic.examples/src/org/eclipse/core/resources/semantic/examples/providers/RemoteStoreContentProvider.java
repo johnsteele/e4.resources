@@ -56,7 +56,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
-import org.eclipse.team.core.history.ITag;
+import org.eclipse.team.core.history.provider.FileRevision;
 
 /**
  * Keeps the remote data in a XML file
@@ -108,7 +108,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 
 					final RemoteFile file = (RemoteFile) item;
 
-					IFileRevision remote = new IFileRevision() {
+					IFileRevision remote = new FileRevision() {
 
 						/**
 						 * @throws CoreException
@@ -121,6 +121,7 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 							return false;
 						}
 
+						@Override
 						public URI getURI() {
 							try {
 								return new URI(file.getPath().toString());
@@ -130,12 +131,9 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 							}
 						}
 
+						@Override
 						public long getTimestamp() {
 							return file.getTimestamp();
-						}
-
-						public ITag[] getTags() {
-							return null;
 						}
 
 						public IStorage getStorage(IProgressMonitor actmonitor) throws CoreException {
@@ -148,25 +146,26 @@ public class RemoteStoreContentProvider extends CachingContentProvider implement
 							return file.getName();
 						}
 
+						@Override
 						public String getContentIdentifier() {
 							return Long.toString(file.getTimestamp());
 						}
 
+						@Override
 						public String getComment() {
 							return null;
 						}
 
+						@Override
 						public String getAuthor() {
 							return null;
 						}
 
+						@Override
 						public boolean exists() {
 							return true;
 						}
 
-						public ITag[] getBranches() {
-							return new ITag[0];
-						}
 					};
 
 					return new IFileRevision[] {null, remote};

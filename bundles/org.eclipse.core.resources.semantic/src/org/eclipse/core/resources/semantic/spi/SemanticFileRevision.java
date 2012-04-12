@@ -18,11 +18,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.ITag;
+import org.eclipse.team.core.history.provider.FileRevision;
 
 /**
  * An abstract helper implementation for {@link IFileRevision}
  */
-public abstract class SemanticFileRevision implements IFileRevision {
+public abstract class SemanticFileRevision extends FileRevision {
 
 	private final String myAuthor;
 	private final String myComment;
@@ -56,18 +57,22 @@ public abstract class SemanticFileRevision implements IFileRevision {
 
 	}
 
+	@Override
 	public boolean exists() {
 		return true;
 	}
 
+	@Override
 	public String getAuthor() {
 		return this.myAuthor;
 	}
 
+	@Override
 	public String getComment() {
 		return this.myComment;
 	}
 
+	@Override
 	public String getContentIdentifier() {
 		return Long.toString(this.myTimestamp);
 	}
@@ -76,14 +81,17 @@ public abstract class SemanticFileRevision implements IFileRevision {
 		return this.myName;
 	}
 
+	@Override
 	public ITag[] getTags() {
 		return new ITag[0];
 	}
 
+	@Override
 	public long getTimestamp() {
 		return this.myTimestamp;
 	}
 
+	@Override
 	public URI getURI() {
 		return this.myUri;
 	}
@@ -99,7 +107,4 @@ public abstract class SemanticFileRevision implements IFileRevision {
 		return this;
 	}
 
-	public ITag[] getBranches() {
-		return new ITag[0];
-	}
 }

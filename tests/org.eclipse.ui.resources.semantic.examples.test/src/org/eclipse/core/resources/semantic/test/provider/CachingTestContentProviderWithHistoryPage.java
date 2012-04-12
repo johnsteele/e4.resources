@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
-import org.eclipse.team.core.history.ITag;
+import org.eclipse.team.core.history.provider.FileRevision;
 import org.eclipse.team.ui.history.IHistoryPageSource;
 import org.eclipse.ui.part.Page;
 
@@ -97,7 +97,7 @@ public class CachingTestContentProviderWithHistoryPage extends CachingTestConten
 
 					final RemoteFile file = (RemoteFile) item;
 
-					IFileRevision remote = new IFileRevision() {
+					IFileRevision remote = new FileRevision() {
 
 						public IFileRevision withAllProperties(IProgressMonitor monitor1) {
 							return this;
@@ -107,6 +107,7 @@ public class CachingTestContentProviderWithHistoryPage extends CachingTestConten
 							return false;
 						}
 
+						@Override
 						public URI getURI() {
 							try {
 								return new URI(file.getPath().toString());
@@ -116,12 +117,9 @@ public class CachingTestContentProviderWithHistoryPage extends CachingTestConten
 							}
 						}
 
+						@Override
 						public long getTimestamp() {
 							return file.getTimestamp();
-						}
-
-						public ITag[] getTags() {
-							return null;
 						}
 
 						public IStorage getStorage(IProgressMonitor monitor1) throws CoreException {
@@ -134,25 +132,26 @@ public class CachingTestContentProviderWithHistoryPage extends CachingTestConten
 							return file.getName();
 						}
 
+						@Override
 						public String getContentIdentifier() {
 							return "RemoteVersion";
 						}
 
+						@Override
 						public String getComment() {
 							return null;
 						}
 
+						@Override
 						public String getAuthor() {
 							return null;
 						}
 
+						@Override
 						public boolean exists() {
 							return true;
 						}
 
-						public ITag[] getBranches() {
-							return null;
-						}
 					};
 
 					return new IFileRevision[] {null, remote};
