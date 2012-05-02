@@ -83,7 +83,7 @@ class CachingOutputStream extends OutputStream {
 			}
 		} catch (CoreException e) {
 			this.fileHandle.rollback();
-			throw new IOException(e.getMessage(), e);
+			throw new IOException(e.getMessage());
 		}
 	}
 
