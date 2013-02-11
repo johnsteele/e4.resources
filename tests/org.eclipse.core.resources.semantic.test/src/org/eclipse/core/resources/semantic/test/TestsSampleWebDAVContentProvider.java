@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
@@ -66,6 +67,7 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 	}
 
 	@Test
+	@Ignore
 	public void testAddWebDAVFolder() throws Exception {
 		final IFolder folder = this.testProject.getFolder("root");
 		final int[] counters = new int[3];
@@ -192,6 +194,7 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 	}
 
 	@Test
+	@Ignore
 	public void testWebDAVAsLinkedFolder() throws Exception {
 		final String linkedProjectName = "testWebDAVAsLinkedFolder";
 
@@ -292,6 +295,7 @@ public class TestsSampleWebDAVContentProvider extends TestsContentProviderUtil {
 	}
 
 	@Test
+	@Ignore
 	public void testWebDAVAsLinkedFile() throws Exception {
 		final String linkedProjectName = "testWebDAVAsLinkedFile";
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.e4.resources.feature_0.12.0.qualifier.jar" id="org.eclipse.e4.resources.feature" version="0.12.0.qualifier">
+      <category name="org.eclipse.e4.resources"/>
+   </feature>
+   <category-def name="org.eclipse.e4.resources" label="Eclipse e4 Semantic File System"/>
+</site>

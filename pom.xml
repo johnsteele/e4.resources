@@ -27,10 +27,8 @@
     <module>./examples/org.eclipse.ui.resources.semantic.examples</module>
     <module>./tests/org.eclipse.core.resources.semantic.test</module>
     <module>./tests/org.eclipse.ui.resources.semantic.examples.test</module>
-    <module>./features/org.eclipse.e4.resources.feature</module>
+    <module>./features/org.eclipse.e4.resources.feature</module> 
     <module>./features/org.eclipse.e4.resources.tests.feature</module>
-<!--
     <module>./build/org.eclipse.e4.resources.update</module>
--->
   </modules>
 </project>
