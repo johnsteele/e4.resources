@@ -781,7 +781,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 	@Test
 	public void testFileStoreBehaviorAfterRemove() throws Exception {
 
-		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
+		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFileX");
 
 		((IFolder) file.getParent()).create(false, true, null);
 
@@ -811,7 +811,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 	@Test
 	public void testFileStoreBehaviorAfterRemove2() throws Exception {
 
-		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFile");
+		IFile file = TestsDefaultContentProvider.this.testProject.getFile("someFolder/SomeFileX");
 
 		((IFolder) file.getParent()).create(false, true, null);
 
@@ -971,7 +971,7 @@ public class TestsDefaultContentProvider extends TestsContentProviderUtil {
 
 					writeContentsToFile(testfile, TEST, UTF_8_CHARSET);
 
-					ISemanticFile sfile = sFolder.addFile("SomeFile", createURI4File(testfile), TestsDefaultContentProvider.this.options,
+					ISemanticFile sfile = sFolder.addFile("SomeFileZ", createURI4File(testfile), TestsDefaultContentProvider.this.options,
 							monitor);
 					if (TestsDefaultContentProvider.this.options == ISemanticFileSystem.SUPPRESS_REFRESH) {
 						testProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);

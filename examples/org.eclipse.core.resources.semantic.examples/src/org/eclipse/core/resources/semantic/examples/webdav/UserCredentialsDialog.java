@@ -11,8 +11,8 @@
  *******************************************************************************/
 package org.eclipse.core.resources.semantic.examples.webdav;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.osgi.util.NLS;
@@ -33,7 +33,7 @@ public class UserCredentialsDialog extends Dialog {
 	protected String message;
 	private Credentials credentials;
 
-	public static Credentials askForCredentials(String host, String message) {
+	public static org.apache.http.auth.Credentials askForCredentials(String host, String message) {
 		UserCredentialsDialog ui = new UserCredentialsDialog(null, host, message);
 		ui.open();
 

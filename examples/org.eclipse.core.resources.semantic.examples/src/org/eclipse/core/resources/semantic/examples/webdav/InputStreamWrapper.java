@@ -14,15 +14,13 @@ package org.eclipse.core.resources.semantic.examples.webdav;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.http.client.methods.HttpUriRequest;
 
 class InputStreamWrapper extends InputStream {
 
 	private InputStream is;
-	private HttpMethod httpMethod;
 
-	protected InputStreamWrapper(HttpMethod method, InputStream is) {
-		this.httpMethod = method;
+	protected InputStreamWrapper(HttpUriRequest method, InputStream is) {
 		this.is = is;
 	}
 
@@ -31,7 +29,7 @@ class InputStreamWrapper extends InputStream {
 		try {
 			this.is.close();
 		} finally {
-			this.httpMethod.releaseConnection();
+			// TODO cleanup
 		}
 	}
 

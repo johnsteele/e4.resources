@@ -25,22 +25,20 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScheme;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
-import org.apache.commons.httpclient.auth.CredentialsProvider;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.eclipse.core.resources.semantic.spi.Util;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -61,7 +59,7 @@ public class WebDAVUtil {
 
 	private static final byte[] buffer = new byte[8192];
 
-	private static HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+	private static DefaultHttpClient httpClient = new DefaultHttpClient();
 
 	public static class WebDAVNode {
 		public IPath path;
@@ -114,51 +112,29 @@ public class WebDAVUtil {
 	 * @param password
 	 */
 	public static void setGlobalCredentialsForTest(String userName, String password) {
-		if (userName != null && password != null) {
-			Credentials defaultcreds = new UsernamePasswordCredentials(userName, password);
-			httpClient.getState().setCredentials(AuthScope.ANY, defaultcreds);
-			httpClient.getParams().setAuthenticationPreemptive(true);
-		} else {
-			httpClient.getState().clearCredentials();
-			httpClient.getParams().setAuthenticationPreemptive(false);
-		}
+		Credentials defaultcreds = new UsernamePasswordCredentials(userName, password);
+		httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, defaultcreds);
 	}
 
 	public static void sendData(String remoteURI, final InputStreamProvider data, final IProgressMonitor monitor) throws IOException {
-		PutMethod putMethod = new PutMethod(remoteURI);
+		HttpPut putMethod = new HttpPut(remoteURI);
 
 		try {
-			installCredentialsProvider(putMethod);
+			installCredentialsProvider(httpClient);
 
-			RequestEntity requestEntity = new RequestEntity() {
+			HttpEntity requestEntity = new InputStreamEntity(data.getInputStream(), -1);
 
-				public void writeRequest(OutputStream out) throws IOException {
-					transferStreams(data.getInputStream(), out, monitor);
-				}
+			putMethod.setEntity(requestEntity);
 
-				public boolean isRepeatable() {
-					return true;
-				}
+			HttpResponse response = httpClient.execute(putMethod);
 
-				public String getContentType() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				public long getContentLength() {
-					return -1;
-				}
-			};
-
-			putMethod.setRequestEntity(requestEntity);
-
-			int statusCode = httpClient.executeMethod(putMethod);
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_RESET_CONTENT) {
-				throw new IOException(putMethod.getStatusText());
+				throw new IOException(response.getStatusLine().getReasonPhrase());
 			}
 		} finally {
-			putMethod.releaseConnection();
+			// TODO cleanup
 		}
 	}
 
@@ -203,23 +179,23 @@ public class WebDAVUtil {
 	}
 
 	public static InputStream openInputStream(String remoteURI, IWebDAVCallback setter) throws IOException {
-		GetMethod getMethod = new GetMethod(remoteURI);
+		HttpPut getMethod = new HttpPut(remoteURI);
 
-		getMethod.setFollowRedirects(true);
-
-		installCredentialsProvider(getMethod);
+		installCredentialsProvider(httpClient);
 		boolean releaseConnectionOnException = true;
 		InputStream is;
 
 		try {
-			int statusCode = httpClient.executeMethod(getMethod);
+			HttpResponse response = httpClient.execute(getMethod);
+
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (statusCode != HttpStatus.SC_OK) {
-				throw new IOException(getMethod.getStatusText());
+				throw new IOException(response.getStatusLine().getReasonPhrase());
 			}
 
 			if (setter != null) {
-				Header timestampHeader = getMethod.getResponseHeader("Last-Modified"); //$NON-NLS-1$
+				Header timestampHeader = response.getFirstHeader("Last-Modified"); //$NON-NLS-1$
 				if (timestampHeader != null) {
 					String timestampString = timestampHeader.getValue();
 					try {
@@ -228,7 +204,7 @@ public class WebDAVUtil {
 						throw new IOException(e.getMessage());
 					}
 				} else {
-					Header dateHeader = getMethod.getResponseHeader("Date"); //$NON-NLS-1$
+					Header dateHeader = response.getFirstHeader("Date"); //$NON-NLS-1$
 					if (dateHeader != null) {
 						String dateString = dateHeader.getValue();
 						try {
@@ -239,23 +215,23 @@ public class WebDAVUtil {
 					}
 				}
 
-				Header contentTypeHeader = getMethod.getResponseHeader("Content-Type"); //$NON-NLS-1$
+				Header contentTypeHeader = response.getFirstHeader("Content-Type"); //$NON-NLS-1$
 				if (contentTypeHeader != null) {
 					setter.setContentType(contentTypeHeader.getValue());
 				}
 
-				Header eTagHeader = getMethod.getResponseHeader("ETag"); //$NON-NLS-1$
+				Header eTagHeader = response.getFirstHeader("ETag"); //$NON-NLS-1$
 				if (eTagHeader != null) {
 					setter.setETag(eTagHeader.getValue());
 				}
 			}
 
-			is = getMethod.getResponseBodyAsStream();
+			is = response.getEntity().getContent();
 
 			releaseConnectionOnException = false;
 		} finally {
 			if (releaseConnectionOnException) {
-				getMethod.releaseConnection();
+				// TODO cleanup
 			}
 		}
 		return new InputStreamWrapper(getMethod, is);
@@ -290,20 +266,16 @@ public class WebDAVUtil {
 
 	public static MultistatusType executePropfindRequest(String uriString, int depth, IProgressMonitor monitor) throws IOException {
 
-		PropfindMethod propfindMethod = new PropfindMethod(uriString);
+		PropfindMethod propfindMethod = new PropfindMethod(URI.create(uriString));
 
-		propfindMethod.setRequestEntity(new RequestEntity() {
-
-			public void writeRequest(OutputStream out) throws IOException {
-				out.write(propfindRequestXML.getBytes(UTF_8));
-			}
+		propfindMethod.setEntity(new HttpEntity() {
 
 			public boolean isRepeatable() {
 				return true;
 			}
 
-			public String getContentType() {
-				return "text/xml; charset=\"utf-8\""; //$NON-NLS-1$
+			public Header getContentType() {
+				return new BasicHeader("content-type", "text/xml; charset=\"utf-8\""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			public long getContentLength() {
@@ -313,50 +285,78 @@ public class WebDAVUtil {
 					return -1;
 				}
 			}
+
+			public boolean isChunked() {
+				return false;
+			}
+
+			public Header getContentEncoding() {
+				return null;
+			}
+
+			public InputStream getContent() throws IllegalStateException {
+				return null;
+			}
+
+			public void writeTo(OutputStream outstream) throws IOException {
+				outstream.write(propfindRequestXML.getBytes(UTF_8));
+			}
+
+			public boolean isStreaming() {
+				return false;
+			}
+
+			@Deprecated
+			public void consumeContent() {
+				//
+			}
 		});
 
-		installCredentialsProvider(propfindMethod);
+		installCredentialsProvider(httpClient);
 
 		try {
 			if (depth == 0) {
-				propfindMethod.addRequestHeader(DEPTH_HEADER, "0"); //$NON-NLS-1$
+				propfindMethod.addHeader(DEPTH_HEADER, "0"); //$NON-NLS-1$
 			} else if (depth == 1) {
-				propfindMethod.addRequestHeader(DEPTH_HEADER, "1"); //$NON-NLS-1$				
+				propfindMethod.addHeader(DEPTH_HEADER, "1"); //$NON-NLS-1$				
 			}
-			int statusCode = httpClient.executeMethod(propfindMethod);
+			HttpResponse response = httpClient.execute(propfindMethod);
+
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			monitor.worked(1);
 
 			if (statusCode == HttpStatus.SC_NOT_FOUND) {
-				throw new WebDAVResourceNotFoundException(propfindMethod.getStatusLine().toString());
+				throw new WebDAVResourceNotFoundException(response.getStatusLine().getReasonPhrase());
 			} else if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_MULTI_STATUS) {
-				throw new IOException(propfindMethod.getStatusLine().toString());
+				throw new IOException(response.getStatusLine().getReasonPhrase());
 			}
 
 			// System.out.println(propfindMethod.getResponseBodyAsString());
 
-			return new PropfindResponseReader().loadMultitatusTypeFromResponse(propfindMethod.getResponseBodyAsStream(), monitor);
+			return new PropfindResponseReader().loadMultitatusTypeFromResponse(response.getEntity().getContent(), monitor);
 		} finally {
-			propfindMethod.releaseConnection();
+			// TODO cleanup
 		}
 	}
 
-	public static void installCredentialsProvider(HttpMethodBase httpMethod) {
-		HttpMethodParams params = new HttpMethodParams();
+	public static void installCredentialsProvider(DefaultHttpClient httpMethod) {
+		httpMethod.setCredentialsProvider(new CredentialsProvider() {
 
-		params.setParameter(CredentialsProvider.PROVIDER, new CredentialsProvider() {
+			public void setCredentials(AuthScope authscope, Credentials credentials) {
+				//
+			}
 
-			public Credentials getCredentials(final AuthScheme scheme, final String host, final int port, boolean proxy)
-					throws CredentialsNotAvailableException {
+			public Credentials getCredentials(final AuthScope authscope) {
 				class UIOperation implements Runnable {
 					public Credentials credentials;
 
 					public void run() {
 						String message = ""; //$NON-NLS-1$
-						if (scheme.getRealm() != null) {
-							message = scheme.getRealm();
+						if (authscope.getRealm() != null) {
+							message = authscope.getRealm();
 						}
-						credentials = UserCredentialsDialog.askForCredentials(host + ":" + port, message); //$NON-NLS-1$
+						credentials = UserCredentialsDialog.askForCredentials(authscope.getHost() + ":" + authscope.getPort(), message); //$NON-NLS-1$
 					}
 				}
 
@@ -370,11 +370,13 @@ public class WebDAVUtil {
 				if (uio.credentials != null) {
 					return uio.credentials;
 				}
-				throw new CredentialsNotAvailableException();
+				return null;
+			}
+
+			public void clear() {
+				//
 			}
 		});
-
-		httpMethod.setParams(params);
 	}
 
 	public static IPath calculateRelativePath(URI rootURI, String href) throws URISyntaxException {
@@ -512,10 +514,10 @@ public class WebDAVUtil {
 	 * @throws IOException
 	 */
 	public static String sendLockRequest(String remoteURI, final IProgressMonitor monitor) throws IOException {
-		LockMethod lockMethod = new LockMethod(remoteURI);
+		LockMethod lockMethod = new LockMethod(URI.create(remoteURI));
 
 		try {
-			installCredentialsProvider(lockMethod);
+			installCredentialsProvider(httpClient);
 
 			String requestBody = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:lockinfo xmlns:D='DAV:'>" //$NON-NLS-1$
 					+ "<D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockinfo>"; //$NON-NLS-1$ 
@@ -527,40 +529,27 @@ public class WebDAVUtil {
 				}
 			};
 
-			RequestEntity requestEntity = new RequestEntity() {
+			BasicHttpEntity requestEntity = new BasicHttpEntity();
 
-				public void writeRequest(OutputStream out) throws IOException {
-					transferStreams(data.getInputStream(), out, monitor);
-				}
+			requestEntity.setContent(data.getInputStream());
 
-				public boolean isRepeatable() {
-					return true;
-				}
+			lockMethod.setEntity(requestEntity);
 
-				public String getContentType() {
-					return null;
-				}
+			HttpResponse response = httpClient.execute(lockMethod);
 
-				public long getContentLength() {
-					return -1;
-				}
-			};
-
-			lockMethod.setRequestEntity(requestEntity);
-
-			int statusCode = httpClient.executeMethod(lockMethod);
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-				throw new IOException(lockMethod.getStatusText());
+				throw new IOException(response.getStatusLine().getReasonPhrase());
 			}
 
-			Header header = lockMethod.getResponseHeader(LOCK_TOKEN_HEADER);
+			Header header = response.getFirstHeader(LOCK_TOKEN_HEADER);
 
 			if (header != null) {
 				return header.getValue();
 			}
 		} finally {
-			lockMethod.releaseConnection();
+			// TODO cleanup
 		}
 		return null;
 	}
@@ -572,24 +561,26 @@ public class WebDAVUtil {
 	 * @throws IOException
 	 */
 	public static void sendUnlockRequest(String remoteURI, String lockToken, final IProgressMonitor monitor) throws IOException {
-		UnlockMethod unlockMethod = new UnlockMethod(remoteURI);
+		UnlockMethod unlockMethod = new UnlockMethod(URI.create(remoteURI));
 
 		try {
-			installCredentialsProvider(unlockMethod);
+			installCredentialsProvider(httpClient);
 
-			unlockMethod.addRequestHeader(LOCK_TOKEN_HEADER, lockToken);
+			unlockMethod.addHeader(LOCK_TOKEN_HEADER, lockToken);
 
-			int statusCode = httpClient.executeMethod(unlockMethod);
+			HttpResponse response = httpClient.execute(unlockMethod);
+
+			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (statusCode != HttpStatus.SC_NO_CONTENT && statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CONFLICT) {
-				throw new IOException(unlockMethod.getStatusText());
+				throw new IOException(response.getStatusLine().getReasonPhrase());
 			}
 		} finally {
-			unlockMethod.releaseConnection();
+			// TODO cleanup
 		}
 	}
 
-	private static class PropfindMethod extends EntityEnclosingMethod {
+	private static class PropfindMethod extends HttpEntityEnclosingRequestBase {
 
 		/**
 		 * Constructor specifying a URI string.
@@ -597,18 +588,19 @@ public class WebDAVUtil {
 		 * @param uri
 		 *            either an absolute or relative URI
 		 */
-		public PropfindMethod(String uri) {
-			super(uri);
+		public PropfindMethod(URI uri) {
+			super();
+			setURI(uri);
 		}
 
 		@Override
-		public String getName() {
+		public String getMethod() {
 			return "PROPFIND"; //$NON-NLS-1$
 		}
 
 	}
 
-	private static class LockMethod extends EntityEnclosingMethod {
+	private static class LockMethod extends HttpEntityEnclosingRequestBase {
 
 		/**
 		 * Constructor specifying a URI string.
@@ -616,18 +608,19 @@ public class WebDAVUtil {
 		 * @param uri
 		 *            either an absolute or relative URI
 		 */
-		public LockMethod(String uri) {
-			super(uri);
+		public LockMethod(URI uri) {
+			super();
+			setURI(uri);
 		}
 
 		@Override
-		public String getName() {
+		public String getMethod() {
 			return "LOCK"; //$NON-NLS-1$
 		}
 
 	}
 
-	protected static class UnlockMethod extends HttpMethodBase {
+	protected static class UnlockMethod extends HttpEntityEnclosingRequestBase {
 
 		/**
 		 * Constructor specifying a URI string.
@@ -635,12 +628,13 @@ public class WebDAVUtil {
 		 * @param uri
 		 *            either an absolute or relative URI
 		 */
-		public UnlockMethod(String uri) {
-			super(uri);
+		public UnlockMethod(URI uri) {
+			super();
+			setURI(uri);
 		}
 
 		@Override
-		public String getName() {
+		public String getMethod() {
 			return "UNLOCK"; //$NON-NLS-1$
 		}
 
