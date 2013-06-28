@@ -14,7 +14,7 @@
 
   <groupId>org.eclipse.e4.resources</groupId>
   <artifactId>e4-resources-aggregator</artifactId>
-  <version>0.14.0-SNAPSHOT</version>
+  <version>0.15.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
    <modules>
